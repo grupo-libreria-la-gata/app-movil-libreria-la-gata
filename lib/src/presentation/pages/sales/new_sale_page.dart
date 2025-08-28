@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/design/design_tokens.dart';
+import '../../../core/services/business_service.dart';
+import '../../../core/services/error_service.dart';
 import '../../widgets/search_bar_widget.dart';
 import '../../widgets/product_card.dart';
+import '../../widgets/loading_widgets.dart';
 
 /// Página para crear una nueva venta
 class NewSalePage extends ConsumerStatefulWidget {
@@ -13,14 +16,16 @@ class NewSalePage extends ConsumerStatefulWidget {
   ConsumerState<NewSalePage> createState() => _NewSalePageState();
 }
 
-class _NewSalePageState extends ConsumerState<NewSalePage> {
+class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _customerNameController = TextEditingController();
   final TextEditingController _customerPhoneController = TextEditingController();
+  final TextEditingController _discountController = TextEditingController();
   
   final List<Map<String, dynamic>> _cartItems = [];
   String _selectedPaymentMethod = 'Efectivo';
-  bool _isProcessing = false;
+  DiscountType _selectedDiscountType = DiscountType.none;
+  double _discountValue = 0.0;
 
   // Datos de ejemplo - esto vendría de un provider
   final List<Map<String, dynamic>> _availableProducts = [
@@ -72,15 +77,19 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
   }
 
   double get _subtotal {
-    return _cartItems.fold(0.0, (sum, item) => sum + (item['total'] as double));
+    return BusinessService().calculateSubtotal(_cartItems);
   }
 
   double get _tax {
-    return _subtotal * 0.15; // 15% IVA
+    return BusinessService().calculateTax(_subtotal);
+  }
+
+  double get _discount {
+    return BusinessService().calculateDiscount(_subtotal, _selectedDiscountType, _discountValue);
   }
 
   double get _total {
-    return _subtotal + _tax;
+    return BusinessService().calculateTotal(_subtotal, _tax, _discount);
   }
 
   @override
@@ -88,6 +97,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
     _searchController.dispose();
     _customerNameController.dispose();
     _customerPhoneController.dispose();
+    _discountController.dispose();
     super.dispose();
   }
 
@@ -289,6 +299,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
           
           const SizedBox(height: DesignTokens.spacingMd),
           
+          // Configuración de descuentos
+          _buildDiscountSection(),
+          
+          const SizedBox(height: DesignTokens.spacingMd),
+          
           // Botón de finalizar venta
           _buildFinishSaleButton(),
         ],
@@ -375,6 +390,28 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
             ),
           ],
         ),
+        if (_selectedDiscountType != DiscountType.none) ...[
+          const SizedBox(height: DesignTokens.spacingXs),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Descuento:',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeMd,
+                  color: DesignTokens.textSecondaryColor,
+                ),
+              ),
+              Text(
+                '-₡${_discount.toStringAsFixed(0)}',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeMd,
+                  color: DesignTokens.errorColor,
+                ),
+              ),
+            ],
+          ),
+        ],
         const Divider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -395,6 +432,78 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
                 color: DesignTokens.primaryColor,
               ),
             ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Construye la sección de descuentos
+  Widget _buildDiscountSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Descuento:',
+          style: TextStyle(
+            fontSize: DesignTokens.fontSizeMd,
+            color: DesignTokens.textSecondaryColor,
+          ),
+        ),
+        const SizedBox(height: DesignTokens.spacingSm),
+        Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<DiscountType>(
+                value: _selectedDiscountType,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: DesignTokens.spacingMd,
+                    vertical: DesignTokens.spacingSm,
+                  ),
+                ),
+                items: DiscountType.values.map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(type.displayName),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedDiscountType = value!;
+                    _discountValue = 0.0;
+                    _discountController.clear();
+                  });
+                },
+              ),
+            ),
+            if (_selectedDiscountType != DiscountType.none) ...[
+              const SizedBox(width: DesignTokens.spacingMd),
+              Expanded(
+                child: TextFormField(
+                  controller: _discountController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: _selectedDiscountType == DiscountType.percentage ? '15%' : '₡1000',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: DesignTokens.spacingMd,
+                      vertical: DesignTokens.spacingSm,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _discountValue = double.tryParse(value) ?? 0.0;
+                    });
+                  },
+                ),
+              ),
+            ],
           ],
         ),
       ],
@@ -452,7 +561,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _cartItems.isEmpty || _isProcessing ? null : _finishSale,
+        onPressed: _cartItems.isEmpty || loadingState.isLoading ? null : _finishSale,
         style: ElevatedButton.styleFrom(
           backgroundColor: DesignTokens.primaryColor,
           foregroundColor: Colors.white,
@@ -463,7 +572,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
             borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
           ),
         ),
-        child: _isProcessing
+        child: loadingState.isLoading
             ? const CircularProgressIndicator(color: Colors.white)
             : Text(
                 'Finalizar Venta - ₡${_total.toStringAsFixed(0)}',
@@ -509,37 +618,27 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
   /// Finaliza la venta
   void _finishSale() async {
     if (_customerNameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor ingresa el nombre del cliente'),
-          backgroundColor: Colors.red,
-        ),
+      ErrorService().showErrorSnackBar(
+        context, 
+        'Por favor ingresa el nombre del cliente'
       );
       return;
     }
 
-    setState(() {
-      _isProcessing = true;
+    await executeWithErrorHandling(() async {
+      // Simular procesamiento
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Mostrar confirmación
+      if (mounted) {
+        ErrorService().showSuccessSnackBar(
+          context, 
+          'Venta completada - Total: ₡${_total.toStringAsFixed(0)}'
+        );
+        
+        // Regresar al dashboard
+        context.go('/dashboard');
+      }
     });
-
-    // Simular procesamiento
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() {
-      _isProcessing = false;
-    });
-
-    // Mostrar confirmación
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Venta completada - Total: ₡${_total.toStringAsFixed(0)}'),
-          backgroundColor: DesignTokens.successColor,
-        ),
-      );
-      
-      // Regresar al dashboard
-      context.go('/dashboard');
-    }
   }
 }

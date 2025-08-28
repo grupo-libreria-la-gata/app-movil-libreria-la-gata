@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/app_config.dart';
 import '../../../core/design/design_tokens.dart';
+import '../../../core/services/error_service.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/loading_widgets.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
@@ -12,7 +14,7 @@ class RegisterPage extends ConsumerStatefulWidget {
   ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends ConsumerState<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -20,7 +22,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   
-  bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
@@ -36,53 +37,35 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  void _handleRegister() async {
     if (_formKey.currentState!.validate() && _acceptTerms) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      // Simular proceso de registro
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _isLoading = false;
-        });
+      await executeWithErrorHandling(() async {
+        // Simular proceso de registro
+        await Future.delayed(const Duration(seconds: 2));
         
         // TODO: Implementar lógica de registro real
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Funcionalidad de registro en desarrollo'),
-            backgroundColor: Colors.orange,
-          ),
+        ErrorService().showWarningSnackBar(
+          context, 
+          'Funcionalidad de registro en desarrollo'
         );
       });
     } else if (!_acceptTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Debes aceptar los términos y condiciones'),
-          backgroundColor: Colors.red,
-        ),
+      ErrorService().showErrorSnackBar(
+        context, 
+        'Debes aceptar los términos y condiciones'
       );
     }
   }
 
-  void _handleGoogleRegister() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simular registro con Google
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _isLoading = false;
-      });
+  void _handleGoogleRegister() async {
+    await executeWithErrorHandling(() async {
+      // Simular registro con Google
+      await Future.delayed(const Duration(seconds: 2));
       
       // TODO: Implementar registro con Google
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registro con Google en desarrollo'),
-          backgroundColor: Colors.orange,
-        ),
+      ErrorService().showWarningSnackBar(
+        context, 
+        'Registro con Google en desarrollo'
       );
     });
   }
@@ -217,13 +200,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             fillColor: Colors.grey[50],
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa tu nombre completo';
-            }
-            if (value.length < 2) {
-              return 'El nombre debe tener al menos 2 caracteres';
-            }
-            return null;
+            return ErrorService().getFieldError('name', value ?? '');
           },
         ),
         const SizedBox(height: 16),
@@ -243,13 +220,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             fillColor: Colors.grey[50],
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa tu correo electrónico';
-            }
-            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-              return 'Por favor ingresa un correo electrónico válido';
-            }
-            return null;
+            return ErrorService().getFieldError('email', value ?? '');
           },
         ),
         const SizedBox(height: 16),
@@ -296,16 +267,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             fillColor: Colors.grey[50],
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa una contraseña';
-            }
-            if (value.length < 8) {
-              return 'La contraseña debe tener al menos 8 caracteres';
-            }
-            if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
-              return 'La contraseña debe contener mayúsculas, minúsculas y números';
-            }
-            return null;
+            return ErrorService().getFieldError('password', value ?? '');
           },
         ),
         const SizedBox(height: 16),
@@ -429,34 +391,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   }
 
   Widget _buildRegisterButton() {
-    return SizedBox(
-      height: 50,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _handleRegister,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(AppConfig.primaryColor),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : const Text(
-                'Crear Cuenta',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-      ),
+    return LoadingButton(
+      onPressed: _handleRegister,
+      isLoading: loadingState.isLoading,
+      text: 'Crear Cuenta',
+      backgroundColor: DesignTokens.primaryColor,
+      textColor: Colors.white,
     );
   }
 
@@ -493,7 +433,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     return SizedBox(
       height: 50,
       child: OutlinedButton.icon(
-        onPressed: _isLoading ? null : _handleGoogleRegister,
+        onPressed: loadingState.isLoading ? null : _handleGoogleRegister,
         icon: Image.network(
           'https://developers.google.com/identity/images/g-logo.png',
           height: 20,

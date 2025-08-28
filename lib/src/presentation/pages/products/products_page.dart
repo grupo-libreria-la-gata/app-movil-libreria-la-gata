@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/design/design_tokens.dart';
+import '../../../core/services/error_service.dart';
+import '../../../core/services/mock_data_service.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/search_bar_widget.dart';
+import '../../widgets/loading_widgets.dart' as loading_widgets;
 
 /// Página para gestionar productos (licores)
 class ProductsPage extends ConsumerStatefulWidget {
@@ -13,58 +16,13 @@ class ProductsPage extends ConsumerStatefulWidget {
   ConsumerState<ProductsPage> createState() => _ProductsPageState();
 }
 
-class _ProductsPageState extends ConsumerState<ProductsPage> {
+class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'Todas';
   String _sortBy = 'name';
 
   // Datos de ejemplo - esto vendría de un provider
-  final List<Map<String, dynamic>> _products = [
-    {
-      'id': '1',
-      'name': 'Jack Daniel\'s',
-      'brand': 'Jack Daniel\'s',
-      'category': 'Whiskey',
-      'price': 25000.0,
-      'stock': 15,
-      'minStock': 5,
-      'imageUrl': null,
-      'description': 'Whiskey Tennessee de alta calidad',
-    },
-    {
-      'id': '2',
-      'name': 'Bacardi Superior',
-      'brand': 'Bacardi',
-      'category': 'Ron',
-      'price': 18000.0,
-      'stock': 8,
-      'minStock': 5,
-      'imageUrl': null,
-      'description': 'Ron blanco premium',
-    },
-    {
-      'id': '3',
-      'name': 'Grey Goose',
-      'brand': 'Grey Goose',
-      'category': 'Vodka',
-      'price': 35000.0,
-      'stock': 3,
-      'minStock': 5,
-      'imageUrl': null,
-      'description': 'Vodka premium francés',
-    },
-    {
-      'id': '4',
-      'name': 'Patrón Silver',
-      'brand': 'Patrón',
-      'category': 'Tequila',
-      'price': 45000.0,
-      'stock': 12,
-      'minStock': 5,
-      'imageUrl': null,
-      'description': 'Tequila premium 100% agave',
-    },
-  ];
+  late List<Map<String, dynamic>> _products;
 
   List<Map<String, dynamic>> get _filteredProducts {
     var filtered = List<Map<String, dynamic>>.from(_products);
@@ -103,9 +61,26 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  /// Carga los productos con manejo de errores
+  Future<void> _loadProducts() async {
+    await executeWithErrorHandling(() async {
+      // Simular carga de productos desde API
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Cargar productos desde el servicio mock
+      _products = MockDataService().mockProducts;
+    });
   }
 
   @override
@@ -135,15 +110,49 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
           // Barra de búsqueda y filtros
           _buildSearchAndFilters(),
           
-          // Lista de productos
+          // Contenido principal
           Expanded(
-            child: _filteredProducts.isEmpty
-                ? _buildEmptyState()
-                : _buildProductsList(),
+            child: _buildMainContent(),
           ),
         ],
       ),
     );
+  }
+
+  /// Construye el contenido principal con manejo de estados
+  Widget _buildMainContent() {
+    if (loadingState.isLoading) {
+      return const Center(
+        child: loading_widgets.LoadingSpinner(message: 'Cargando productos...'),
+      );
+    }
+
+    if (loadingState.hasError) {
+      return loading_widgets.ErrorWidget(
+        message: loadingState.error!,
+        onRetry: _loadProducts,
+      );
+    }
+
+    if (loadingState.isOffline) {
+      return loading_widgets.ErrorWidget(
+        message: 'No hay conexión a internet',
+        onRetry: _loadProducts,
+        icon: Icons.wifi_off,
+      );
+    }
+
+    if (_filteredProducts.isEmpty) {
+      return loading_widgets.EmptyStateWidget(
+        title: 'No se encontraron productos',
+        subtitle: 'Intenta ajustar los filtros de búsqueda',
+        icon: Icons.inventory_2_outlined,
+        actionText: 'Recargar',
+        onAction: _loadProducts,
+      );
+    }
+
+    return _buildProductsList();
   }
 
   /// Construye la barra de búsqueda y filtros

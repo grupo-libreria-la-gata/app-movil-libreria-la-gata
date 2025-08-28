@@ -7,8 +7,11 @@ import '../presentation/pages/auth/register_page.dart';
 import '../presentation/pages/auth/forgot_password_page.dart';
 import '../presentation/pages/auth/email_verification_page.dart';
 import '../presentation/pages/products/products_page.dart';
+import '../presentation/pages/products/product_detail_page.dart';
 import '../presentation/pages/sales/new_sale_page.dart';
 import '../presentation/pages/sales/sales_history_page.dart';
+import '../presentation/pages/customers/customers_page.dart';
+import '../presentation/pages/inventory/inventory_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/admin/admin_page.dart';
 
@@ -114,14 +117,7 @@ class AppRoutes {
         name: 'productDetail',
         builder: (context, state) {
           final productId = state.pathParameters['id']!;
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Producto $productId'),
-            ),
-            body: Center(
-              child: Text('Detalle del producto $productId - En desarrollo'),
-            ),
-          );
+          return ProductDetailPage(productId: productId);
         },
       ),
       GoRoute(
@@ -171,22 +167,14 @@ class AppRoutes {
       GoRoute(
         path: inventory,
         name: 'inventory',
-        builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Control de Inventario - En desarrollo'),
-          ),
-        ),
+        builder: (context, state) => const InventoryPage(),
       ),
       
       // Clientes
       GoRoute(
         path: customers,
         name: 'customers',
-        builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Gestión de Clientes - En desarrollo'),
-          ),
-        ),
+        builder: (context, state) => const CustomersPage(),
       ),
       GoRoute(
         path: customerDetail,
