@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/app_config.dart';
 import '../../../core/design/design_tokens.dart';
+import '../../../core/utils/responsive_helper.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/dashboard_card.dart';
 import '../../widgets/stats_card.dart';
@@ -79,24 +80,24 @@ class DashboardPage extends ConsumerWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(DesignTokens.spacingLg),
+        padding: ResponsiveHelper.instance.getResponsivePadding(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Sección de bienvenida
             _buildWelcomeSection(context, authState),
             
-            const SizedBox(height: DesignTokens.spacingXl),
+            SizedBox(height: ResponsiveHelper.instance.getResponsiveSpacing(context, DesignTokens.spacingXl)),
             
             // Estadísticas rápidas
             _buildStatsSection(context),
             
-            const SizedBox(height: DesignTokens.spacingXl),
+            SizedBox(height: ResponsiveHelper.instance.getResponsiveSpacing(context, DesignTokens.spacingXl)),
             
             // Acciones principales
             _buildMainActionsSection(context, authState),
             
-            const SizedBox(height: DesignTokens.spacingXl),
+            SizedBox(height: ResponsiveHelper.instance.getResponsiveSpacing(context, DesignTokens.spacingXl)),
             
             // Acciones secundarias
             _buildSecondaryActionsSection(context, authState),
@@ -108,8 +109,11 @@ class DashboardPage extends ConsumerWidget {
 
   /// Construye la sección de bienvenida
   Widget _buildWelcomeSection(BuildContext context, AuthState authState) {
+    final responsiveHelper = ResponsiveHelper.instance;
+    final isSmallMobile = responsiveHelper.isSmallMobile(context);
+    
     return Container(
-      padding: const EdgeInsets.all(DesignTokens.spacingLg),
+      padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingLg)),
       decoration: BoxDecoration(
         gradient: DesignTokens.primaryGradient,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusLg),
@@ -125,43 +129,44 @@ class DashboardPage extends ConsumerWidget {
                   '¡Bienvenido!',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: DesignTokens.fontSize2xl,
+                    fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSize3xl),
                     fontWeight: DesignTokens.fontWeightBold,
                   ),
                 ),
-                const SizedBox(height: DesignTokens.spacingSm),
+                SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
                 Text(
                   authState.user?.name ?? 'Usuario',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: DesignTokens.fontSizeLg,
+                    fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXl),
                     fontWeight: DesignTokens.fontWeightMedium,
                   ),
                 ),
-                const SizedBox(height: DesignTokens.spacingSm),
+                SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
                 Text(
                   'Sistema de Facturación La Gata',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: DesignTokens.fontSizeMd,
+                    fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeLg),
                   ),
                 ),
               ],
             ),
           ),
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusFull),
+          if (!isSmallMobile) // Ocultar icono en móviles muy pequeños
+            Container(
+              width: responsiveHelper.getResponsiveIconSize(context, 60),
+              height: responsiveHelper.getResponsiveIconSize(context, 60),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusFull),
+              ),
+              child: Icon(
+                Icons.local_bar,
+                color: Colors.white,
+                size: responsiveHelper.getResponsiveIconSize(context, 30),
+              ),
             ),
-            child: Icon(
-              Icons.local_bar,
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
         ],
       ),
     );
@@ -169,25 +174,27 @@ class DashboardPage extends ConsumerWidget {
 
   /// Construye la sección de estadísticas
   Widget _buildStatsSection(BuildContext context) {
+    final responsiveHelper = ResponsiveHelper.instance;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Estadísticas del Día',
           style: TextStyle(
-            fontSize: DesignTokens.fontSizeXl,
+            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXl),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
           ),
         ),
-        const SizedBox(height: DesignTokens.spacingMd),
+        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: DesignTokens.spacingMd,
-          mainAxisSpacing: DesignTokens.spacingMd,
-          childAspectRatio: 1.8,
+          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(context),
+          crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
+          mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
+          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(context),
           children: [
             StatsCard(
               title: 'Ventas Hoy',
@@ -229,25 +236,27 @@ class DashboardPage extends ConsumerWidget {
 
   /// Construye la sección de acciones principales
   Widget _buildMainActionsSection(BuildContext context, AuthState authState) {
+    final responsiveHelper = ResponsiveHelper.instance;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Acciones Principales',
           style: TextStyle(
-            fontSize: DesignTokens.fontSizeXl,
+            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXl),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
           ),
         ),
-        const SizedBox(height: DesignTokens.spacingMd),
+        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: DesignTokens.spacingMd,
-          mainAxisSpacing: DesignTokens.spacingMd,
-          childAspectRatio: 1.2,
+          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(context),
+          crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
+          mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
+          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(context),
           children: [
             DashboardCard(
               title: 'Nueva Venta',
@@ -288,6 +297,7 @@ class DashboardPage extends ConsumerWidget {
     final user = authState.user;
     final isAdmin = user?.isAdmin ?? false;
     final canManageInventory = user?.canManageInventory ?? false;
+    final responsiveHelper = ResponsiveHelper.instance;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,19 +305,19 @@ class DashboardPage extends ConsumerWidget {
         Text(
           'Más Opciones',
           style: TextStyle(
-            fontSize: DesignTokens.fontSizeXl,
+            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXl),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
           ),
         ),
-        const SizedBox(height: DesignTokens.spacingMd),
+        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: DesignTokens.spacingMd,
-          mainAxisSpacing: DesignTokens.spacingMd,
-          childAspectRatio: 1.2,
+          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(context),
+          crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
+          mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
+          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(context),
           children: [
             if (canManageInventory)
               DashboardCard(

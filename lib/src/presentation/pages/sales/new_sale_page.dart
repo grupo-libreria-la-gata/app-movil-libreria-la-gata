@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/design/design_tokens.dart';
 import '../../../core/services/business_service.dart';
 import '../../../core/services/error_service.dart';
+import '../../../core/services/mock_data_service.dart';
 import '../../widgets/search_bar_widget.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/loading_widgets.dart';
@@ -28,41 +29,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
   double _discountValue = 0.0;
 
   // Datos de ejemplo - esto vendría de un provider
-  final List<Map<String, dynamic>> _availableProducts = [
-    {
-      'id': '1',
-      'name': 'Jack Daniel\'s',
-      'brand': 'Jack Daniel\'s',
-      'category': 'Whiskey',
-      'price': 25000.0,
-      'stock': 15,
-      'minStock': 5,
-      'imageUrl': null,
-      'description': 'Whiskey Tennessee de alta calidad',
-    },
-    {
-      'id': '2',
-      'name': 'Bacardi Superior',
-      'brand': 'Bacardi',
-      'category': 'Ron',
-      'price': 18000.0,
-      'stock': 8,
-      'minStock': 5,
-      'imageUrl': null,
-      'description': 'Ron blanco premium',
-    },
-    {
-      'id': '3',
-      'name': 'Grey Goose',
-      'brand': 'Grey Goose',
-      'category': 'Vodka',
-      'price': 35000.0,
-      'stock': 3,
-      'minStock': 5,
-      'imageUrl': null,
-      'description': 'Vodka premium francés',
-    },
-  ];
+  late List<Map<String, dynamic>> _availableProducts;
 
   List<Map<String, dynamic>> get _filteredProducts {
     if (_searchController.text.isEmpty) {
@@ -93,12 +60,29 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _customerNameController.dispose();
     _customerPhoneController.dispose();
     _discountController.dispose();
     super.dispose();
+  }
+
+  /// Carga los productos disponibles
+  Future<void> _loadProducts() async {
+    await executeWithErrorHandling(() async {
+      // Simular carga de productos
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Cargar productos desde el servicio mock
+      _availableProducts = MockDataService().mockProducts;
+    });
   }
 
   @override

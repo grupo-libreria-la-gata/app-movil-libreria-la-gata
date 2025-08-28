@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/design/design_tokens.dart';
+import '../../../core/utils/responsive_helper.dart';
 import '../../../core/services/error_service.dart';
 import '../../../core/services/mock_data_service.dart';
+import '../../../core/services/filter_service.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/search_bar_widget.dart';
+import '../../widgets/advanced_filters_widget.dart';
+import '../../widgets/filter_chips_widget.dart';
 import '../../widgets/loading_widgets.dart' as loading_widgets;
 
 /// Página para gestionar productos (licores)
@@ -20,43 +24,28 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'Todas';
   String _sortBy = 'name';
+  bool _sortAscending = true;
+  Map<String, dynamic> _advancedFilters = {};
 
   // Datos de ejemplo - esto vendría de un provider
   late List<Map<String, dynamic>> _products;
 
   List<Map<String, dynamic>> get _filteredProducts {
-    var filtered = List<Map<String, dynamic>>.from(_products);
-
-    // Filtrar por búsqueda
-    if (_searchController.text.isNotEmpty) {
-      filtered = filtered.where((product) {
-        final search = _searchController.text.toLowerCase();
-        return product['name'].toLowerCase().contains(search) ||
-               product['brand'].toLowerCase().contains(search);
-      }).toList();
-    }
-
-    // Filtrar por categoría
-    if (_selectedCategory != 'Todas') {
-      filtered = filtered.where((product) {
-        return product['category'] == _selectedCategory;
-      }).toList();
-    }
-
-    // Ordenar
-    filtered.sort((a, b) {
-      switch (_sortBy) {
-        case 'name':
-          return a['name'].compareTo(b['name']);
-        case 'price':
-          return a['price'].compareTo(b['price']);
-        case 'stock':
-          return a['stock'].compareTo(b['stock']);
-        default:
-          return a['name'].compareTo(b['name']);
-      }
-    });
-
+    final filterService = FilterService();
+    
+    // Combinar filtros básicos con avanzados
+    final allFilters = <String, dynamic>{
+      'search': _searchController.text,
+      'category': _selectedCategory,
+      ..._advancedFilters,
+    };
+    
+    // Aplicar filtros combinados
+    var filtered = filterService.applyProductFilters(_products, allFilters);
+    
+    // Aplicar ordenamiento
+    filtered = filterService.sortProducts(filtered, _sortBy, _sortAscending);
+    
     return filtered;
   }
 
@@ -157,8 +146,10 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
 
   /// Construye la barra de búsqueda y filtros
   Widget _buildSearchAndFilters() {
+    final responsiveHelper = ResponsiveHelper.instance;
+    
     return Container(
-      padding: const EdgeInsets.all(DesignTokens.spacingMd),
+      padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -178,22 +169,61 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
             onChanged: (value) => setState(() {}),
           ),
           
-          const SizedBox(height: DesignTokens.spacingMd),
+          SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
           
-          // Filtros
-          Row(
-            children: [
-              // Filtro por categoría
-              Expanded(
-                child: _buildCategoryFilter(),
+          // Filtros básicos - Cambiar a columna en móviles pequeños
+          ResponsiveHelper.instance.isSmallMobile(context) 
+            ? Column(
+                children: [
+                  _buildCategoryFilter(),
+                  SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+                  _buildSortFilter(),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(child: _buildCategoryFilter()),
+                  SizedBox(width: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+                  Expanded(child: _buildSortFilter()),
+                ],
               ),
-              const SizedBox(width: DesignTokens.spacingMd),
-              // Ordenar por
-              Expanded(
-                child: _buildSortFilter(),
-              ),
-            ],
+          
+          SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+          
+          // Filtros avanzados
+          AdvancedFiltersWidget(
+            filters: _advancedFilters,
+            onFiltersChanged: (filters) {
+              setState(() {
+                _advancedFilters = filters;
+              });
+            },
+            onClearFilters: () {
+              setState(() {
+                _advancedFilters = {};
+              });
+            },
           ),
+          
+          // Chips de filtros activos
+          if (FilterService().getActiveFiltersCount(_advancedFilters) > 0) ...[
+            SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
+            FilterChipsWidget(
+              filters: _advancedFilters,
+              onRemoveFilter: (key) {
+                setState(() {
+                  _advancedFilters.remove(key);
+                });
+              },
+              onClearAll: () {
+                setState(() {
+                  _advancedFilters = {};
+                });
+              },
+            ),
+            SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
+            _buildFilterStats(),
+          ],
         ],
       ),
     );
@@ -239,40 +269,104 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
 
   /// Construye el filtro de ordenamiento
   Widget _buildSortFilter() {
-    return DropdownButtonFormField<String>(
-      value: _sortBy,
-      decoration: InputDecoration(
-        labelText: 'Ordenar por',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+    return Row(
+      children: [
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            value: _sortBy,
+            decoration: InputDecoration(
+              labelText: 'Ordenar por',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: DesignTokens.spacingMd,
+                vertical: DesignTokens.spacingSm,
+              ),
+            ),
+            items: [
+              DropdownMenuItem(value: 'name', child: const Text('Nombre')),
+              DropdownMenuItem(value: 'brand', child: const Text('Marca')),
+              DropdownMenuItem(value: 'category', child: const Text('Categoría')),
+              DropdownMenuItem(value: 'price', child: const Text('Precio')),
+              DropdownMenuItem(value: 'stock', child: const Text('Stock')),
+              DropdownMenuItem(value: 'createdAt', child: const Text('Fecha')),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _sortBy = value!;
+              });
+            },
+          ),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: DesignTokens.spacingMd,
-          vertical: DesignTokens.spacingSm,
+        const SizedBox(width: DesignTokens.spacingSm),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _sortAscending = !_sortAscending;
+            });
+          },
+          icon: Icon(
+            _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+            size: 20,
+          ),
+          tooltip: _sortAscending ? 'Ascendente' : 'Descendente',
+          style: IconButton.styleFrom(
+            backgroundColor: DesignTokens.primaryColor.withValues(alpha: 0.1),
+            foregroundColor: DesignTokens.primaryColor,
+          ),
         ),
-      ),
-      items: [
-        DropdownMenuItem(value: 'name', child: const Text('Nombre')),
-        DropdownMenuItem(value: 'price', child: const Text('Precio')),
-        DropdownMenuItem(value: 'stock', child: const Text('Stock')),
       ],
-      onChanged: (value) {
-        setState(() {
-          _sortBy = value!;
-        });
-      },
+    );
+  }
+
+  /// Construye las estadísticas de filtros
+  Widget _buildFilterStats() {
+    final filterService = FilterService();
+    final stats = filterService.getFilterStats(_products, _filteredProducts);
+    final activeFiltersCount = filterService.getActiveFiltersCount(_advancedFilters);
+    
+    return Container(
+      padding: const EdgeInsets.all(DesignTokens.spacingSm),
+      decoration: BoxDecoration(
+        color: DesignTokens.primaryColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+        border: Border.all(color: DesignTokens.primaryColor.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.filter_list,
+            size: 16,
+            color: DesignTokens.primaryColor,
+          ),
+          const SizedBox(width: DesignTokens.spacingXs),
+          Expanded(
+            child: Text(
+              '$activeFiltersCount filtros activos • ${stats['filtered']} de ${stats['total']} productos (${stats['percentage']}%)',
+              style: TextStyle(
+                fontSize: DesignTokens.fontSizeSm,
+                color: DesignTokens.primaryColor,
+                fontWeight: DesignTokens.fontWeightMedium,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   /// Construye la lista de productos
   Widget _buildProductsList() {
+    final responsiveHelper = ResponsiveHelper.instance;
+    
     return ListView.builder(
-      padding: const EdgeInsets.all(DesignTokens.spacingMd),
+      padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
       itemCount: _filteredProducts.length,
       itemBuilder: (context, index) {
         final product = _filteredProducts[index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: DesignTokens.spacingMd),
+          padding: EdgeInsets.only(bottom: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
           child: ProductCard(
             product: product,
             onTap: () => context.push('/products/${product['id']}'),

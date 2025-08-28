@@ -14,6 +14,7 @@ import '../presentation/pages/customers/customers_page.dart';
 import '../presentation/pages/inventory/inventory_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/admin/admin_page.dart';
+import '../presentation/pages/settings/settings_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -233,11 +234,7 @@ class AppRoutes {
       GoRoute(
         path: settings,
         name: 'settings',
-        builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Configuración del Sistema - En desarrollo'),
-          ),
-        ),
+        builder: (context, state) => const SettingsPage(),
       ),
       
       // Administración

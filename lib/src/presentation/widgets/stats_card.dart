@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/design/design_tokens.dart';
+import '../../core/utils/responsive_helper.dart';
 
 /// Widget para mostrar estadísticas en el dashboard
 class StatsCard extends StatelessWidget {
@@ -22,6 +23,9 @@ class StatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsiveHelper = ResponsiveHelper.instance;
+    final isSmallMobile = responsiveHelper.isSmallMobile(context);
+    
     return Card(
       elevation: DesignTokens.elevationSm,
       color: DesignTokens.cardColor,
@@ -29,7 +33,7 @@ class StatsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
       ),
       child: Container(
-        padding: const EdgeInsets.all(DesignTokens.spacingSm),
+        padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -39,8 +43,8 @@ class StatsCard extends StatelessWidget {
               children: [
                 // Icono
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: responsiveHelper.getResponsiveIconSize(context, 40),
+                  height: responsiveHelper.getResponsiveIconSize(context, 40),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
@@ -48,16 +52,16 @@ class StatsCard extends StatelessWidget {
                   child: Icon(
                     icon,
                     color: color,
-                    size: 16,
+                    size: responsiveHelper.getResponsiveIconSize(context, 20),
                   ),
                 ),
                 
                 // Indicador de cambio
-                if (change != null)
+                if (change != null && !isSmallMobile) // Ocultar en móviles muy pequeños
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingSm,
-                      vertical: DesignTokens.spacingXs,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm),
+                      vertical: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingXs),
                     ),
                     decoration: BoxDecoration(
                       color: _getChangeColor().withValues(alpha: 0.1),
@@ -68,14 +72,14 @@ class StatsCard extends StatelessWidget {
                       children: [
                         Icon(
                           _getChangeIcon(),
-                          size: 12,
+                          size: responsiveHelper.getResponsiveIconSize(context, 12),
                           color: _getChangeColor(),
                         ),
-                        const SizedBox(width: 2),
+                        SizedBox(width: responsiveHelper.getResponsiveSpacing(context, 2)),
                         Text(
                           change!,
                           style: TextStyle(
-                            fontSize: DesignTokens.fontSizeXs,
+                            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXs),
                             fontWeight: DesignTokens.fontWeightMedium,
                             color: _getChangeColor(),
                           ),
@@ -86,25 +90,25 @@ class StatsCard extends StatelessWidget {
               ],
             ),
             
-            const SizedBox(height: DesignTokens.spacingSm),
+            SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
             
             // Valor principal
             Text(
               value,
               style: TextStyle(
-                fontSize: DesignTokens.fontSizeXl,
+                fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSize2xl),
                 fontWeight: DesignTokens.fontWeightBold,
                 color: DesignTokens.textPrimaryColor,
               ),
             ),
             
-            const SizedBox(height: DesignTokens.spacingXs),
+            SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingXs)),
             
             // Título
             Text(
               title,
               style: TextStyle(
-                fontSize: DesignTokens.fontSizeXs,
+                fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeSm),
                 color: DesignTokens.textSecondaryColor,
               ),
               maxLines: 1,

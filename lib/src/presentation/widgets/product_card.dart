@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/design/design_tokens.dart';
+import '../../core/utils/responsive_helper.dart';
 
 /// Widget para mostrar un producto en la lista
 class ProductCard extends StatelessWidget {
@@ -20,6 +21,8 @@ class ProductCard extends StatelessWidget {
     final minStock = product['minStock'] as int;
     final isLowStock = stock <= minStock;
     final isOutOfStock = stock == 0;
+    final responsiveHelper = ResponsiveHelper.instance;
+    final isSmallMobile = responsiveHelper.isSmallMobile(context);
 
     return Card(
       elevation: DesignTokens.elevationSm,
@@ -31,33 +34,50 @@ class ProductCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
         child: Padding(
-          padding: const EdgeInsets.all(DesignTokens.spacingMd),
-          child: Row(
-            children: [
-              // Imagen del producto
-              _buildProductImage(),
-              
-              const SizedBox(width: DesignTokens.spacingMd),
-              
-              // Información del producto
-              Expanded(
-                child: _buildProductInfo(),
+          padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+          child: isSmallMobile 
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      _buildProductImage(context),
+                      SizedBox(width: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+                      Expanded(child: _buildProductInfo(context)),
+                    ],
+                  ),
+                  SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
+                  _buildProductActions(context, isLowStock, isOutOfStock),
+                ],
+              )
+            : Row(
+                children: [
+                  // Imagen del producto
+                  _buildProductImage(context),
+                  
+                  SizedBox(width: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+                  
+                  // Información del producto
+                  Expanded(
+                    child: _buildProductInfo(context),
+                  ),
+                  
+                  // Acciones y estado
+                  _buildProductActions(context, isLowStock, isOutOfStock),
+                ],
               ),
-              
-              // Acciones y estado
-              _buildProductActions(isLowStock, isOutOfStock),
-            ],
-          ),
         ),
       ),
     );
   }
 
   /// Construye la imagen del producto
-  Widget _buildProductImage() {
+  Widget _buildProductImage(BuildContext context) {
+    final responsiveHelper = ResponsiveHelper.instance;
+    
     return Container(
-      width: 60,
-      height: 60,
+      width: responsiveHelper.getResponsiveIconSize(context, 60),
+      height: responsiveHelper.getResponsiveIconSize(context, 60),
       decoration: BoxDecoration(
         color: DesignTokens.primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
@@ -87,7 +107,9 @@ class ProductCard extends StatelessWidget {
   }
 
   /// Construye la información del producto
-  Widget _buildProductInfo() {
+  Widget _buildProductInfo(BuildContext context) {
+    final responsiveHelper = ResponsiveHelper.instance;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -95,7 +117,7 @@ class ProductCard extends StatelessWidget {
         Text(
           product['name'],
           style: TextStyle(
-            fontSize: DesignTokens.fontSizeLg,
+            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeLg),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
           ),
@@ -103,25 +125,25 @@ class ProductCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         
-        const SizedBox(height: DesignTokens.spacingXs),
+        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingXs)),
         
         // Marca
         Text(
           product['brand'],
           style: TextStyle(
-            fontSize: DesignTokens.fontSizeMd,
+            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeMd),
             color: DesignTokens.textSecondaryColor,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         
-        const SizedBox(height: DesignTokens.spacingXs),
+        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingXs)),
         
         // Categoría
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingSm,
+          padding: EdgeInsets.symmetric(
+            horizontal: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm),
             vertical: 2,
           ),
           decoration: BoxDecoration(
@@ -131,20 +153,20 @@ class ProductCard extends StatelessWidget {
           child: Text(
             product['category'],
             style: TextStyle(
-              fontSize: DesignTokens.fontSizeXs,
+              fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXs),
               color: DesignTokens.accentColor,
               fontWeight: DesignTokens.fontWeightMedium,
             ),
           ),
         ),
         
-        const SizedBox(height: DesignTokens.spacingSm),
+        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
         
         // Precio
         Text(
           '₡${product['price'].toStringAsFixed(0)}',
           style: TextStyle(
-            fontSize: DesignTokens.fontSizeLg,
+            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeLg),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.primaryColor,
           ),
@@ -154,7 +176,9 @@ class ProductCard extends StatelessWidget {
   }
 
   /// Construye las acciones y estado del producto
-  Widget _buildProductActions(bool isLowStock, bool isOutOfStock) {
+  Widget _buildProductActions(BuildContext context, bool isLowStock, bool isOutOfStock) {
+    final responsiveHelper = ResponsiveHelper.instance;
+    
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -164,7 +188,7 @@ class ProductCard extends StatelessWidget {
             icon: Icon(
               Icons.edit,
               color: DesignTokens.textSecondaryColor,
-              size: 20,
+              size: responsiveHelper.getResponsiveIconSize(context, 20),
             ),
             onPressed: onEdit,
           ),
@@ -173,8 +197,8 @@ class ProductCard extends StatelessWidget {
         
         // Estado del stock
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingSm,
+          padding: EdgeInsets.symmetric(
+            horizontal: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm),
             vertical: 4,
           ),
           decoration: BoxDecoration(
@@ -184,7 +208,7 @@ class ProductCard extends StatelessWidget {
           child: Text(
             'Stock: ${product['stock']}',
             style: TextStyle(
-              fontSize: DesignTokens.fontSizeXs,
+              fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXs),
               color: _getStockColor(isLowStock, isOutOfStock),
               fontWeight: DesignTokens.fontWeightMedium,
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/design/design_tokens.dart';
+import '../../core/utils/responsive_helper.dart';
 
 /// Widget para las tarjetas del dashboard
 class DashboardCard extends StatelessWidget {
@@ -20,6 +21,8 @@ class DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsiveHelper = ResponsiveHelper.instance;
+    
     return Card(
       elevation: DesignTokens.elevationMd,
       color: DesignTokens.cardColor,
@@ -30,14 +33,14 @@ class DashboardCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
         child: Container(
-          padding: const EdgeInsets.all(DesignTokens.spacingMd),
+          padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Icono
               Container(
-                width: 50,
-                height: 50,
+                width: responsiveHelper.getResponsiveIconSize(context, 50),
+                height: responsiveHelper.getResponsiveIconSize(context, 50),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
@@ -45,16 +48,16 @@ class DashboardCard extends StatelessWidget {
                 child: Icon(
                   icon,
                   color: color,
-                  size: 28,
+                  size: responsiveHelper.getResponsiveIconSize(context, 28),
                 ),
               ),
-              const SizedBox(height: DesignTokens.spacingMd),
+              SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
               
               // Título
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: DesignTokens.fontSizeLg,
+                  fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeLg),
                   fontWeight: DesignTokens.fontWeightBold,
                   color: DesignTokens.textPrimaryColor,
                 ),
@@ -63,13 +66,13 @@ class DashboardCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               
-              const SizedBox(height: DesignTokens.spacingXs),
+              SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingXs)),
               
               // Subtítulo
               Text(
                 subtitle,
                 style: TextStyle(
-                  fontSize: DesignTokens.fontSizeSm,
+                  fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeSm),
                   color: DesignTokens.textSecondaryColor,
                 ),
                 textAlign: TextAlign.center,

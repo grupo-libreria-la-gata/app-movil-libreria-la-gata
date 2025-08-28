@@ -106,10 +106,55 @@ class DesignTokens {
   
   // ===== BREAKPOINTS =====
   
+  static const double breakpointMobile = 480.0; // New mobile breakpoint for screens < 480px
   static const double breakpointSm = 600.0;
   static const double breakpointMd = 900.0;
   static const double breakpointLg = 1200.0;
   static const double breakpointXl = 1536.0;
+  
+  // ===== RESPONSIVE SPACING =====
+  
+  /// Espaciado responsivo para móviles pequeños
+  static double get responsiveSpacingXs => 2.0;
+  static double get responsiveSpacingSm => 4.0;
+  static double get responsiveSpacingMd => 8.0;
+  static double get responsiveSpacingLg => 12.0;
+  static double get responsiveSpacingXl => 16.0;
+  static double get responsiveSpacing2xl => 24.0;
+  
+  // ===== RESPONSIVE FONT SIZES =====
+  
+  /// Tamaños de fuente responsivos para móviles pequeños
+  static double get responsiveFontSizeXs => 8.0;
+  static double get responsiveFontSizeSm => 10.0;
+  static double get responsiveFontSizeMd => 12.0;
+  static double get responsiveFontSizeLg => 14.0;
+  static double get responsiveFontSizeXl => 16.0;
+  static double get responsiveFontSize2xl => 18.0;
+  static double get responsiveFontSize3xl => 20.0;
+  
+  // ===== RESPONSIVE CARD HEIGHTS =====
+  
+  /// Alturas de tarjetas responsivas para móviles pequeños
+  static double get responsiveInvoiceCardHeight => 100.0;
+  static double get responsiveProductCardHeight => 160.0;
+  static double get responsiveDashboardCardHeight => 120.0;
+  
+  // ===== RESPONSIVE GRID SETTINGS =====
+  
+  /// Configuraciones de grid responsivas
+  static int get responsiveGridCrossAxisCount => 1; // 1 columna en móviles pequeños
+  static double get responsiveGridChildAspectRatio => 1.5; // Aspecto más alto para móviles
+  static double get responsiveGridSpacing => 8.0; // Espaciado reducido
+  
+  // ===== RESPONSIVE ICON SIZES =====
+  
+  /// Tamaños de iconos responsivos
+  static double get responsiveIconSizeXs => 12.0;
+  static double get responsiveIconSizeSm => 16.0;
+  static double get responsiveIconSizeMd => 20.0;
+  static double get responsiveIconSizeLg => 24.0;
+  static double get responsiveIconSizeXl => 28.0;
   
   // ===== CUSTOM VALUES =====
   

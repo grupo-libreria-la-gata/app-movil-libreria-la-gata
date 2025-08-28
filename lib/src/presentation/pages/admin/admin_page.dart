@@ -91,14 +91,7 @@ class AdminPage extends ConsumerWidget {
           subtitle: 'Ajustar parámetros generales',
           icon: Icons.settings,
           color: DesignTokens.infoColor,
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Configuración del sistema - En desarrollo'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          },
+          onTap: () => context.push('/settings'),
         ),
         const SizedBox(height: DesignTokens.spacingMd),
         
