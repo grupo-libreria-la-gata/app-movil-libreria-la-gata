@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.go('/home'),
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           'Mi Perfil',
@@ -58,7 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           IconButton(
             icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () => context.go('/home'),
+            onPressed: () => context.go('/dashboard'),
             tooltip: 'Ir al inicio',
           ),
         ],

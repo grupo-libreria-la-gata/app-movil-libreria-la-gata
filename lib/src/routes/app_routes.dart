@@ -9,6 +9,7 @@ import '../presentation/pages/auth/email_verification_page.dart';
 import '../presentation/pages/products/products_page.dart';
 import '../presentation/pages/sales/new_sale_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
+import '../presentation/pages/admin/admin_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -46,6 +47,9 @@ class AppRoutes {
   // Configuración
   static const String settings = '/settings';
   static const String profile = '/profile';
+  
+  // Administración
+  static const String admin = '/admin';
 
   static GoRouter get router => GoRouter(
     initialLocation: splash,
@@ -249,6 +253,13 @@ class AppRoutes {
             child: Text('Configuración del Sistema - En desarrollo'),
           ),
         ),
+      ),
+      
+      // Administración
+      GoRoute(
+        path: admin,
+        name: 'admin',
+        builder: (context, state) => const AdminPage(),
       ),
       
       // Perfil

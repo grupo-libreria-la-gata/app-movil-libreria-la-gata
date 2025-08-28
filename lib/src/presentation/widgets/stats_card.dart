@@ -29,7 +29,7 @@ class StatsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
       ),
       child: Container(
-        padding: const EdgeInsets.all(DesignTokens.spacingMd),
+        padding: const EdgeInsets.all(DesignTokens.spacingSm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -39,8 +39,8 @@ class StatsCard extends StatelessWidget {
               children: [
                 // Icono
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
@@ -48,7 +48,7 @@ class StatsCard extends StatelessWidget {
                   child: Icon(
                     icon,
                     color: color,
-                    size: 20,
+                    size: 16,
                   ),
                 ),
                 
@@ -86,13 +86,13 @@ class StatsCard extends StatelessWidget {
               ],
             ),
             
-            const SizedBox(height: DesignTokens.spacingMd),
+            const SizedBox(height: DesignTokens.spacingSm),
             
             // Valor principal
             Text(
               value,
               style: TextStyle(
-                fontSize: DesignTokens.fontSize2xl,
+                fontSize: DesignTokens.fontSizeXl,
                 fontWeight: DesignTokens.fontWeightBold,
                 color: DesignTokens.textPrimaryColor,
               ),
@@ -104,7 +104,7 @@ class StatsCard extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: DesignTokens.fontSizeSm,
+                fontSize: DesignTokens.fontSizeXs,
                 color: DesignTokens.textSecondaryColor,
               ),
               maxLines: 1,

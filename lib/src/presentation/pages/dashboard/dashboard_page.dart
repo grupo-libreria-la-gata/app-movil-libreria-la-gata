@@ -31,17 +31,10 @@ class DashboardPage extends ConsumerWidget {
           children: [
             // Logo clickeable
             GestureDetector(
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('🏠 Dashboard de La Gata'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-              },
+              onTap: () => context.go('/dashboard'),
               child: Container(
-                width: 40,
-                height: 40,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
@@ -50,18 +43,21 @@ class DashboardPage extends ConsumerWidget {
                 child: Icon(
                   Icons.local_bar, // Icono de licorería
                   color: DesignTokens.primaryColor,
-                  size: 24,
+                  size: 20,
                 ),
               ),
             ),
-            const SizedBox(width: DesignTokens.spacingMd),
+            const SizedBox(width: DesignTokens.spacingSm),
             // Nombre de la app
-            Text(
-              AppConfig.appName,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: DesignTokens.fontSizeLg,
-                fontWeight: DesignTokens.fontWeightBold,
+            Expanded(
+              child: Text(
+                AppConfig.appName,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: DesignTokens.fontSizeLg,
+                  fontWeight: DesignTokens.fontWeightBold,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -69,14 +65,15 @@ class DashboardPage extends ConsumerWidget {
         actions: [
           // Notificaciones
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
+            icon: const Icon(Icons.notifications, color: Colors.white, size: 22),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('🔔 Notificaciones próximamente')),
               );
             },
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
           ),
-          const SizedBox(width: DesignTokens.spacingSm),
           // Menú de usuario
           _buildUserMenu(ref, context),
         ],
@@ -190,7 +187,7 @@ class DashboardPage extends ConsumerWidget {
           crossAxisCount: 2,
           crossAxisSpacing: DesignTokens.spacingMd,
           mainAxisSpacing: DesignTokens.spacingMd,
-          childAspectRatio: 1.5,
+          childAspectRatio: 1.8,
           children: [
             StatsCard(
               title: 'Ventas Hoy',
@@ -336,11 +333,11 @@ class DashboardPage extends ConsumerWidget {
                 onTap: () => context.push('/users'),
               ),
             DashboardCard(
-              title: 'Configuración',
-              subtitle: 'Ajustes del sistema',
-              icon: Icons.settings,
+              title: 'Administración',
+              subtitle: 'Gestión del sistema',
+              icon: Icons.admin_panel_settings,
               color: DesignTokens.textSecondaryColor,
-              onTap: () => context.push('/settings'),
+              onTap: () => context.push('/admin'),
             ),
           ],
         ),
@@ -356,21 +353,25 @@ class DashboardPage extends ConsumerWidget {
     return PopupMenuButton<String>(
       icon: CircleAvatar(
         backgroundColor: Colors.white,
+        radius: 16,
         child: Text(
           user?.name.substring(0, 1).toUpperCase() ?? 'U',
           style: TextStyle(
             color: DesignTokens.primaryColor,
             fontWeight: DesignTokens.fontWeightBold,
+            fontSize: DesignTokens.fontSizeSm,
           ),
         ),
       ),
+      padding: const EdgeInsets.all(8),
+      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
       onSelected: (value) {
         switch (value) {
           case 'profile':
             context.push('/profile');
             break;
-          case 'settings':
-            context.push('/settings');
+          case 'admin':
+            context.push('/admin');
             break;
           case 'logout':
             ref.read(authProvider.notifier).signOut();
@@ -389,12 +390,12 @@ class DashboardPage extends ConsumerWidget {
           ),
         ),
         PopupMenuItem(
-          value: 'settings',
+          value: 'admin',
           child: Row(
             children: [
-              const Icon(Icons.settings),
+              const Icon(Icons.admin_panel_settings),
               const SizedBox(width: DesignTokens.spacingSm),
-              const Text('Configuración'),
+              const Text('Administración'),
             ],
           ),
         ),

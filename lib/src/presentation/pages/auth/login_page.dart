@@ -27,27 +27,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      final authNotifier = ref.read(authProvider.notifier);
-      authNotifier.signInWithEmailAndPassword(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
+      // Validar credenciales ficticias
+      final email = _emailController.text.trim().toLowerCase();
+      final password = _passwordController.text;
+      
+      // Credenciales válidas: cualquier email y contraseña "usuario"
+      if (password == 'usuario') {
+        final authNotifier = ref.read(authProvider.notifier);
+        authNotifier.signInWithEmailAndPassword(email, password);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Credenciales incorrectas. Usa cualquier email y contraseña "usuario"'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
-  }
-
-  void _handleGoogleLogin() {
-    // TODO: Implementar login con Google cuando esté configurado
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Login con Google en desarrollo'),
-        backgroundColor: Colors.orange,
-      ),
-    );
-  }
-
-  void _handleGuestLogin() {
-    final authNotifier = ref.read(authProvider.notifier);
-    authNotifier.signInAsGuest();
   }
 
   @override
@@ -94,18 +90,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 
                 // Botón de login
                 _buildLoginButton(),
-                const SizedBox(height: 16),
-                
-                // Divider
-                _buildDivider(),
-                const SizedBox(height: 16),
-                
-                // Botón de Google
-                _buildGoogleButton(),
-                const SizedBox(height: 16),
-                
-                // Botón continuar como invitado
-                _buildGuestButton(),
                 const SizedBox(height: 32),
                 
                 // Enlaces adicionales
@@ -164,9 +148,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         TextFormField(
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
+          style: TextStyle(color: DesignTokens.textPrimaryColor),
           decoration: InputDecoration(
             labelText: 'Correo electrónico',
+            labelStyle: TextStyle(color: DesignTokens.textPrimaryColor),
             hintText: 'ejemplo@correo.com',
+            hintStyle: TextStyle(color: DesignTokens.textSecondaryColor),
             prefixIcon: Icon(Icons.email_outlined, color: DesignTokens.textSecondaryColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
@@ -199,9 +186,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         TextFormField(
           controller: _passwordController,
           obscureText: _obscurePassword,
+          style: TextStyle(color: DesignTokens.textPrimaryColor),
           decoration: InputDecoration(
             labelText: 'Contraseña',
+            labelStyle: TextStyle(color: DesignTokens.textPrimaryColor),
             hintText: 'Ingresa tu contraseña',
+            hintStyle: TextStyle(color: DesignTokens.textSecondaryColor),
             prefixIcon: Icon(Icons.lock_outlined, color: DesignTokens.textSecondaryColor),
             suffixIcon: IconButton(
               icon: Icon(
@@ -241,35 +231,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ),
         const SizedBox(height: 16),
         
-        // Recordar contraseña y olvidé contraseña
+        // Recordar contraseña
         Row(
           children: [
-            // Checkbox recordar
-            Row(
-              children: [
-                Checkbox(
-                  value: _rememberMe,
-                  onChanged: (value) {
-                    setState(() {
-                      _rememberMe = value ?? false;
-                    });
-                  },
-                  activeColor: DesignTokens.primaryColor,
-                ),
-                const Text('Recordarme'),
-              ],
+            Checkbox(
+              value: _rememberMe,
+              onChanged: (value) {
+                setState(() {
+                  _rememberMe = value ?? false;
+                });
+              },
+              activeColor: DesignTokens.primaryColor,
             ),
-            const Spacer(),
-            // Enlace olvidé contraseña
-            TextButton(
-              onPressed: () => context.go('/forgot-password'),
-              child: Text(
-                '¿Olvidaste tu contraseña?',
-                style: TextStyle(
-                  color: DesignTokens.primaryColor,
-                ),
-              ),
-            ),
+            const Text('Recordarme'),
           ],
         ),
       ],
@@ -310,119 +284,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildDivider() {
-    return Row(
-      children: [
-        Expanded(
-          child: Divider(
-            color: DesignTokens.dividerColor,
-            thickness: 1,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'o continúa con',
-            style: TextStyle(
-              color: DesignTokens.textSecondaryColor,
-              fontSize: DesignTokens.fontSizeSm,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Divider(
-            color: DesignTokens.dividerColor,
-            thickness: 1,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGoogleButton() {
-    final authState = ref.watch(authProvider);
-    
-    return SizedBox(
-      height: 50,
-      child: OutlinedButton.icon(
-        onPressed: authState.isLoading ? null : _handleGoogleLogin,
-        icon: Image.network(
-          'https://developers.google.com/identity/images/g-logo.png',
-          height: 20,
-          width: 20,
-          errorBuilder: (context, error, stackTrace) {
-            return const Icon(Icons.g_mobiledata, size: 20);
-          },
-        ),
-        label: const Text(
-          'Continuar con Google',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: DesignTokens.textPrimaryColor,
-          side: BorderSide(color: DesignTokens.dividerColor),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGuestButton() {
-    final authState = ref.watch(authProvider);
-    
-    return SizedBox(
-      height: 50,
-      child: TextButton.icon(
-        onPressed: authState.isLoading ? null : _handleGuestLogin,
-        icon: const Icon(Icons.person_outline),
-        label: const Text('Continuar como invitado'),
-        style: TextButton.styleFrom(
-          foregroundColor: DesignTokens.textSecondaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildAdditionalLinks() {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '¿No tienes una cuenta? ',
-              style: TextStyle(
-                color: DesignTokens.textSecondaryColor,
-              ),
-            ),
-            TextButton(
-              onPressed: () => context.go('/register'),
-              child: Text(
-                'Regístrate aquí',
-                style: TextStyle(
-                  color: DesignTokens.primaryColor,
-                  fontWeight: DesignTokens.fontWeightSemiBold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
         TextButton(
-          onPressed: () => context.go('/'),
+          onPressed: () => context.go('/forgot-password'),
           child: Text(
-            'Continuar como invitado',
+            '¿Olvidaste tu contraseña?',
             style: TextStyle(
-              color: Colors.grey[600],
-              decoration: TextDecoration.underline,
+              color: DesignTokens.primaryColor,
+              fontWeight: DesignTokens.fontWeightMedium,
             ),
           ),
         ),
