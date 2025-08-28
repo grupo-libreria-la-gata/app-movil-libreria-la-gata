@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Design Tokens para AveTurismo App
+/// Design Tokens para La Gata - Sistema de Facturación
 /// 
 /// Este archivo centraliza todos los elementos de diseño para facilitar
 /// la adaptación al diseño final de la diseñadora gráfica.
@@ -9,33 +9,38 @@ import 'package:flutter/material.dart';
 class DesignTokens {
   // ===== COLORS =====
   
-  /// Colores primarios de la marca
-  static const Color primaryColor = Color(0xFF2E7D32); // Verde principal
-  static const Color primaryLightColor = Color(0xFF4CAF50);
-  static const Color primaryDarkColor = Color(0xFF1B5E20);
+  /// Colores primarios de la marca - Tema licorería mejorado
+  static const Color primaryColor = Color(0xFFD4AF37); // Dorado elegante
+  static const Color primaryLightColor = Color(0xFFF4E4BC); // Dorado claro suave
+  static const Color primaryDarkColor = Color(0xFFB8860B); // Dorado oscuro
   
   /// Colores secundarios/accent
-  static const Color accentColor = Color(0xFFFF9800); // Naranja
-  static const Color accentLightColor = Color(0xFFFFB74D);
-  static const Color accentDarkColor = Color(0xFFF57C00);
+  static const Color accentColor = Color(0xFF8B4513); // Marrón chocolate
+  static const Color accentLightColor = Color(0xFFD2691E); // Marrón claro
+  static const Color accentDarkColor = Color(0xFF654321); // Marrón oscuro
   
   /// Colores de estado
-  static const Color successColor = Color(0xFF4CAF50);
-  static const Color warningColor = Color(0xFFFF9800);
-  static const Color errorColor = Color(0xFFF44336);
-  static const Color infoColor = Color(0xFF2196F3);
+  static const Color successColor = Color(0xFF2E7D32); // Verde más elegante
+  static const Color warningColor = Color(0xFFF57C00); // Naranja vibrante
+  static const Color errorColor = Color(0xFFD32F2F); // Rojo más suave
+  static const Color infoColor = Color(0xFF1976D2); // Azul profesional
   
-  /// Colores neutros
-  static const Color backgroundColor = Color(0xFFFAFAFA);
-  static const Color surfaceColor = Color(0xFFFFFFFF);
-  static const Color cardColor = Color(0xFFFFFFFF);
-  static const Color dividerColor = Color(0xFFE0E0E0);
+  /// Colores neutros - Fondo blanco para páginas principales
+  static const Color backgroundColor = Color(0xFFFFFFFF); // Blanco puro
+  static const Color surfaceColor = Color(0xFFFFFFFF); // Blanco puro
+  static const Color cardColor = Color(0xFFFFFFFF); // Blanco puro
+  static const Color dividerColor = Color(0xFFE8E8E8); // Gris muy claro
   
   /// Colores de texto
-  static const Color textPrimaryColor = Color(0xFF212121);
-  static const Color textSecondaryColor = Color(0xFF757575);
-  static const Color textDisabledColor = Color(0xFFBDBDBD);
-  static const Color textOnPrimaryColor = Color(0xFFFFFFFF);
+  static const Color textPrimaryColor = Color(0xFF1A1A1A); // Negro suave
+  static const Color textSecondaryColor = Color(0xFF666666); // Gris medio
+  static const Color textDisabledColor = Color(0xFFBDBDBD); // Gris claro
+  static const Color textOnPrimaryColor = Color(0xFFFFFFFF); // Blanco
+  static const Color textOnAccentColor = Color(0xFFFFFFFF); // Blanco
+  
+  /// Colores de gradientes
+  static const Color gradientStartColor = Color(0xFFD4AF37);
+  static const Color gradientEndColor = Color(0xFFB8860B);
   
   // ===== TYPOGRAPHY =====
   
@@ -101,64 +106,40 @@ class DesignTokens {
   static const double breakpointLg = 1200.0;
   static const double breakpointXl = 1536.0;
   
-  // ===== COMPONENT SPECIFIC =====
+  // ===== CUSTOM VALUES =====
   
-  /// AppBar
-  static const double appBarHeight = 56.0;
-  static const double appBarElevation = 0.0;
+  /// Valores específicos para el sistema de facturación
+  static const double invoiceCardHeight = 120.0;
+  static const double productCardHeight = 200.0;
+  static const double dashboardCardHeight = 150.0;
   
-  /// Buttons
-  static const double buttonHeight = 48.0;
-  static const double buttonMinWidth = 120.0;
+  /// Sombras personalizadas mejoradas
+  static List<BoxShadow> get cardShadow => [
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.08),
+      blurRadius: 12,
+      offset: const Offset(0, 4),
+    ),
+  ];
   
-  /// Input Fields
-  static const double inputHeight = 48.0;
-  static const double inputBorderWidth = 1.0;
-  static const double inputFocusedBorderWidth = 2.0;
+  static List<BoxShadow> get elevatedShadow => [
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.12),
+      blurRadius: 16,
+      offset: const Offset(0, 6),
+    ),
+  ];
   
-  /// Cards
-  static const double cardElevation = elevationSm;
-  static const EdgeInsets cardPadding = EdgeInsets.all(spacingMd);
+  /// Gradientes personalizados
+  static LinearGradient get primaryGradient => const LinearGradient(
+    colors: [gradientStartColor, gradientEndColor],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
   
-  /// Navigation
-  static const double bottomNavHeight = 56.0;
-  static const double drawerWidth = 280.0;
-  
-  // ===== UTILITY METHODS =====
-  
-  /// Obtener color con opacidad
-  static Color withOpacity(Color color, double opacity) {
-    return color.withValues(alpha: (opacity * 255).round().toDouble());
-  }
-  
-  /// Obtener color de estado según el tipo
-  static Color getStateColor(String state) {
-    switch (state.toLowerCase()) {
-      case 'success':
-      case 'active':
-      case 'completed':
-        return successColor;
-      case 'warning':
-      case 'pending':
-        return warningColor;
-      case 'error':
-      case 'failed':
-      case 'cancelled':
-        return errorColor;
-      case 'info':
-      case 'processing':
-        return infoColor;
-      default:
-        return textSecondaryColor;
-    }
-  }
-  
-  /// Obtener breakpoint actual basado en el ancho de pantalla
-  static String getBreakpoint(double width) {
-    if (width >= breakpointXl) return 'xl';
-    if (width >= breakpointLg) return 'lg';
-    if (width >= breakpointMd) return 'md';
-    if (width >= breakpointSm) return 'sm';
-    return 'xs';
-  }
+  static LinearGradient get accentGradient => const LinearGradient(
+    colors: [accentColor, accentDarkColor],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

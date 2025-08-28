@@ -61,7 +61,7 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
       if (mounted) {
         final authState = ref.read(authProvider);
         if (authState.isAuthenticated) {
-          context.go('/home');
+          context.go('/dashboard');
         } else {
           context.go('/login');
         }
@@ -107,7 +107,7 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
                         ],
                       ),
                       child: Icon(
-                        Icons.flutter_dash,
+                        Icons.local_bar,
                         size: 60,
                         color: DesignTokens.primaryColor,
                       ),
@@ -130,7 +130,7 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
                     
                     // Descripción
                     Text(
-                      'Descubre la belleza natural de Nicaragua',
+                      'Sistema de Facturación',
                       style: TextStyle(
                         fontSize: DesignTokens.fontSizeMd,
                         fontWeight: DesignTokens.fontWeightNormal,

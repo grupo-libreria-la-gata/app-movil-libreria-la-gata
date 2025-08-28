@@ -1,65 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../presentation/pages/splash_page.dart';
-import '../presentation/pages/home_page.dart';
-import '../presentation/pages/reserves/reserves_page.dart';
-import '../presentation/pages/reserves/reserve_detail_page.dart';
+import '../presentation/pages/dashboard/dashboard_page.dart';
 import '../presentation/pages/auth/login_page.dart';
 import '../presentation/pages/auth/register_page.dart';
 import '../presentation/pages/auth/forgot_password_page.dart';
 import '../presentation/pages/auth/email_verification_page.dart';
-import '../presentation/pages/birds/birds_page.dart';
-import '../presentation/pages/birds/bird_detail_page.dart';
-import '../presentation/pages/bookings/bookings_page.dart';
+import '../presentation/pages/products/products_page.dart';
+import '../presentation/pages/sales/new_sale_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
-import '../presentation/pages/events/events_page.dart';
-import '../presentation/pages/education/education_page.dart';
-// import '../presentation/pages/bookings/create_booking_page.dart';
-// import '../presentation/pages/profile/profile_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
-  static const String home = '/home';
+  static const String dashboard = '/dashboard';
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
   static const String emailVerification = '/email-verification';
-  static const String reserves = '/reserves';
-  static const String reserveDetail = '/reserves/:id';
-  static const String birds = '/birds';
-  static const String birdDetail = '/birds/:id';
-  static const String bookings = '/bookings';
-  static const String createBooking = '/bookings/create';
+  
+  // Productos
+  static const String products = '/products';
+  static const String productDetail = '/products/:id';
+  static const String newProduct = '/products/new';
+  static const String editProduct = '/products/:id/edit';
+  
+  // Ventas
+  static const String sales = '/sales';
+  static const String newSale = '/sales/new';
+  static const String saleDetail = '/sales/:id';
+  
+  // Inventario
+  static const String inventory = '/inventory';
+  
+  // Clientes
+  static const String customers = '/customers';
+  static const String customerDetail = '/customers/:id';
+  
+  // Reportes
+  static const String reports = '/reports';
+  
+  // Usuarios
+  static const String users = '/users';
+  static const String userDetail = '/users/:id';
+  
+  // Configuración
+  static const String settings = '/settings';
   static const String profile = '/profile';
-  static const String events = '/events';
-  static const String education = '/education';
 
   static GoRouter get router => GoRouter(
     initialLocation: splash,
     routes: [
+      // Página de splash
       GoRoute(
         path: splash,
         name: 'splash',
         builder: (context, state) => const SplashPage(),
       ),
+      
+      // Dashboard principal
       GoRoute(
-        path: home,
-        name: 'home',
-        builder: (context, state) => const HomePage(),
+        path: dashboard,
+        name: 'dashboard',
+        builder: (context, state) => const DashboardPage(),
       ),
-      GoRoute(
-        path: reserves,
-        name: 'reserves',
-        builder: (context, state) => const ReservesPage(),
-      ),
-      GoRoute(
-        path: reserveDetail,
-        name: 'reserveDetail',
-        builder: (context, state) {
-          final reserveId = state.pathParameters['id']!;
-          return ReserveDetailPage(reserveId: reserveId);
-        },
-      ),
+      
+      // Autenticación
       GoRoute(
         path: login,
         name: 'login',
@@ -83,89 +88,175 @@ class AppRoutes {
           return EmailVerificationPage(email: email);
         },
       ),
-      // GoRoute(
-      //   path: register,
-      //   name: 'register',
-      //   builder: (context, state) => const RegisterPage(),
-      // ),
-      // GoRoute(
-      //   path: reserves,
-      //   name: 'reserves',
-      //   builder: (context, state) => const ReservesPage(),
-      // ),
-      // GoRoute(
-      //   path: reserveDetail,
-      //   name: 'reserveDetail',
-      //   builder: (context, state) {
-      //     final reserveId = state.pathParameters['id']!;
-      //     return ReserveDetailPage(reserveId: reserveId);
-      //   },
-      // ),
+      
+      // Productos
       GoRoute(
-        path: birds,
-        name: 'birds',
-        builder: (context, state) => const BirdsPage(),
+        path: products,
+        name: 'products',
+        builder: (context, state) => const ProductsPage(),
       ),
       GoRoute(
-        path: birdDetail,
-        name: 'birdDetail',
+        path: newProduct,
+        name: 'newProduct',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Nuevo Producto - En desarrollo'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: productDetail,
+        name: 'productDetail',
         builder: (context, state) {
-          final birdId = state.pathParameters['id']!;
-          return BirdDetailPage(birdId: birdId);
+          final productId = state.pathParameters['id']!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Producto $productId'),
+            ),
+            body: Center(
+              child: Text('Detalle del producto $productId - En desarrollo'),
+            ),
+          );
         },
       ),
       GoRoute(
-        path: bookings,
-        name: 'bookings',
-        builder: (context, state) => const BookingsPage(),
+        path: editProduct,
+        name: 'editProduct',
+        builder: (context, state) {
+          final productId = state.pathParameters['id']!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Editar Producto $productId'),
+            ),
+            body: Center(
+              child: Text('Editar producto $productId - En desarrollo'),
+            ),
+          );
+        },
       ),
+      
+      // Ventas
+      GoRoute(
+        path: newSale,
+        name: 'newSale',
+        builder: (context, state) => const NewSalePage(),
+      ),
+      GoRoute(
+        path: sales,
+        name: 'sales',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Historial de Ventas - En desarrollo'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: saleDetail,
+        name: 'saleDetail',
+        builder: (context, state) {
+          final saleId = state.pathParameters['id']!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Venta $saleId'),
+            ),
+            body: Center(
+              child: Text('Detalle de venta $saleId - En desarrollo'),
+            ),
+          );
+        },
+      ),
+      
+      // Inventario
+      GoRoute(
+        path: inventory,
+        name: 'inventory',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Control de Inventario - En desarrollo'),
+          ),
+        ),
+      ),
+      
+      // Clientes
+      GoRoute(
+        path: customers,
+        name: 'customers',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Gestión de Clientes - En desarrollo'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: customerDetail,
+        name: 'customerDetail',
+        builder: (context, state) {
+          final customerId = state.pathParameters['id']!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Cliente $customerId'),
+            ),
+            body: Center(
+              child: Text('Detalle del cliente $customerId - En desarrollo'),
+            ),
+          );
+        },
+      ),
+      
+      // Reportes
+      GoRoute(
+        path: reports,
+        name: 'reports',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Reportes y Estadísticas - En desarrollo'),
+          ),
+        ),
+      ),
+      
+      // Usuarios
+      GoRoute(
+        path: users,
+        name: 'users',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Gestión de Usuarios - En desarrollo'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: userDetail,
+        name: 'userDetail',
+        builder: (context, state) {
+          final userId = state.pathParameters['id']!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Usuario $userId'),
+            ),
+            body: Center(
+              child: Text('Detalle del usuario $userId - En desarrollo'),
+            ),
+          );
+        },
+      ),
+      
+      // Configuración
+      GoRoute(
+        path: settings,
+        name: 'settings',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Configuración del Sistema - En desarrollo'),
+          ),
+        ),
+      ),
+      
+      // Perfil
       GoRoute(
         path: profile,
         name: 'profile',
         builder: (context, state) => const ProfilePage(),
       ),
-      GoRoute(
-        path: events,
-        name: 'events',
-        builder: (context, state) => const EventsPage(),
-      ),
-      GoRoute(
-        path: education,
-        name: 'education',
-        builder: (context, state) => const EducationPage(),
-      ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(
-        title: const Text('Error'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Página no encontrada',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'La página que buscas no existe',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => context.go(home),
-              child: const Text('Volver al inicio'),
-            ),
-          ],
-        ),
-      ),
-    ),
   );
 }

@@ -1,309 +1,216 @@
-# AviFy - Plataforma de Aviturismo
+# La Gata — App móvil para la librería
 
 ## 📋 Descripción del Proyecto
 
-AviFy es una aplicación móvil desarrollada en Flutter para promover el aviturismo y las reservas naturales de Nicaragua. La plataforma centraliza información de especies de aves, gestiona reservas de visitas guiadas y facilita la conexión entre operadores locales con turistas nacionales e internacionales.
+**La Gata** es una aplicación móvil desarrollada en **Flutter** que facilita la gestión y venta de libros para la librería "La Gata". Permite a los usuarios navegar el catálogo, consultar fichas de libros, realizar reservas o compras, y a los administradores gestionar inventario, pedidos y promociones.
+
+---
 
 ## 🎯 Objetivos del MVP
 
 ### Funcionalidades Prioridad Alta (MVP)
-- ✅ Autenticación básica (registro/login)
-- ✅ Listado de reservas naturales
-- ✅ Ficha de reserva con información y mapa
-- ✅ Catálogo de aves con fotos y descripciones
-- ✅ Sistema de reservas online
-- ✅ Panel básico para operadores
+
+* ✅ Autenticación básica (registro/login con email y social login opcional)
+* ✅ Catálogo de libros con imágenes, autor, sinopsis y disponibilidad
+* ✅ Ficha de libro con detalles, reseñas y botón de compra/reserva
+* ✅ Carrito de compras y proceso de checkout simple
+* ✅ Panel básico para el personal/administrador (gestionar inventario y pedidos)
 
 ### Funcionalidades Prioridad Media
-- 📅 Calendario de temporadas y eventos
-- 📚 Módulo educativo
-- 💬 Chat básico entre turista y guía
-- 🔔 Notificaciones push
+
+* 📅 Reservas de ejemplares y notificaciones de disponibilidad
+* 🔎 Búsqueda avanzada y filtros (género, autor, precio)
+* ⭐ Sistema de valoraciones y reseñas
+* 🔔 Notificaciones push (promociones, reservas listas)
 
 ### Funcionalidades Prioridad Baja
-- 🐦 Conteos ciudadanos (crowdsourcing)
-- ⭐ Sistema de valoraciones/reseñas
-- 🌍 Multi-idioma (español/inglés)
+
+* 🌍 Multi-idioma (español / inglés)
+* 📚 Recomendaciones personalizadas
+* 🧾 Integración con pasarelas de pago (Stripe/PayPal) para producción
+
+---
 
 ## 🏗️ Arquitectura del Proyecto
 
-### Estructura de Carpetas
+Se mantiene una estructura basada en **Clean Architecture** y separación por capas (presentation, domain, data). Se usa **Provider / Riverpod** para el manejo de estado.
+
 ```
 lib/
 ├── main.dart
 ├── src/
 │   ├── config/
 │   │   ├── app_config.dart
-│   │   └── feature_flags.dart
+│   │   └── env.dart
 │   ├── core/
 │   │   ├── design/
 │   │   │   └── design_tokens.dart
-│   │   ├── interfaces/
-│   │   │   └── api_interfaces.dart
-│   │   ├── theme/
-│   │   │   └── app_theme.dart
-│   │   └── utils/
-│   │       └── helpers.dart
+│   │   ├── utils/
+│   │   │   └── helpers.dart
 │   ├── data/
 │   │   ├── models/
 │   │   │   ├── user_model.dart
-│   │   │   ├── bird_model.dart
-│   │   │   ├── reserve_model.dart
-│   │   │   └── booking_model.dart
+│   │   │   ├── book_model.dart
+│   │   │   ├── order_model.dart
+│   │   │   └── review_model.dart
 │   │   └── services/
 │   │       ├── api_service.dart
 │   │       ├── auth_service.dart
-│   │       └── database_service.dart
+│   │       └── local_storage_service.dart
 │   ├── domain/
 │   │   ├── entities/
-│   │   │   ├── user.dart
-│   │   │   ├── bird.dart
-│   │   │   ├── reserve.dart
-│   │   │   └── booking.dart
 │   │   └── repositories/
-│   │       ├── user_repository.dart
-│   │       ├── bird_repository.dart
-│   │       ├── reserve_repository.dart
-│   │       └── booking_repository.dart
 │   ├── presentation/
 │   │   ├── pages/
-│   │   │   ├── home_page.dart
-│   │   │   ├── auth/
-│   │   │   │   ├── login_page.dart
-│   │   │   │   ├── register_page.dart
-│   │   │   │   ├── forgot_password_page.dart
-│   │   │   │   └── email_verification_page.dart
-│   │   │   ├── reserves/
-│   │   │   │   ├── reserves_page.dart
-│   │   │   │   └── reserve_detail_page.dart
-│   │   │   ├── birds/
-│   │   │   │   ├── birds_page.dart
-│   │   │   │   └── bird_detail_page.dart
-│   │   │   ├── bookings/
-│   │   │   │   ├── bookings_page.dart
-│   │   │   │   └── create_booking_page.dart
-│   │   │   ├── events/
-│   │   │   │   └── events_page.dart
-│   │   │   ├── education/
-│   │   │   │   └── education_page.dart
-│   │   │   └── profile/
-│   │   │       └── profile_page.dart
 │   │   ├── providers/
-│   │   │   ├── auth_provider.dart
-│   │   │   ├── bird_provider.dart
-│   │   │   ├── reserve_provider.dart
-│   │   │   └── booking_provider.dart
 │   │   └── widgets/
-│   │       ├── custom_button.dart
-│   │       ├── bird_card.dart
-│   │       ├── reserve_card.dart
-│   │       └── loading_widget.dart
 │   └── routes/
 │       └── app_routes.dart
 └── docs/
     └── TEAM_COORDINATION.md
 ```
 
-### **Patrones de Diseño Implementados**
-- **Clean Architecture:** Separación de responsabilidades
-- **Repository Pattern:** Abstracción de fuentes de datos
-- **Provider/Riverpod:** Gestión de estado
-- **Feature Flags:** Control de funcionalidades
-- **Design Tokens:** Sistema de diseño centralizado
+---
 
-## 🗄️ Base de Datos
+## 🗄️ Modelo de Datos (resumen)
 
-### Tablas Principales
-- **Users**: Usuarios del sistema (turistas, guías, admin)
-- **Birds**: Catálogo de aves con información detallada
-- **Reserves**: Reservas naturales habilitadas
-- **Guides**: Guías certificados
-- **Bookings**: Reservas de visitas
-- **Events**: Eventos y temporadas
-- **Sightings**: Avistamientos ciudadanos
-- **Reviews**: Valoraciones y reseñas
+Tablas / colecciones sugeridas:
 
-## 🛠️ Tecnologías y Dependencias
-
-### Dependencias Principales
-```yaml
-# State Management
-provider: ^6.1.1
-riverpod: ^2.4.9
-flutter_riverpod: ^2.4.9
-
-# Networking & API
-http: ^1.1.0
-dio: ^5.4.0
-
-# Local Database
-sqflite: ^2.3.0
-path: ^1.8.3
-
-# Authentication
-firebase_auth: ^4.15.3
-google_sign_in: ^6.1.6
-
-# Maps & Location
-google_maps_flutter: ^2.5.3
-geolocator: ^10.1.0
-
-# Navigation
-go_router: ^12.1.3
-
-# UI Components
-cached_network_image: ^3.3.0
-flutter_staggered_grid_view: ^0.7.0
-shimmer: ^3.0.0
-```
-
-## 🚀 Plan de Implementación
-
-### Fase 1: Configuración Base (Completado)
-- ✅ Estructura de carpetas
-- ✅ Configuración de dependencias
-- ✅ Tema de la aplicación
-- ✅ Rutas principales
-- ✅ Página de inicio
-
-### Fase 2: Autenticación y Usuarios
-- 🔄 Entidades y modelos de usuario
-- 🔄 Servicios de autenticación
-- 🔄 Páginas de login/registro
-- 🔄 Providers de estado
-
-### Fase 3: Reservas Naturales
-- 🔄 Entidades y modelos de reservas
-- 🔄 API service para reservas
-- 🔄 Páginas de listado y detalle
-- 🔄 Integración con mapas
-
-### Fase 4: Catálogo de Aves
-- 🔄 Entidades y modelos de aves
-- 🔄 API service para aves
-- 🔄 Páginas de catálogo y detalle
-- 🔄 Filtros y búsqueda
-
-### Fase 5: Sistema de Reservas
-- 🔄 Entidades y modelos de bookings
-- 🔄 API service para reservas
-- 🔄 Páginas de creación y gestión
-- 🔄 Integración con guías
-
-### Fase 6: Funcionalidades Adicionales
-- 🔄 Eventos y calendario
-- 🔄 Módulo educativo
-- 🔄 Notificaciones
-- 🔄 Panel de administración
-
-## 📱 Características de la UI/UX
-
-### Diseño
-- **Tema**: Material Design 3 con colores naturales
-- **Paleta**: Verde (naturaleza), Azul (aves), Naranja (accent)
-- **Tipografía**: Poppins (moderna y legible)
-- **Iconografía**: Material Icons + iconos personalizados
-
-### Navegación
-- **Bottom Navigation**: Para secciones principales
-- **Drawer**: Menú lateral para opciones adicionales
-- **Breadcrumbs**: Para navegación profunda
-- **Gestos**: Swipe para acciones rápidas
-
-## 🔧 Configuración del Entorno
-
-### Requisitos
-- Flutter SDK: ^3.8.1
-- Dart SDK: ^3.8.1
-- Android Studio / VS Code
-- Git
-
-### Instalación
-```bash
-# Clonar el repositorio
-git clone [url-del-repositorio]
-
-# Instalar dependencias
-flutter pub get
-
-# Ejecutar la aplicación
-flutter run
-```
-
-### Configuración de APIs
-1. **Google Maps API Key**: Configurar en `app_config.dart`
-2. **Firebase**: Configurar proyecto y credenciales
-3. **Backend API**: Configurar URL base en `app_config.dart`
-
-## 📊 Métricas y Analytics
-
-### KPIs del MVP
-- Usuarios registrados
-- Reservas creadas
-- Tiempo de sesión
-- Tasa de conversión
-- Valoraciones promedio
-
-### Herramientas
-- Firebase Analytics
-- Crashlytics
-- Performance Monitoring
-
-## 🔒 Seguridad
-
-### Implementaciones
-- Autenticación JWT
-- Encriptación de datos sensibles
-- Validación de entrada
-- Rate limiting
-- HTTPS obligatorio
-
-## 🧪 Testing
-
-### Estrategia
-- **Unit Tests**: Lógica de negocio
-- **Widget Tests**: Componentes UI
-- **Integration Tests**: Flujos completos
-- **E2E Tests**: Casos de uso críticos
-
-## 📦 Despliegue
-
-### Plataformas
-- **Android**: Google Play Store
-- **iOS**: App Store
-- **Web**: PWA (futuro)
-
-### CI/CD
-- GitHub Actions
-- Firebase App Distribution
-- Automated testing
-- Code quality checks
-
-## 🤝 Contribución
-
-### Guías
-1. Fork del repositorio
-2. Crear rama feature: `git checkout -b feature/nueva-funcionalidad`
-3. Commit cambios: `git commit -m 'Agregar nueva funcionalidad'`
-4. Push a la rama: `git push origin feature/nueva-funcionalidad`
-5. Crear Pull Request
-
-### Estándares de Código
-- Dart/Flutter linting rules
-- Conventional commits
-- Code review obligatorio
-- Documentación inline
-
-## 📞 Contacto
-
-- **Desarrollador**: [Tu Nombre]
-- **Email**: [tu-email@ejemplo.com]
-- **Proyecto**: AveTurismo Nicaragua
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+* **Users**: id, nombre, email, rol (cliente, personal, admin)
+* **Books**: id, título, autor, isbn, precio, stock, sinopsis, imágenes, categorías
+* **Orders**: id, userId, items, total, estado, fecha
+* **Reviews**: id, bookId, userId, rating, comment, fecha
+* **Promotions**: id, bookId, discount, from, to
 
 ---
 
-**Nota**: Este es un proyecto en desarrollo activo. Las funcionalidades se implementarán según las prioridades establecidas en el MVP.
+## 🛠️ Tecnologías y Dependencias (sugeridas)
+
+* Flutter SDK: ^3.8.1 (o la versión que use el equipo)
+* State Management: `flutter_riverpod`, `provider` (elige uno principal)
+* Networking: `dio` o `http`
+* Local DB/Cache: `sqflite` o `hive`
+* Auth: `firebase_auth` (opcional) / JWT según backend
+* UI: `cached_network_image`, `flutter_staggered_grid_view`
+* Navigation: `go_router`
+
+Ejemplo en `pubspec.yaml` (resumen):
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.4.9
+  dio: ^5.4.0
+  sqflite: ^2.3.0
+  cached_network_image: ^3.3.0
+  go_router: ^12.1.3
+  intl: ^0.18.0
+```
+
+---
+
+## 🔧 Configuración del Entorno (local)
+
+1. Clona el repositorio (desde la organización en GitHub):
+
+```bash
+git clone https://github.com/ORG/app-movil-libreria-la-gata.git
+cd app-movil-libreria-la-gata
+```
+
+2. Instala dependencias:
+
+```bash
+flutter pub get
+```
+
+3. Variables de entorno y configuración:
+
+* Crea un archivo `lib/src/config/env.dart` o usa `.env` para claves privadas (no subir al repo).
+* Configura `app_config.dart` con la `API_BASE_URL` y claves de terceros (Firebase, Stripe, etc.).
+
+4. Ejecuta la app:
+
+```bash
+flutter run
+```
+
+---
+
+## 🧾 .gitignore recomendado (resumen)
+
+Incluye los archivos generados y locales que no deben subirse:
+
+```
+.dart_tool/
+.packages
+build/
+ios/Pods/
+**/local.properties
+.env
+*.keystore
+```
+
+---
+
+## 🧪 Testing
+
+* Unit tests: lógica de dominio y repositorios
+* Widget tests: vistas críticas (carrito, ficha de libro)
+* Integration/E2E: flujo de compra
+
+Ejecutar tests:
+
+```bash
+flutter test
+```
+
+---
+
+## 🚀 CI/CD
+
+Se recomienda usar **GitHub Actions** para:
+
+* Ejecutar `flutter analyze` y `flutter test` en `push`/`pull_request`.
+* Generar builds de debug/apk en ramas específicas.
+
+Ejemplo básico de workflow: `.github/workflows/flutter.yml` (ver plantilla en docs).
+
+---
+
+## 🤝 Contribución
+
+Flujo de trabajo recomendado:
+
+1. Fork (si no eres miembro de la organización) o crea rama desde `main`:
+
+```bash
+git checkout -b feature/nombre-descriptivo
+```
+
+2. Commits claros (Convencional Commits recomendados)
+3. Push y Pull Request hacia `main` con descripción y checklist
+4. Revisiones de código obligatorias antes de merge
+
+**Reglas rápidas:**
+
+* `main` protegido: merges sólo por PR y con al menos 1 aprobación
+* Tests deben pasar antes de merge
+
+---
+
+## 📄 Licencia
+
+Este proyecto usa la **Licencia MIT**. Ver `LICENSE`.
+
+---
+
+## 📞 Contacto
+
+* Coordinador del proyecto: **[Tu Nombre]**
+* Email: **[tu-email@ejemplo.com](mailto:tu-email@ejemplo.com)**
+
+---
+
+> *Nota:* Este README está adaptado para el proyecto `app-movil-libreria-la-gata`. Si quieres que lo personalice con el **nombre real de la organización**, **URLs del repo**, o que incluya instrucciones concretas para CI, keys de Firebase o ejemplos de `app_config.dart`, dímelo y lo actualizo.

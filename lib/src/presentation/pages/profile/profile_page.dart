@@ -106,25 +106,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ],
                             ),
-                            child: _user.avatarUrl != null
-                                ? ClipOval(
-                                    child: Image.network(
-                                      _user.avatarUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return const Icon(
-                                          Icons.person,
-                                          size: 60,
-                                          color: Colors.grey,
-                                        );
-                                      },
-                                    ),
-                                  )
-                                : const Icon(
-                                    Icons.person,
-                                    size: 60,
-                                    color: Colors.grey,
-                                  ),
+                            child: const Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Colors.grey,
+                            ),
                           ),
                           if (_isEditing)
                             Positioned(
@@ -155,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     
                     // Nombre del usuario
                     Text(
-                      _user.nombre,
+                      _user.name,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -174,8 +160,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     const SizedBox(height: DesignTokens.spacingMd),
                     
-                    // Badge de verificación
-                    if (_user.isVerified)
+                    // Badge de estado activo
+                    if (_user.isActive)
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: DesignTokens.spacingMd,
@@ -189,13 +175,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.verified,
+                              Icons.check_circle,
                               color: Colors.white,
                               size: 16,
                             ),
                             SizedBox(width: 4),
                             Text(
-                              'Verificado',
+                              'Activo',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -224,12 +210,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildInfoField(
                         context,
                         label: 'Nombre Completo',
-                        value: _user.nombre,
+                        value: _user.name,
                         icon: Icons.person_outline,
                         isEditing: _isEditing,
                         onChanged: (value) {
                           setState(() {
-                            _user = _user.copyWith(nombre: value);
+                            _user = _user.copyWith(name: value);
                           });
                         },
                       ),
@@ -584,13 +570,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   User _getMockUser() {
     return User(
-      userId: '1',
-      nombre: 'Juan Nicolás López',
+      id: '1',
+      name: 'Juan Nicolás López',
       email: 'juan.lopez@example.com',
       phone: '+505 8888 8888',
-      avatarUrl: null,
-      roleId: 1,
-      isVerified: true,
+      role: UserRole.seller,
+      isActive: true,
       createdAt: DateTime.now().subtract(const Duration(days: 365)),
     );
   }

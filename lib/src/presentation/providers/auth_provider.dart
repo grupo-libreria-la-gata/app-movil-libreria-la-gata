@@ -1,46 +1,45 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/user.dart';
 
-/// Estado de autenticación de la aplicación
+/// Estado de autenticación
 class AuthState {
   final bool isAuthenticated;
+  final bool isLoading;
   final bool isGuest;
   final User? user;
-  final bool isLoading;
   final String? error;
 
   const AuthState({
     this.isAuthenticated = false,
+    this.isLoading = false,
     this.isGuest = false,
     this.user,
-    this.isLoading = false,
     this.error,
   });
 
   AuthState copyWith({
     bool? isAuthenticated,
+    bool? isLoading,
     bool? isGuest,
     User? user,
-    bool? isLoading,
     String? error,
   }) {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      isLoading: isLoading ?? this.isLoading,
       isGuest: isGuest ?? this.isGuest,
       user: user ?? this.user,
-      isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
     );
   }
-
-  /// Verificar si el usuario puede realizar acciones completas
-  bool get canPerformActions => isAuthenticated && !isGuest;
-  
-  /// Verificar si el usuario puede solo ver contenido
-  bool get canViewContent => isAuthenticated || isGuest;
 }
 
-/// Provider para manejar la autenticación
+/// Provider para el estado de autenticación
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier();
+});
+
+/// Notifier para manejar la autenticación
 class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier() : super(const AuthState());
 
@@ -54,12 +53,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       
       // Simular usuario autenticado
       final user = User(
-        userId: 'user_123',
-        nombre: 'Usuario Demo',
+        id: 'user_123',
+        name: 'Usuario Demo',
         email: email,
         phone: '+505 8888 8888',
-        roleId: 1,
-        isVerified: true,
+        role: UserRole.seller,
         createdAt: DateTime.now(),
       );
       
@@ -87,12 +85,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       
       // Simular usuario registrado
       final user = User(
-        userId: 'user_${DateTime.now().millisecondsSinceEpoch}',
-        nombre: name,
+        id: 'user_${DateTime.now().millisecondsSinceEpoch}',
+        name: name,
         email: email,
         phone: null,
-        roleId: 1,
-        isVerified: false,
+        role: UserRole.seller,
         createdAt: DateTime.now(),
       );
       
@@ -119,12 +116,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       
       // Usuario invitado sin datos completos
       final guestUser = User(
-        userId: 'guest_${DateTime.now().millisecondsSinceEpoch}',
-        nombre: 'Invitado',
-        email: 'guest@aveturismo.com',
+        id: 'guest_${DateTime.now().millisecondsSinceEpoch}',
+        name: 'Invitado',
+        email: 'guest@lagata.com',
         phone: null,
-        roleId: 2,
-        isVerified: false,
+        role: UserRole.cashier,
         createdAt: DateTime.now(),
       );
       
@@ -181,7 +177,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(error: null);
   }
 
-  /// Verificar si el usuario está autenticado al iniciar la app
+  /// Verificar token guardado
   Future<void> checkAuthStatus() async {
     state = state.copyWith(isLoading: true);
     
@@ -189,7 +185,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // TODO: Verificar token guardado cuando la API esté lista
       await Future.delayed(const Duration(seconds: 1)); // Simulación
       
-      // Por ahora, siempre redirigir al login
+      // Por ahora, siempre inicia sin autenticación
       state = const AuthState();
     } catch (e) {
       state = state.copyWith(
@@ -200,19 +196,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
-/// Provider de autenticación
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier();
-});
-
 /// Provider para verificar si el usuario puede realizar acciones
 final canPerformActionsProvider = Provider<bool>((ref) {
   final authState = ref.watch(authProvider);
-  return authState.canPerformActions;
-});
-
-/// Provider para verificar si el usuario puede ver contenido
-final canViewContentProvider = Provider<bool>((ref) {
-  final authState = ref.watch(authProvider);
-  return authState.canViewContent;
+  return authState.isAuthenticated && !authState.isLoading;
 });

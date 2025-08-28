@@ -7,13 +7,13 @@ import 'src/routes/app_routes.dart';
 void main() {
   runApp(
     const ProviderScope(
-      child: AveTurismoApp(),
+      child: LaGataApp(),
     ),
   );
 }
 
-class AveTurismoApp extends StatelessWidget {
-  const AveTurismoApp({super.key});
+class LaGataApp extends StatelessWidget {
+  const LaGataApp({super.key});
 
   @override
   Widget build(BuildContext context) {

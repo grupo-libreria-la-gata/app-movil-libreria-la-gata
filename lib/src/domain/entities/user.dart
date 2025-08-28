@@ -1,71 +1,110 @@
-import 'package:uuid/uuid.dart';
-
+/// Entidad que representa un usuario del sistema de facturación
 class User {
-  final String userId;
-  final String nombre;
+  final String id;
+  final String name;
   final String email;
   final String? phone;
-  final String? avatarUrl;
-  final int roleId;
-  final bool isVerified;
+  final UserRole role;
+  final bool isActive;
   final DateTime createdAt;
+  final DateTime? lastLogin;
 
-  User({
-    String? userId,
-    required this.nombre,
+  const User({
+    required this.id,
+    required this.name,
     required this.email,
     this.phone,
-    this.avatarUrl,
-    required this.roleId,
-    this.isVerified = false,
-    DateTime? createdAt,
-  }) : 
-    userId = userId ?? const Uuid().v4(),
-    createdAt = createdAt ?? DateTime.now();
+    required this.role,
+    this.isActive = true,
+    required this.createdAt,
+    this.lastLogin,
+  });
 
-  factory User.fromJson(Map<String, dynamic> json) {
+  /// Verifica si el usuario tiene permisos de administrador
+  bool get isAdmin => role == UserRole.admin;
+
+  /// Verifica si el usuario tiene permisos de vendedor
+  bool get isSeller => role == UserRole.seller || role == UserRole.admin;
+
+  /// Verifica si el usuario tiene permisos de inventario
+  bool get canManageInventory => role == UserRole.inventory || role == UserRole.admin;
+
+  /// Verifica si el usuario puede ver reportes
+  bool get canViewReports => role == UserRole.seller || role == UserRole.inventory || role == UserRole.admin;
+
+  /// Copia el usuario con nuevos valores
+  User copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? phone,
+    UserRole? role,
+    bool? isActive,
+    DateTime? createdAt,
+    DateTime? lastLogin,
+  }) {
     return User(
-      userId: json['userId'],
-      nombre: json['nombre'],
-      email: json['email'],
-      phone: json['phone'],
-      avatarUrl: json['avatarUrl'],
-      roleId: json['roleId'],
-      isVerified: json['isVerified'] ?? false,
-      createdAt: DateTime.parse(json['createdAt']),
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      role: role ?? this.role,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      lastLogin: lastLogin ?? this.lastLogin,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  /// Convierte la entidad a un Map
+  Map<String, dynamic> toMap() {
     return {
-      'userId': userId,
-      'nombre': nombre,
+      'id': id,
+      'name': name,
       'email': email,
       'phone': phone,
-      'avatarUrl': avatarUrl,
-      'roleId': roleId,
-      'isVerified': isVerified,
+      'role': role.name,
+      'isActive': isActive,
       'createdAt': createdAt.toIso8601String(),
+      'lastLogin': lastLogin?.toIso8601String(),
     };
   }
 
-  User copyWith({
-    String? nombre,
-    String? email,
-    String? phone,
-    String? avatarUrl,
-    int? roleId,
-    bool? isVerified,
-  }) {
+  /// Crea una entidad desde un Map
+  factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      userId: userId,
-      nombre: nombre ?? this.nombre,
-      email: email ?? this.email,
-      phone: phone ?? this.phone,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      roleId: roleId ?? this.roleId,
-      isVerified: isVerified ?? this.isVerified,
-      createdAt: createdAt,
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+      phone: map['phone'],
+      role: UserRole.values.firstWhere(
+        (e) => e.name == map['role'],
+        orElse: () => UserRole.seller,
+      ),
+      isActive: map['isActive'] ?? true,
+      createdAt: DateTime.parse(map['createdAt']),
+      lastLogin: map['lastLogin'] != null ? DateTime.parse(map['lastLogin']) : null,
     );
   }
+
+  @override
+  String toString() {
+    return 'User(id: $id, name: $name, email: $email, role: $role)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is User && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+}
+
+/// Roles de usuario en el sistema
+enum UserRole {
+  admin,      // Administrador - acceso completo
+  seller,     // Vendedor - puede hacer ventas y ver reportes básicos
+  inventory,  // Inventario - puede gestionar productos y stock
+  cashier,    // Cajero - solo puede hacer ventas
 }

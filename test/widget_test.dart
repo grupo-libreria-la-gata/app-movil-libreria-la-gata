@@ -10,12 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ave_turismo_app/main.dart';
 
 void main() {
-  testWidgets('AveTurismo app smoke test', (WidgetTester tester) async {
+  testWidgets('La Gata app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const AveTurismoApp());
+    await tester.pumpWidget(const LaGataApp());
 
     // Verify that our app shows the welcome message.
-    expect(find.text('AviFy'), findsOneWidget);
-    expect(find.text('¡Bienvenido a AviFy!'), findsOneWidget);
+    expect(find.text('La Gata'), findsOneWidget);
+    expect(find.text('Sistema de Facturación'), findsOneWidget);
   });
 }

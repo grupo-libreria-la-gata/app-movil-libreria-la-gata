@@ -340,7 +340,7 @@ class HomePage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                authState.isGuest ? 'Modo Invitado' : authState.user?.nombre ?? 'Usuario',
+                authState.isGuest ? 'Modo Invitado' : authState.user?.name ?? 'Usuario',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,

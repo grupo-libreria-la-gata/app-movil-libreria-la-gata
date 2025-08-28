@@ -1,21 +1,21 @@
 class AppConfig {
   // API Configuration
-  static const String baseUrl = 'https://api.aveturismo.com/api/v1';
+  static const String baseUrl = 'https://api.lagata.com/api/v1';
   static const String apiKey = 'your_api_key_here';
   
   // Database Configuration
-  static const String databaseName = 'ave_turismo.db';
+  static const String databaseName = 'la_gata_facturacion.db';
   static const int databaseVersion = 1;
   
   // App Information
-  static const String appName = 'AviFy';
+  static const String appName = 'La Gata';
   static const String appVersion = '1.0.0';
-  static const String appDescription = 'Plataforma de aviturismo y reservas naturales de Nicaragua';
+  static const String appDescription = 'Sistema de facturación para licorería La Gata';
   
   // Colors (usando Design Tokens)
-  static const int primaryColor = 0xFF2E7D32; // Green - TODO: Migrar a DesignTokens
-  static const int secondaryColor = 0xFF4CAF50; // Light Green - TODO: Migrar a DesignTokens
-  static const int accentColor = 0xFFFF9800; // Orange - TODO: Migrar a DesignTokens
+  static const int primaryColor = 0xFF8B4513; // Brown - TODO: Migrar a DesignTokens
+  static const int secondaryColor = 0xFFD2691E; // Chocolate - TODO: Migrar a DesignTokens
+  static const int accentColor = 0xFFFFD700; // Gold - TODO: Migrar a DesignTokens
   
   // Map Configuration
   static const String googleMapsApiKey = 'your_google_maps_api_key_here';
@@ -38,7 +38,19 @@ class AppConfig {
   static const int cacheExpirationDays = 7;
   
   // Notification Configuration
-  static const String notificationChannelId = 'ave_turismo_channel';
-  static const String notificationChannelName = 'AveTurismo Notifications';
-  static const String notificationChannelDescription = 'Notifications for AveTurismo app';
+  static const String notificationChannelId = 'la_gata_channel';
+  static const String notificationChannelName = 'La Gata Notifications';
+  static const String notificationChannelDescription = 'Notifications for La Gata billing system';
+  
+  // Business Configuration
+  static const String businessName = 'Licorería La Gata';
+  static const String businessAddress = 'Managua, Nicaragua';
+  static const String businessPhone = '+505 1234-5678';
+  static const String businessEmail = 'info@lagata.com';
+  static const String businessRuc = 'J123456789';
+  
+  // Invoice Configuration
+  static const String invoicePrefix = 'LG';
+  static const int invoiceNumberLength = 8;
+  static const double taxRate = 0.15; // 15% IVA
 }

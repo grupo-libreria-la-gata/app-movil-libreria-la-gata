@@ -55,8 +55,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     // Escuchar cambios en el estado de autenticación
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next.isAuthenticated && !next.isLoading) {
-        // Redirigir a la página principal después del login exitoso
-        context.go('/home');
+        // Redirigir al dashboard después del login exitoso
+        context.go('/dashboard');
       }
       
       if (next.error != null) {
