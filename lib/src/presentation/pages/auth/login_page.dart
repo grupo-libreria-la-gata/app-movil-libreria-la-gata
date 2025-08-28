@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/app_config.dart';
+import '../../../core/design/design_tokens.dart';
 import '../../providers/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -73,6 +73,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     return Scaffold(
+      backgroundColor: DesignTokens.backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -125,28 +126,31 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: const Color(AppConfig.primaryColor),
+            gradient: DesignTokens.primaryGradient,
             borderRadius: BorderRadius.circular(20),
+            boxShadow: DesignTokens.elevatedShadow,
           ),
           child: const Icon(
-            Icons.flutter_dash,
+            Icons.local_bar,
             size: 40,
             color: Colors.white,
           ),
         ),
         const SizedBox(height: 16),
         Text(
-          '¡Bienvenido de vuelta!',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: const Color(AppConfig.primaryColor),
+          '¡Bienvenido a La Gata!',
+          style: TextStyle(
+            fontSize: DesignTokens.fontSize3xl,
+            fontWeight: DesignTokens.fontWeightBold,
+            color: DesignTokens.textPrimaryColor,
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          'Inicia sesión para continuar',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Colors.grey[600],
+          'Sistema de Facturación',
+          style: TextStyle(
+            fontSize: DesignTokens.fontSizeLg,
+            color: DesignTokens.textSecondaryColor,
           ),
         ),
       ],
@@ -163,12 +167,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           decoration: InputDecoration(
             labelText: 'Correo electrónico',
             hintText: 'ejemplo@correo.com',
-            prefixIcon: const Icon(Icons.email_outlined),
+            prefixIcon: Icon(Icons.email_outlined, color: DesignTokens.textSecondaryColor),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+              borderSide: BorderSide(color: DesignTokens.dividerColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+              borderSide: BorderSide(color: DesignTokens.dividerColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+              borderSide: BorderSide(color: DesignTokens.primaryColor, width: 2),
             ),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: DesignTokens.cardColor,
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -189,10 +202,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           decoration: InputDecoration(
             labelText: 'Contraseña',
             hintText: 'Ingresa tu contraseña',
-            prefixIcon: const Icon(Icons.lock_outlined),
+            prefixIcon: Icon(Icons.lock_outlined, color: DesignTokens.textSecondaryColor),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                color: DesignTokens.textSecondaryColor,
               ),
               onPressed: () {
                 setState(() {
@@ -201,10 +215,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               },
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+              borderSide: BorderSide(color: DesignTokens.dividerColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+              borderSide: BorderSide(color: DesignTokens.dividerColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+              borderSide: BorderSide(color: DesignTokens.primaryColor, width: 2),
             ),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: DesignTokens.cardColor,
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -231,7 +254,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       _rememberMe = value ?? false;
                     });
                   },
-                  activeColor: const Color(AppConfig.primaryColor),
+                  activeColor: DesignTokens.primaryColor,
                 ),
                 const Text('Recordarme'),
               ],
@@ -240,10 +263,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             // Enlace olvidé contraseña
             TextButton(
               onPressed: () => context.go('/forgot-password'),
-              child: const Text(
+              child: Text(
                 '¿Olvidaste tu contraseña?',
                 style: TextStyle(
-                  color: Color(AppConfig.primaryColor),
+                  color: DesignTokens.primaryColor,
                 ),
               ),
             ),
@@ -261,10 +284,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       child: ElevatedButton(
         onPressed: authState.isLoading ? null : _handleLogin,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(AppConfig.primaryColor),
+          backgroundColor: DesignTokens.primaryColor,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
           ),
         ),
         child: authState.isLoading
@@ -292,7 +315,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       children: [
         Expanded(
           child: Divider(
-            color: Colors.grey[300],
+            color: DesignTokens.dividerColor,
             thickness: 1,
           ),
         ),
@@ -301,14 +324,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Text(
             'o continúa con',
             style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
+              color: DesignTokens.textSecondaryColor,
+              fontSize: DesignTokens.fontSizeSm,
             ),
           ),
         ),
         Expanded(
           child: Divider(
-            color: Colors.grey[300],
+            color: DesignTokens.dividerColor,
             thickness: 1,
           ),
         ),
@@ -339,10 +362,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.grey[800],
-          side: BorderSide(color: Colors.grey[300]!),
+          foregroundColor: DesignTokens.textPrimaryColor,
+          side: BorderSide(color: DesignTokens.dividerColor),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
           ),
         ),
       ),
@@ -359,9 +382,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         icon: const Icon(Icons.person_outline),
         label: const Text('Continuar como invitado'),
         style: TextButton.styleFrom(
-          foregroundColor: Colors.grey[600],
+          foregroundColor: DesignTokens.textSecondaryColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
           ),
         ),
       ),
@@ -377,16 +400,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             Text(
               '¿No tienes una cuenta? ',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: DesignTokens.textSecondaryColor,
               ),
             ),
             TextButton(
               onPressed: () => context.go('/register'),
-              child: const Text(
+              child: Text(
                 'Regístrate aquí',
                 style: TextStyle(
-                  color: Color(AppConfig.primaryColor),
-                  fontWeight: FontWeight.w600,
+                  color: DesignTokens.primaryColor,
+                  fontWeight: DesignTokens.fontWeightSemiBold,
                 ),
               ),
             ),

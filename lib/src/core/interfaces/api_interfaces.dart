@@ -6,9 +6,8 @@
 /// TODO: Implementar estas interfaces cuando la API esté lista
 
 import '../../domain/entities/user.dart';
-import '../../domain/entities/bird.dart';
-import '../../domain/entities/reserve.dart';
-import '../../domain/entities/booking.dart';
+import '../../domain/entities/product.dart';
+import '../../domain/entities/sale.dart';
 
 /// Resultado de una operación de API
 class ApiResult<T> {
@@ -56,132 +55,135 @@ abstract class IAuthService {
   Future<ApiResult<User>> updateUserProfile(User user);
 }
 
-/// Interfaz para el servicio de reservas naturales
-abstract class IReserveService {
-  /// Obtener lista de reservas
-  Future<ApiResult<List<Reserve>>> getReserves({
-    String? province,
+/// Interfaz para el servicio de productos
+abstract class IProductService {
+  /// Obtener lista de productos
+  Future<ApiResult<List<Product>>> getProducts({
+    String? category,
     String? search,
     int? page,
     int? limit,
   });
   
-  /// Obtener reserva por ID
-  Future<ApiResult<Reserve>> getReserveById(String reserveId);
+  /// Obtener producto por ID
+  Future<ApiResult<Product>> getProductById(String productId);
   
-  /// Obtener reservas favoritas del usuario
-  Future<ApiResult<List<Reserve>>> getFavoriteReserves(String userId);
+  /// Crear nuevo producto
+  Future<ApiResult<Product>> createProduct(Product product);
   
-  /// Agregar/remover reserva de favoritos
-  Future<ApiResult<void>> toggleFavoriteReserve(String userId, String reserveId);
+  /// Actualizar producto
+  Future<ApiResult<Product>> updateProduct(String productId, Product product);
+  
+  /// Eliminar producto
+  Future<ApiResult<void>> deleteProduct(String productId);
+  
+  /// Actualizar stock de producto
+  Future<ApiResult<Product>> updateProductStock(String productId, int newStock);
+  
+  /// Obtener productos con stock bajo
+  Future<ApiResult<List<Product>>> getLowStockProducts();
 }
 
-/// Interfaz para el servicio de aves
-abstract class IBirdService {
-  /// Obtener lista de aves
-  Future<ApiResult<List<Bird>>> getBirds({
-    String? family,
-    String? search,
-    bool? isEndemic,
-    bool? isMigratory,
-    int? page,
-    int? limit,
-  });
-  
-  /// Obtener ave por ID
-  Future<ApiResult<Bird>> getBirdById(String birdId);
-  
-  /// Obtener aves por familia
-  Future<ApiResult<List<Bird>>> getBirdsByFamily(String family);
-  
-  /// Buscar aves por nombre
-  Future<ApiResult<List<Bird>>> searchBirds(String query);
-}
-
-/// Interfaz para el servicio de reservas de visitas
-abstract class IBookingService {
-  /// Obtener reservas del usuario
-  Future<ApiResult<List<Booking>>> getUserBookings(String userId);
-  
-  /// Crear nueva reserva
-  Future<ApiResult<Booking>> createBooking(Booking booking);
-  
-  /// Actualizar reserva
-  Future<ApiResult<Booking>> updateBooking(String bookingId, Booking booking);
-  
-  /// Cancelar reserva
-  Future<ApiResult<void>> cancelBooking(String bookingId);
-  
-  /// Obtener reserva por ID
-  Future<ApiResult<Booking>> getBookingById(String bookingId);
-  
-  /// Obtener guías disponibles
-  Future<ApiResult<List<Map<String, dynamic>>>> getAvailableGuides({
-    String? reserveId,
-    DateTime? date,
-  });
-}
-
-/// Interfaz para el servicio de eventos
-abstract class IEventService {
-  /// Obtener lista de eventos
-  Future<ApiResult<List<Map<String, dynamic>>>> getEvents({
+/// Interfaz para el servicio de ventas
+abstract class ISaleService {
+  /// Obtener lista de ventas
+  Future<ApiResult<List<Sale>>> getSales({
     DateTime? startDate,
     DateTime? endDate,
-    String? type,
+    String? sellerId,
     int? page,
     int? limit,
   });
   
-  /// Obtener evento por ID
-  Future<ApiResult<Map<String, dynamic>>> getEventById(String eventId);
+  /// Obtener venta por ID
+  Future<ApiResult<Sale>> getSaleById(String saleId);
   
-  /// Inscribirse a un evento
-  Future<ApiResult<void>> registerForEvent(String userId, String eventId);
+  /// Crear nueva venta
+  Future<ApiResult<Sale>> createSale(Sale sale);
   
-  /// Cancelar inscripción a evento
-  Future<ApiResult<void>> unregisterFromEvent(String userId, String eventId);
+  /// Actualizar venta
+  Future<ApiResult<Sale>> updateSale(String saleId, Sale sale);
+  
+  /// Cancelar venta
+  Future<ApiResult<void>> cancelSale(String saleId);
+  
+  /// Obtener estadísticas de ventas
+  Future<ApiResult<Map<String, dynamic>>> getSalesStats({
+    DateTime? startDate,
+    DateTime? endDate,
+  });
 }
 
-/// Interfaz para el servicio de contenido educativo
-abstract class IEducationService {
-  /// Obtener artículos educativos
-  Future<ApiResult<List<Map<String, dynamic>>>> getArticles({
-    String? category,
+/// Interfaz para el servicio de clientes
+abstract class ICustomerService {
+  /// Obtener lista de clientes
+  Future<ApiResult<List<Map<String, dynamic>>>> getCustomers({
+    String? search,
     int? page,
     int? limit,
   });
   
-  /// Obtener artículo por ID
-  Future<ApiResult<Map<String, dynamic>>> getArticleById(String articleId);
+  /// Obtener cliente por ID
+  Future<ApiResult<Map<String, dynamic>>> getCustomerById(String customerId);
   
-  /// Obtener quizzes
-  Future<ApiResult<List<Map<String, dynamic>>>> getQuizzes({
-    String? difficulty,
-    int? page,
-    int? limit,
-  });
+  /// Crear nuevo cliente
+  Future<ApiResult<Map<String, dynamic>>> createCustomer(Map<String, dynamic> customer);
   
-  /// Enviar respuestas de quiz
-  Future<ApiResult<Map<String, dynamic>>> submitQuizAnswers(
-    String quizId, 
-    List<Map<String, dynamic>> answers
-  );
+  /// Actualizar cliente
+  Future<ApiResult<Map<String, dynamic>>> updateCustomer(String customerId, Map<String, dynamic> customer);
+  
+  /// Eliminar cliente
+  Future<ApiResult<void>> deleteCustomer(String customerId);
+  
+  /// Obtener historial de compras del cliente
+  Future<ApiResult<List<Sale>>> getCustomerPurchaseHistory(String customerId);
 }
 
-/// Interfaz para el servicio de ciencia ciudadana
-abstract class ICitizenScienceService {
-  /// Reportar avistamiento de ave
-  Future<ApiResult<Map<String, dynamic>>> reportSighting(Map<String, dynamic> sighting);
+/// Interfaz para el servicio de inventario
+abstract class IInventoryService {
+  /// Obtener estado del inventario
+  Future<ApiResult<Map<String, dynamic>>> getInventoryStatus();
   
-  /// Obtener avistamientos del usuario
-  Future<ApiResult<List<Map<String, dynamic>>>> getUserSightings(String userId);
+  /// Realizar ajuste de inventario
+  Future<ApiResult<void>> adjustInventory(String productId, int quantity, String reason);
   
-  /// Obtener avistamientos por ave
-  Future<ApiResult<List<Map<String, dynamic>>>> getSightingsByBird(String birdId);
+  /// Obtener movimientos de inventario
+  Future<ApiResult<List<Map<String, dynamic>>>> getInventoryMovements({
+    String? productId,
+    DateTime? startDate,
+    DateTime? endDate,
+    int? page,
+    int? limit,
+  });
   
-  /// Obtener estadísticas de avistamientos
-  Future<ApiResult<Map<String, dynamic>>> getSightingStats();
+  /// Generar reporte de inventario
+  Future<ApiResult<Map<String, dynamic>>> generateInventoryReport();
+}
+
+/// Interfaz para el servicio de reportes
+abstract class IReportService {
+  /// Obtener reporte de ventas
+  Future<ApiResult<Map<String, dynamic>>> getSalesReport({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? format,
+  });
+  
+  /// Obtener reporte de productos más vendidos
+  Future<ApiResult<List<Map<String, dynamic>>>> getTopSellingProducts({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? limit,
+  });
+  
+  /// Obtener reporte de ganancias
+  Future<ApiResult<Map<String, dynamic>>> getProfitReport({
+    DateTime? startDate,
+    DateTime? endDate,
+  });
+  
+  /// Obtener reporte de inventario
+  Future<ApiResult<Map<String, dynamic>>> getInventoryReport();
 }
 
 /// Interfaz para el servicio de notificaciones

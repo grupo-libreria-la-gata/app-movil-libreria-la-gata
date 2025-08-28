@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/app_config.dart';
+import '../../../core/design/design_tokens.dart';
 
 class EmailVerificationPage extends StatefulWidget {
   final String email;
@@ -92,11 +93,12 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        title: const Text('Verificar Email'),
+        title: Text('Verificar Email', style: TextStyle(color: DesignTokens.textPrimaryColor)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: const Color(AppConfig.primaryColor),
+        foregroundColor: DesignTokens.primaryColor,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/app_config.dart';
+import '../../../core/design/design_tokens.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -68,11 +69,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        title: const Text('Recuperar Contraseña'),
+        title: Text('Recuperar Contraseña', style: TextStyle(color: DesignTokens.textPrimaryColor)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: const Color(AppConfig.primaryColor),
+        foregroundColor: DesignTokens.primaryColor,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

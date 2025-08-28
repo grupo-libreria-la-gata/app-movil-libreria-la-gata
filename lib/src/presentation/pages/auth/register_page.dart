@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/app_config.dart';
+import '../../../core/design/design_tokens.dart';
 import '../../providers/auth_provider.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -91,8 +92,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     // Escuchar cambios en el estado de autenticación
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next.isAuthenticated && !next.isLoading) {
-        // Redirigir a la página principal después del registro exitoso
-        context.go('/home');
+        // Redirigir al dashboard después del registro exitoso
+        context.go('/dashboard');
       }
       
       if (next.error != null) {
@@ -109,11 +110,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     });
 
     return Scaffold(
+      backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        title: const Text('Crear Cuenta'),
+        title: Text('Crear Cuenta', style: TextStyle(color: DesignTokens.textPrimaryColor)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: const Color(AppConfig.primaryColor),
+        foregroundColor: DesignTokens.primaryColor,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -165,28 +167,31 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: const Color(AppConfig.primaryColor),
+            gradient: DesignTokens.primaryGradient,
             borderRadius: BorderRadius.circular(20),
+            boxShadow: DesignTokens.elevatedShadow,
           ),
           child: const Icon(
-            Icons.person_add,
+            Icons.local_bar,
             size: 40,
             color: Colors.white,
           ),
         ),
         const SizedBox(height: 16),
         Text(
-          'Únete a AveTurismo',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: const Color(AppConfig.primaryColor),
+          'Únete a La Gata',
+          style: TextStyle(
+            fontSize: DesignTokens.fontSize3xl,
+            fontWeight: DesignTokens.fontWeightBold,
+            color: DesignTokens.textPrimaryColor,
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          'Crea tu cuenta para acceder a todas las funcionalidades',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Colors.grey[600],
+          'Sistema de Facturación',
+          style: TextStyle(
+            fontSize: DesignTokens.fontSizeLg,
+            color: DesignTokens.textSecondaryColor,
           ),
           textAlign: TextAlign.center,
         ),
