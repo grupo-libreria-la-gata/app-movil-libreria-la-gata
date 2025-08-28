@@ -9,15 +9,20 @@ import 'package:flutter/material.dart';
 class DesignTokens {
   // ===== COLORS =====
   
-  /// Colores primarios de la marca - Tema licorería mejorado
-  static const Color primaryColor = Color(0xFFD4AF37); // Dorado elegante
-  static const Color primaryLightColor = Color(0xFFF4E4BC); // Dorado claro suave
-  static const Color primaryDarkColor = Color(0xFFB8860B); // Dorado oscuro
+  /// Colores primarios de la marca - Tema Elegante y Premium
+  static const Color primaryColor = Color(0xFF2C1810); // Marrón oscuro elegante
+  static const Color primaryLightColor = Color(0xFF3D2418); // Marrón oscuro claro
+  static const Color primaryDarkColor = Color(0xFF1A0F08); // Marrón muy oscuro
   
   /// Colores secundarios/accent
-  static const Color accentColor = Color(0xFF8B4513); // Marrón chocolate
-  static const Color accentLightColor = Color(0xFFD2691E); // Marrón claro
-  static const Color accentDarkColor = Color(0xFF654321); // Marrón oscuro
+  static const Color accentColor = Color(0xFFD4AF37); // Dorado premium
+  static const Color accentLightColor = Color(0xFFF4E4BC); // Dorado claro
+  static const Color accentDarkColor = Color(0xFFB8860B); // Dorado oscuro
+  
+  /// Colores temáticos para licorería
+  static const Color wineColor = Color(0xFF8B4513); // Marrón chocolate
+  static const Color wineLightColor = Color(0xFFD2691E); // Marrón claro
+  static const Color wineDarkColor = Color(0xFF654321); // Marrón oscuro
   
   /// Colores de estado
   static const Color successColor = Color(0xFF2E7D32); // Verde más elegante
@@ -39,8 +44,8 @@ class DesignTokens {
   static const Color textOnAccentColor = Color(0xFFFFFFFF); // Blanco
   
   /// Colores de gradientes
-  static const Color gradientStartColor = Color(0xFFD4AF37);
-  static const Color gradientEndColor = Color(0xFFB8860B);
+  static const Color gradientStartColor = Color(0xFF2C1810);
+  static const Color gradientEndColor = Color(0xFF3D2418);
   
   // ===== TYPOGRAPHY =====
   
@@ -139,6 +144,12 @@ class DesignTokens {
   
   static LinearGradient get accentGradient => const LinearGradient(
     colors: [accentColor, accentDarkColor],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  
+  static LinearGradient get wineGradient => const LinearGradient(
+    colors: [wineColor, wineDarkColor],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

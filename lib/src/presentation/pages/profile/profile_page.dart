@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../domain/entities/user.dart';
 import '../../../core/design/design_tokens.dart';
+import '../../providers/auth_provider.dart';
 
 /// Página que muestra el perfil del usuario
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _isEditing = false;
   late User _user;
 
@@ -243,6 +245,16 @@ class _ProfilePageState extends State<ProfilePage> {
                           });
                         },
                       ),
+                      _buildInfoField(
+                        context,
+                        label: 'Rol',
+                        value: _getRoleDisplayName(_user.role),
+                        icon: Icons.work_outline,
+                        isEditing: false, // El rol no se puede editar desde el perfil
+                        onChanged: (value) {
+                          // No se puede cambiar el rol desde aquí
+                        },
+                      ),
                     ],
                   ),
                   
@@ -256,26 +268,26 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       _buildStatCard(
                         context,
-                        icon: Icons.calendar_today,
-                        title: 'Reservas Totales',
-                        value: '12',
-                        color: Colors.blue,
+                        icon: Icons.point_of_sale,
+                        title: 'Ventas Realizadas',
+                        value: '156',
+                        color: DesignTokens.successColor,
                       ),
                       const SizedBox(height: DesignTokens.spacingMd),
                       _buildStatCard(
                         context,
-                        icon: Icons.flutter_dash,
-                        title: 'Aves Observadas',
-                        value: '45',
-                        color: Colors.green,
+                        icon: Icons.inventory,
+                        title: 'Productos Vendidos',
+                        value: '2,847',
+                        color: DesignTokens.infoColor,
                       ),
                       const SizedBox(height: DesignTokens.spacingMd),
                       _buildStatCard(
                         context,
-                        icon: Icons.location_on,
-                        title: 'Reservas Visitadas',
-                        value: '8',
-                        color: Colors.orange,
+                        icon: Icons.trending_up,
+                        title: 'Ventas Esta Semana',
+                        value: '₡125K',
+                        color: DesignTokens.accentColor,
                       ),
                     ],
                   ),
@@ -350,7 +362,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        _showLogoutDialog(context);
+                        _showLogoutDialog(context, ref);
                       },
                       icon: const Icon(Icons.logout),
                       label: const Text('Cerrar Sesión'),
@@ -385,14 +397,14 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             Icon(
               icon,
-              color: DesignTokens.primaryColor,
+              color: Colors.white,
               size: 24,
             ),
             const SizedBox(width: DesignTokens.spacingSm),
             Text(
               title,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: DesignTokens.primaryColor,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -418,7 +430,7 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           Icon(
             icon,
-            color: Colors.grey[600],
+            color: Colors.white,
             size: 20,
           ),
           const SizedBox(width: DesignTokens.spacingSm),
@@ -429,7 +441,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Text(
                   label,
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -447,6 +459,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Text(
                     value,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -480,12 +493,12 @@ class _ProfilePageState extends State<ProfilePage> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color,
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
             ),
             child: Icon(
               icon,
-              color: Colors.white,
+              color: color,
               size: 20,
             ),
           ),
@@ -497,7 +510,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Text(
                   title,
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -527,11 +540,17 @@ class _ProfilePageState extends State<ProfilePage> {
     return ListTile(
       leading: Icon(
         icon,
-        color: DesignTokens.primaryColor,
+        color: Colors.white,
       ),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      title: Text(
+        title,
+        style: const TextStyle(color: Colors.white),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
       onTap: onTap,
     );
   }
@@ -544,7 +563,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -558,7 +577,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              context.go('/login');
+              ref.read(authProvider.notifier).signOut();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Cerrar Sesión'),
@@ -574,9 +593,25 @@ class _ProfilePageState extends State<ProfilePage> {
       name: 'Juan Nicolás López',
       email: 'juan.lopez@example.com',
       phone: '+505 8888 8888',
-      role: UserRole.seller,
+      role: UserRole.admin, // Rol por defecto como administrador
       isActive: true,
       createdAt: DateTime.now().subtract(const Duration(days: 365)),
     );
+  }
+
+  /// Obtiene el nombre de visualización del rol
+  String _getRoleDisplayName(UserRole role) {
+    switch (role) {
+      case UserRole.admin:
+        return 'Administrador';
+      case UserRole.seller:
+        return 'Vendedor';
+      case UserRole.inventory:
+        return 'Inventario';
+      case UserRole.cashier:
+        return 'Cajero';
+      default:
+        return 'Usuario';
+    }
   }
 }

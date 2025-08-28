@@ -374,7 +374,7 @@ class DashboardPage extends ConsumerWidget {
             context.push('/admin');
             break;
           case 'logout':
-            ref.read(authProvider.notifier).signOut();
+            _showLogoutDialog(context, ref);
             break;
         }
       },
@@ -411,6 +411,31 @@ class DashboardPage extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  /// Muestra el diálogo de confirmación para cerrar sesión
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cerrar Sesión'),
+        content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ref.read(authProvider.notifier).signOut();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Cerrar Sesión'),
+          ),
+        ],
+      ),
     );
   }
 }

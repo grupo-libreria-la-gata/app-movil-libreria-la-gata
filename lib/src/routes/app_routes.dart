@@ -8,6 +8,7 @@ import '../presentation/pages/auth/forgot_password_page.dart';
 import '../presentation/pages/auth/email_verification_page.dart';
 import '../presentation/pages/products/products_page.dart';
 import '../presentation/pages/sales/new_sale_page.dart';
+import '../presentation/pages/sales/sales_history_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/admin/admin_page.dart';
 
@@ -148,11 +149,7 @@ class AppRoutes {
       GoRoute(
         path: sales,
         name: 'sales',
-        builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Historial de Ventas - En desarrollo'),
-          ),
-        ),
+        builder: (context, state) => const SalesHistoryPage(),
       ),
       GoRoute(
         path: saleDetail,
