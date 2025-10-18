@@ -46,7 +46,7 @@ class AdminPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: DesignTokens.spacingXl),
-            
+
             // Opciones de administración
             _buildAdminOptions(context),
           ],
@@ -67,7 +67,7 @@ class AdminPage extends ConsumerWidget {
           onTap: () => context.push('/register'),
         ),
         const SizedBox(height: DesignTokens.spacingMd),
-        
+
         _buildAdminCard(
           context,
           title: 'Gestión de Roles',
@@ -84,7 +84,7 @@ class AdminPage extends ConsumerWidget {
           },
         ),
         const SizedBox(height: DesignTokens.spacingMd),
-        
+
         _buildAdminCard(
           context,
           title: 'Configuración del Sistema',
@@ -94,7 +94,7 @@ class AdminPage extends ConsumerWidget {
           onTap: () => context.push('/settings'),
         ),
         const SizedBox(height: DesignTokens.spacingMd),
-        
+
         _buildAdminCard(
           context,
           title: 'Respaldo y Restauración',
@@ -109,6 +109,39 @@ class AdminPage extends ConsumerWidget {
               ),
             );
           },
+        ),
+
+        const SizedBox(height: DesignTokens.spacingMd),
+
+        _buildAdminCard(
+          context,
+          title: 'Gestión de Marcas',
+          subtitle: 'Crear, editar y desactivar marcas',
+          icon: Icons.local_offer,
+          color: DesignTokens.successColor,
+          onTap: () => context.push('/admin/brands'),
+        ),
+
+        const SizedBox(height: DesignTokens.spacingMd),
+
+        _buildAdminCard(
+          context,
+          title: 'Gestión de Productos',
+          subtitle: 'Administrar productos',
+          icon: Icons.precision_manufacturing,
+          color: DesignTokens.infoColor,
+          onTap: () => context.push('/admin/products')
+        ),
+
+        const SizedBox(height: DesignTokens.spacingMd),
+
+        _buildAdminCard(
+          context,
+          title: 'Gestión de Categorías',
+          subtitle: 'Organizar productos por categoría',
+          icon: Icons.category,
+          color: DesignTokens.warningColor,
+          onTap: () => context.push('/admin/categories')
         ),
       ],
     );
@@ -141,16 +174,14 @@ class AdminPage extends ConsumerWidget {
                 height: 50,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                  borderRadius: BorderRadius.circular(
+                    DesignTokens.borderRadiusMd,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 28,
-                ),
+                child: Icon(icon, color: color, size: 28),
               ),
               const SizedBox(width: DesignTokens.spacingLg),
-              
+
               // Información
               Expanded(
                 child: Column(
@@ -175,7 +206,7 @@ class AdminPage extends ConsumerWidget {
                   ],
                 ),
               ),
-              
+
               // Flecha
               Icon(
                 Icons.arrow_forward_ios,

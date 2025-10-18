@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import '../../../core/design/design_tokens.dart';
 import '../../providers/auth_provider.dart';
 
@@ -25,45 +28,64 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.dispose();
   }
 
-  void _handleLogin() {
-    if (_formKey.currentState!.validate()) {
-      // Validar credenciales ficticias
-      final email = _emailController.text.trim().toLowerCase();
-      final password = _passwordController.text;
-      
-      // Credenciales válidas: cualquier email y contraseña "usuario"
-      if (password == 'usuario') {
+  void _handleLogin() async {
+  if (_formKey.currentState!.validate()) {
+    final email = _emailController.text.trim().toLowerCase();
+    final password = _passwordController.text;
+
+    final url = Uri.parse('http://localhost:5044/api/Auth/login');
+
+    try {
+      print('Enviando solicitud a: $url');
+      print('Payload: $email / $password');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'passwordHash': password,
+        }),
+      );
+
+      print('Código de respuesta: ${response.statusCode}');
+      print('Cuerpo de respuesta: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('Respuesta decodificada: $data');
+
         final authNotifier = ref.read(authProvider.notifier);
         authNotifier.signInWithEmailAndPassword(email, password);
       } else {
+        final error = jsonDecode(response.body)['message'] ?? 'Credenciales incorrectas';
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Credenciales incorrectas. Usa cualquier email y contraseña "usuario"'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(error), backgroundColor: Colors.red),
         );
       }
+    } catch (e) {
+      print('Error al conectar con la API: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error de conexión con la API'), backgroundColor: Colors.red),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
-    // Escuchar cambios en el estado de autenticación
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next.isAuthenticated && !next.isLoading) {
-        // Redirigir al dashboard después del login exitoso
         context.go('/dashboard');
       }
-      
+
       if (next.error != null) {
-        // Mostrar error si existe
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.error!),
             backgroundColor: Colors.red,
           ),
         );
-        // Limpiar el error
         ref.read(authProvider.notifier).clearError();
       }
     });
@@ -79,20 +101,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                
-                // Logo y título
                 _buildHeader(),
                 const SizedBox(height: 48),
-                
-                // Formulario de login
                 _buildLoginForm(),
                 const SizedBox(height: 24),
-                
-                // Botón de login
                 _buildLoginButton(),
                 const SizedBox(height: 32),
-                
-                // Enlaces adicionales
                 _buildAdditionalLinks(),
               ],
             ),
@@ -105,7 +119,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        // Logo placeholder
         Container(
           width: 80,
           height: 80,
@@ -144,7 +157,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget _buildLoginForm() {
     return Column(
       children: [
-        // Campo de email
         TextFormField(
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
@@ -181,8 +193,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           },
         ),
         const SizedBox(height: 16),
-        
-        // Campo de contraseña
         TextFormField(
           controller: _passwordController,
           obscureText: _obscurePassword,
@@ -230,8 +240,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           },
         ),
         const SizedBox(height: 16),
-        
-        // Recordar contraseña
         Row(
           children: [
             Checkbox(
@@ -252,7 +260,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Widget _buildLoginButton() {
     final authState = ref.watch(authProvider);
-    
+
     return SizedBox(
       height: 50,
       child: ElevatedButton(

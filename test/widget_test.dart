@@ -7,7 +7,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:la_gata_app/main.dart';
+import 'package:integrador_lagata/main.dart';
 
 void main() {
   testWidgets('La Gata app smoke test', (WidgetTester tester) async {

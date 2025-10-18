@@ -38,7 +38,9 @@ class DashboardPage extends ConsumerWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                  borderRadius: BorderRadius.circular(
+                    DesignTokens.borderRadiusMd,
+                  ),
                   boxShadow: DesignTokens.cardShadow,
                 ),
                 child: Icon(
@@ -66,7 +68,11 @@ class DashboardPage extends ConsumerWidget {
         actions: [
           // Notificaciones
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white, size: 22),
+            icon: const Icon(
+              Icons.notifications,
+              color: Colors.white,
+              size: 22,
+            ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('🔔 Notificaciones próximamente')),
@@ -86,19 +92,34 @@ class DashboardPage extends ConsumerWidget {
           children: [
             // Sección de bienvenida
             _buildWelcomeSection(context, authState),
-            
-            SizedBox(height: ResponsiveHelper.instance.getResponsiveSpacing(context, DesignTokens.spacingXl)),
-            
+
+            SizedBox(
+              height: ResponsiveHelper.instance.getResponsiveSpacing(
+                context,
+                DesignTokens.spacingXl,
+              ),
+            ),
+
             // Estadísticas rápidas
             _buildStatsSection(context),
-            
-            SizedBox(height: ResponsiveHelper.instance.getResponsiveSpacing(context, DesignTokens.spacingXl)),
-            
+
+            SizedBox(
+              height: ResponsiveHelper.instance.getResponsiveSpacing(
+                context,
+                DesignTokens.spacingXl,
+              ),
+            ),
+
             // Acciones principales
             _buildMainActionsSection(context, authState),
-            
-            SizedBox(height: ResponsiveHelper.instance.getResponsiveSpacing(context, DesignTokens.spacingXl)),
-            
+
+            SizedBox(
+              height: ResponsiveHelper.instance.getResponsiveSpacing(
+                context,
+                DesignTokens.spacingXl,
+              ),
+            ),
+
             // Acciones secundarias
             _buildSecondaryActionsSection(context, authState),
           ],
@@ -111,9 +132,11 @@ class DashboardPage extends ConsumerWidget {
   Widget _buildWelcomeSection(BuildContext context, AuthState authState) {
     final responsiveHelper = ResponsiveHelper.instance;
     final isSmallMobile = responsiveHelper.isSmallMobile(context);
-    
+
     return Container(
-      padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingLg)),
+      padding: EdgeInsets.all(
+        responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingLg),
+      ),
       decoration: BoxDecoration(
         gradient: DesignTokens.primaryGradient,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusLg),
@@ -129,25 +152,44 @@ class DashboardPage extends ConsumerWidget {
                   '¡Bienvenido!',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSize3xl),
+                    fontSize: responsiveHelper.getResponsiveFontSize(
+                      context,
+                      DesignTokens.fontSize3xl,
+                    ),
                     fontWeight: DesignTokens.fontWeightBold,
                   ),
                 ),
-                SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
+                SizedBox(
+                  height: responsiveHelper.getResponsiveSpacing(
+                    context,
+                    DesignTokens.spacingSm,
+                  ),
+                ),
                 Text(
                   authState.user?.name ?? 'Usuario',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXl),
+                    fontSize: responsiveHelper.getResponsiveFontSize(
+                      context,
+                      DesignTokens.fontSizeXl,
+                    ),
                     fontWeight: DesignTokens.fontWeightMedium,
                   ),
                 ),
-                SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
+                SizedBox(
+                  height: responsiveHelper.getResponsiveSpacing(
+                    context,
+                    DesignTokens.spacingSm,
+                  ),
+                ),
                 Text(
                   'Sistema de Facturación La Gata',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeLg),
+                    fontSize: responsiveHelper.getResponsiveFontSize(
+                      context,
+                      DesignTokens.fontSizeLg,
+                    ),
                   ),
                 ),
               ],
@@ -159,7 +201,9 @@ class DashboardPage extends ConsumerWidget {
               height: responsiveHelper.getResponsiveIconSize(context, 60),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusFull),
+                borderRadius: BorderRadius.circular(
+                  DesignTokens.borderRadiusFull,
+                ),
               ),
               child: Icon(
                 Icons.local_bar,
@@ -175,29 +219,41 @@ class DashboardPage extends ConsumerWidget {
   /// Construye la sección de estadísticas
   Widget _buildStatsSection(BuildContext context) {
     final responsiveHelper = ResponsiveHelper.instance;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Estadísticas del Día',
           style: TextStyle(
-            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXl),
+            fontSize: responsiveHelper.getResponsiveFontSize(
+              context,
+              DesignTokens.fontSizeXl,
+            ),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
           ),
         ),
-        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+        SizedBox(
+          height: responsiveHelper.getResponsiveSpacing(
+            context,
+            DesignTokens.spacingMd,
+          ),
+        ),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(context),
+          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(
+            context,
+          ),
           crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
           mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(context),
+          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(
+            context,
+          ),
           children: [
             StatsCard(
-              title: 'Ventas Hoy',
+              title: 'Compras del dia',
               value: '₡125,000',
               icon: Icons.point_of_sale,
               color: DesignTokens.primaryColor,
@@ -205,7 +261,7 @@ class DashboardPage extends ConsumerWidget {
               isPositive: true,
             ),
             StatsCard(
-              title: 'Productos Vendidos',
+              title: 'Productos comprados',
               value: '45',
               icon: Icons.inventory,
               color: DesignTokens.successColor,
@@ -221,7 +277,7 @@ class DashboardPage extends ConsumerWidget {
               isPositive: false,
             ),
             StatsCard(
-              title: 'Clientes Atendidos',
+              title: 'proveedores atendidos',
               value: '12',
               icon: Icons.people,
               color: DesignTokens.accentColor,
@@ -237,29 +293,41 @@ class DashboardPage extends ConsumerWidget {
   /// Construye la sección de acciones principales
   Widget _buildMainActionsSection(BuildContext context, AuthState authState) {
     final responsiveHelper = ResponsiveHelper.instance;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Acciones Principales',
           style: TextStyle(
-            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXl),
+            fontSize: responsiveHelper.getResponsiveFontSize(
+              context,
+              DesignTokens.fontSizeXl,
+            ),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
           ),
         ),
-        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+        SizedBox(
+          height: responsiveHelper.getResponsiveSpacing(
+            context,
+            DesignTokens.spacingMd,
+          ),
+        ),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(context),
+          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(
+            context,
+          ),
           crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
           mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(context),
+          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(
+            context,
+          ),
           children: [
             DashboardCard(
-              title: 'Nueva Venta',
+              title: 'Nueva Compra',
               subtitle: 'Crear factura',
               icon: Icons.add_shopping_cart,
               color: DesignTokens.successColor,
@@ -273,7 +341,7 @@ class DashboardPage extends ConsumerWidget {
               onTap: () => context.push('/products'),
             ),
             DashboardCard(
-              title: 'Ventas',
+              title: 'Compras',
               subtitle: 'Ver historial',
               icon: Icons.receipt_long,
               color: DesignTokens.primaryColor,
@@ -293,7 +361,10 @@ class DashboardPage extends ConsumerWidget {
   }
 
   /// Construye la sección de acciones secundarias
-  Widget _buildSecondaryActionsSection(BuildContext context, AuthState authState) {
+  Widget _buildSecondaryActionsSection(
+    BuildContext context,
+    AuthState authState,
+  ) {
     final user = authState.user;
     final isAdmin = user?.isAdmin ?? false;
     final canManageInventory = user?.canManageInventory ?? false;
@@ -305,19 +376,31 @@ class DashboardPage extends ConsumerWidget {
         Text(
           'Más Opciones',
           style: TextStyle(
-            fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeXl),
+            fontSize: responsiveHelper.getResponsiveFontSize(
+              context,
+              DesignTokens.fontSizeXl,
+            ),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
           ),
         ),
-        SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+        SizedBox(
+          height: responsiveHelper.getResponsiveSpacing(
+            context,
+            DesignTokens.spacingMd,
+          ),
+        ),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(context),
+          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(
+            context,
+          ),
           crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
           mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(context),
+          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(
+            context,
+          ),
           children: [
             if (canManageInventory)
               DashboardCard(
@@ -328,22 +411,22 @@ class DashboardPage extends ConsumerWidget {
                 onTap: () => context.push('/inventory'),
               ),
             DashboardCard(
-              title: 'Clientes',
-              subtitle: 'Gestionar clientes',
+              title: 'Proveedores',
+              subtitle: 'Gestionar proveedores',
               icon: Icons.people_outline,
               color: DesignTokens.warningColor,
               onTap: () => context.push('/customers'),
             ),
             if (isAdmin)
               DashboardCard(
-                title: 'Usuarios',
+                title: 'Empleados',
                 subtitle: 'Gestionar empleados',
                 icon: Icons.manage_accounts,
                 color: DesignTokens.accentDarkColor,
                 onTap: () => context.push('/users'),
               ),
             DashboardCard(
-              title: 'Administración',
+              title: 'Administracion',
               subtitle: 'Gestión del sistema',
               icon: Icons.admin_panel_settings,
               color: DesignTokens.textSecondaryColor,

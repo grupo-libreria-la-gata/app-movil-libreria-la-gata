@@ -15,6 +15,9 @@ import '../presentation/pages/inventory/inventory_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/admin/admin_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
+import '../presentation/pages/brand_management/brand_management_page.dart';
+import '../presentation/pages/category_management/category_management_page.dart';
+import '../presentation/pages/producto_management/product_management_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -23,36 +26,36 @@ class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
   static const String emailVerification = '/email-verification';
-  
+
   // Productos
   static const String products = '/products';
   static const String productDetail = '/products/:id';
   static const String newProduct = '/products/new';
   static const String editProduct = '/products/:id/edit';
-  
+
   // Ventas
   static const String sales = '/sales';
   static const String newSale = '/sales/new';
   static const String saleDetail = '/sales/:id';
-  
+
   // Inventario
   static const String inventory = '/inventory';
-  
+
   // Clientes
   static const String customers = '/customers';
   static const String customerDetail = '/customers/:id';
-  
+
   // Reportes
   static const String reports = '/reports';
-  
+
   // Usuarios
   static const String users = '/users';
   static const String userDetail = '/users/:id';
-  
+
   // Configuración
   static const String settings = '/settings';
   static const String profile = '/profile';
-  
+
   // Administración
   static const String admin = '/admin';
 
@@ -65,14 +68,14 @@ class AppRoutes {
         name: 'splash',
         builder: (context, state) => const SplashPage(),
       ),
-      
+
       // Dashboard principal
       GoRoute(
         path: dashboard,
         name: 'dashboard',
         builder: (context, state) => const DashboardPage(),
       ),
-      
+
       // Autenticación
       GoRoute(
         path: login,
@@ -93,11 +96,12 @@ class AppRoutes {
         path: emailVerification,
         name: 'emailVerification',
         builder: (context, state) {
-          final email = state.uri.queryParameters['email'] ?? 'usuario@ejemplo.com';
+          final email =
+              state.uri.queryParameters['email'] ?? 'usuario@ejemplo.com';
           return EmailVerificationPage(email: email);
         },
       ),
-      
+
       // Productos
       GoRoute(
         path: products,
@@ -108,9 +112,7 @@ class AppRoutes {
         path: newProduct,
         name: 'newProduct',
         builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Nuevo Producto - En desarrollo'),
-          ),
+          body: Center(child: Text('Nuevo Producto - En desarrollo')),
         ),
       ),
       GoRoute(
@@ -127,16 +129,14 @@ class AppRoutes {
         builder: (context, state) {
           final productId = state.pathParameters['id']!;
           return Scaffold(
-            appBar: AppBar(
-              title: Text('Editar Producto $productId'),
-            ),
+            appBar: AppBar(title: Text('Editar Producto $productId')),
             body: Center(
               child: Text('Editar producto $productId - En desarrollo'),
             ),
           );
         },
       ),
-      
+
       // Ventas
       GoRoute(
         path: newSale,
@@ -154,23 +154,21 @@ class AppRoutes {
         builder: (context, state) {
           final saleId = state.pathParameters['id']!;
           return Scaffold(
-            appBar: AppBar(
-              title: Text('Venta $saleId'),
-            ),
+            appBar: AppBar(title: Text('Venta $saleId')),
             body: Center(
               child: Text('Detalle de venta $saleId - En desarrollo'),
             ),
           );
         },
       ),
-      
+
       // Inventario
       GoRoute(
         path: inventory,
         name: 'inventory',
         builder: (context, state) => const InventoryPage(),
       ),
-      
+
       // Clientes
       GoRoute(
         path: customers,
@@ -183,35 +181,29 @@ class AppRoutes {
         builder: (context, state) {
           final customerId = state.pathParameters['id']!;
           return Scaffold(
-            appBar: AppBar(
-              title: Text('Cliente $customerId'),
-            ),
+            appBar: AppBar(title: Text('Cliente $customerId')),
             body: Center(
               child: Text('Detalle del cliente $customerId - En desarrollo'),
             ),
           );
         },
       ),
-      
+
       // Reportes
       GoRoute(
         path: reports,
         name: 'reports',
         builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Reportes y Estadísticas - En desarrollo'),
-          ),
+          body: Center(child: Text('Reportes y Estadísticas - En desarrollo')),
         ),
       ),
-      
+
       // Usuarios
       GoRoute(
         path: users,
         name: 'users',
         builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('Gestión de Usuarios - En desarrollo'),
-          ),
+          body: Center(child: Text('Gestión de Usuarios - En desarrollo')),
         ),
       ),
       GoRoute(
@@ -220,35 +212,54 @@ class AppRoutes {
         builder: (context, state) {
           final userId = state.pathParameters['id']!;
           return Scaffold(
-            appBar: AppBar(
-              title: Text('Usuario $userId'),
-            ),
+            appBar: AppBar(title: Text('Usuario $userId')),
             body: Center(
               child: Text('Detalle del usuario $userId - En desarrollo'),
             ),
           );
         },
       ),
-      
+
       // Configuración
       GoRoute(
         path: settings,
         name: 'settings',
         builder: (context, state) => const SettingsPage(),
       ),
-      
+
       // Administración
       GoRoute(
         path: admin,
         name: 'admin',
         builder: (context, state) => const AdminPage(),
       ),
-      
+
       // Perfil
       GoRoute(
         path: profile,
         name: 'profile',
         builder: (context, state) => const ProfilePage(),
+      ),
+
+      // brand management
+      GoRoute(
+        path: '/admin/brands',
+        name: 'brandManagement',
+        builder: (context, state) => const BrandManagementPage(),
+      ),
+
+      // category management
+      GoRoute(
+        path: '/admin/categories',
+        name: 'categoryManagement',
+        builder: (context, state) => const CategoryManagementPage(),
+      ),
+
+      // producto magement
+      GoRoute(
+        path: '/admin/products',
+        name: 'productManagement',
+        builder: (context, state) => const ProductManagementPage(),
       ),
     ],
   );
