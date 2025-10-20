@@ -10,7 +10,7 @@ class ApiService {
   factory ApiService() => _instance;
   ApiService._internal();
 
-  late Dio _dio;
+  Dio? _dio;
   String? _accessToken;
   String? _refreshToken;
 
@@ -19,47 +19,53 @@ class ApiService {
 
   /// Inicializa el servicio de API
   void initialize() {
-    _dio = Dio(BaseOptions(
-      baseUrl: AppConfig.baseUrl,
-      connectTimeout: Duration(milliseconds: AppConfig.connectionTimeout),
-      receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeout),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    ));
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: AppConfig.baseUrl,
+        connectTimeout: Duration(milliseconds: AppConfig.connectionTimeout),
+        receiveTimeout: Duration(milliseconds: AppConfig.receiveTimeout),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
 
     // Interceptor para manejo de autenticación
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-        if (_accessToken != null) {
-          options.headers['Authorization'] = 'Bearer $_accessToken';
-        }
-        handler.next(options);
-      },
-      onError: (error, handler) async {
-        if (error.response?.statusCode == 401) {
-          // Token expirado, intentar refrescar
-          if (await _refreshAccessToken()) {
-            // Reintentar la petición original
-            final options = error.requestOptions;
+    _dio!.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          if (_accessToken != null) {
             options.headers['Authorization'] = 'Bearer $_accessToken';
-            final response = await _dio.fetch(options);
-            handler.resolve(response);
-            return;
           }
-        }
-        handler.next(error);
-      },
-    ));
+          handler.next(options);
+        },
+        onError: (error, handler) async {
+          if (error.response?.statusCode == 401) {
+            // Token expirado, intentar refrescar
+            if (await _refreshAccessToken()) {
+              // Reintentar la petición original
+              final options = error.requestOptions;
+              options.headers['Authorization'] = 'Bearer $_accessToken';
+              final response = await _dio!.fetch(options);
+              handler.resolve(response);
+              return;
+            }
+          }
+          handler.next(error);
+        },
+      ),
+    );
 
     // Interceptor para logging en desarrollo
     if (AppConfig.appVersion.contains('debug')) {
-      _dio.interceptors.add(LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-        logPrint: (object) => print('API: $object'),
-      ));
+      _dio!.interceptors.add(
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+          logPrint: (object) => {}, // Removed print for production
+        ),
+      );
     }
   }
 
@@ -92,11 +98,13 @@ class ApiService {
   /// Refresca el token de acceso
   Future<bool> _refreshAccessToken() async {
     if (_refreshToken == null) return false;
+    if (_dio == null) return false;
 
     try {
-      final response = await _dio.post('/auth/refresh', data: {
-        'refreshToken': _refreshToken,
-      });
+      final response = await _dio!.post(
+        '/auth/refresh',
+        data: {'refreshToken': _refreshToken},
+      );
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -117,6 +125,10 @@ class ApiService {
     Map<String, dynamic>? headers,
   }) async {
     try {
+      if (_dio == null) {
+        initialize();
+      }
+
       if (!await hasInternetConnection()) {
         return ApiResponse.error(
           message: 'Sin conexión a internet',
@@ -124,7 +136,7 @@ class ApiService {
         );
       }
 
-      final response = await _dio.get(
+      final response = await _dio!.get(
         endpoint,
         queryParameters: queryParameters,
         options: Options(headers: headers),
@@ -149,6 +161,10 @@ class ApiService {
     Map<String, dynamic>? headers,
   }) async {
     try {
+      if (_dio == null) {
+        initialize();
+      }
+
       if (!await hasInternetConnection()) {
         return ApiResponse.error(
           message: 'Sin conexión a internet',
@@ -156,7 +172,7 @@ class ApiService {
         );
       }
 
-      final response = await _dio.post(
+      final response = await _dio!.post(
         endpoint,
         data: data,
         queryParameters: queryParameters,
@@ -182,6 +198,10 @@ class ApiService {
     Map<String, dynamic>? headers,
   }) async {
     try {
+      if (_dio == null) {
+        initialize();
+      }
+
       if (!await hasInternetConnection()) {
         return ApiResponse.error(
           message: 'Sin conexión a internet',
@@ -189,7 +209,7 @@ class ApiService {
         );
       }
 
-      final response = await _dio.put(
+      final response = await _dio!.put(
         endpoint,
         data: data,
         queryParameters: queryParameters,
@@ -215,6 +235,10 @@ class ApiService {
     Map<String, dynamic>? headers,
   }) async {
     try {
+      if (_dio == null) {
+        initialize();
+      }
+
       if (!await hasInternetConnection()) {
         return ApiResponse.error(
           message: 'Sin conexión a internet',
@@ -222,7 +246,7 @@ class ApiService {
         );
       }
 
-      final response = await _dio.patch(
+      final response = await _dio!.patch(
         endpoint,
         data: data,
         queryParameters: queryParameters,
@@ -248,6 +272,10 @@ class ApiService {
     Map<String, dynamic>? headers,
   }) async {
     try {
+      if (_dio == null) {
+        initialize();
+      }
+
       if (!await hasInternetConnection()) {
         return ApiResponse.error(
           message: 'Sin conexión a internet',
@@ -255,7 +283,7 @@ class ApiService {
         );
       }
 
-      final response = await _dio.delete(
+      final response = await _dio!.delete(
         endpoint,
         data: data,
         queryParameters: queryParameters,
@@ -352,6 +380,10 @@ class ApiService {
     ProgressCallback? onSendProgress,
   }) async {
     try {
+      if (_dio == null) {
+        initialize();
+      }
+
       if (!await hasInternetConnection()) {
         return ApiResponse.error(
           message: 'Sin conexión a internet',
@@ -364,7 +396,7 @@ class ApiService {
         ...?additionalData,
       });
 
-      final response = await _dio.post(
+      final response = await _dio!.post(
         endpoint,
         data: formData,
         onSendProgress: onSendProgress,
@@ -388,6 +420,10 @@ class ApiService {
     ProgressCallback? onReceiveProgress,
   }) async {
     try {
+      if (_dio == null) {
+        initialize();
+      }
+
       if (!await hasInternetConnection()) {
         return ApiResponse.error(
           message: 'Sin conexión a internet',
@@ -395,7 +431,7 @@ class ApiService {
         );
       }
 
-      final response = await _dio.download(
+      final response = await _dio!.download(
         endpoint,
         savePath,
         onReceiveProgress: onReceiveProgress,

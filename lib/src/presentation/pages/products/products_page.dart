@@ -32,20 +32,20 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
 
   List<Map<String, dynamic>> get _filteredProducts {
     final filterService = FilterService();
-    
+
     // Combinar filtros básicos con avanzados
     final allFilters = <String, dynamic>{
       'search': _searchController.text,
       'category': _selectedCategory,
       ..._advancedFilters,
     };
-    
+
     // Aplicar filtros combinados
     var filtered = filterService.applyProductFilters(_products, allFilters);
-    
+
     // Aplicar ordenamiento
     filtered = filterService.sortProducts(filtered, _sortBy, _sortAscending);
-    
+
     return filtered;
   }
 
@@ -66,7 +66,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
     await executeWithErrorHandling(() async {
       // Simular carga de productos desde API
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Cargar productos desde el servicio mock
       _products = MockDataService().mockProducts;
     });
@@ -79,10 +79,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
       appBar: AppBar(
         backgroundColor: DesignTokens.primaryColor,
         elevation: 0,
-        title: const Text(
-          'Productos',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Productos', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
@@ -98,11 +95,9 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
         children: [
           // Barra de búsqueda y filtros
           _buildSearchAndFilters(),
-          
+
           // Contenido principal
-          Expanded(
-            child: _buildMainContent(),
-          ),
+          Expanded(child: _buildMainContent()),
         ],
       ),
     );
@@ -147,9 +142,11 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
   /// Construye la barra de búsqueda y filtros
   Widget _buildSearchAndFilters() {
     final responsiveHelper = ResponsiveHelper.instance;
-    
+
     return Container(
-      padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+      padding: EdgeInsets.all(
+        responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd),
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -168,28 +165,48 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
             hintText: 'Buscar productos...',
             onChanged: (value) => setState(() {}),
           ),
-          
-          SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
-          
+
+          SizedBox(
+            height: responsiveHelper.getResponsiveSpacing(
+              context,
+              DesignTokens.spacingMd,
+            ),
+          ),
+
           // Filtros básicos - Cambiar a columna en móviles pequeños
-          ResponsiveHelper.instance.isSmallMobile(context) 
-            ? Column(
-                children: [
-                  _buildCategoryFilter(),
-                  SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
-                  _buildSortFilter(),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(child: _buildCategoryFilter()),
-                  SizedBox(width: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
-                  Expanded(child: _buildSortFilter()),
-                ],
-              ),
-          
-          SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
-          
+          ResponsiveHelper.instance.isSmallMobile(context)
+              ? Column(
+                  children: [
+                    _buildCategoryFilter(),
+                    SizedBox(
+                      height: responsiveHelper.getResponsiveSpacing(
+                        context,
+                        DesignTokens.spacingMd,
+                      ),
+                    ),
+                    _buildSortFilter(),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: _buildCategoryFilter()),
+                    SizedBox(
+                      width: responsiveHelper.getResponsiveSpacing(
+                        context,
+                        DesignTokens.spacingMd,
+                      ),
+                    ),
+                    Expanded(child: _buildSortFilter()),
+                  ],
+                ),
+
+          SizedBox(
+            height: responsiveHelper.getResponsiveSpacing(
+              context,
+              DesignTokens.spacingMd,
+            ),
+          ),
+
           // Filtros avanzados
           AdvancedFiltersWidget(
             filters: _advancedFilters,
@@ -204,10 +221,15 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
               });
             },
           ),
-          
+
           // Chips de filtros activos
           if (FilterService().getActiveFiltersCount(_advancedFilters) > 0) ...[
-            SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
+            SizedBox(
+              height: responsiveHelper.getResponsiveSpacing(
+                context,
+                DesignTokens.spacingSm,
+              ),
+            ),
             FilterChipsWidget(
               filters: _advancedFilters,
               onRemoveFilter: (key) {
@@ -221,7 +243,12 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
                 });
               },
             ),
-            SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingSm)),
+            SizedBox(
+              height: responsiveHelper.getResponsiveSpacing(
+                context,
+                DesignTokens.spacingSm,
+              ),
+            ),
             _buildFilterStats(),
           ],
         ],
@@ -232,7 +259,7 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
   /// Construye el filtro de categorías
   Widget _buildCategoryFilter() {
     return DropdownButtonFormField<String>(
-      value: _selectedCategory,
+      initialValue: _selectedCategory,
       decoration: InputDecoration(
         labelText: 'Categoría',
         border: OutlineInputBorder(
@@ -243,22 +270,20 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
           vertical: DesignTokens.spacingSm,
         ),
       ),
-      items: [
-        'Todas',
-        'Whiskey',
-        'Ron',
-        'Vodka',
-        'Tequila',
-        'Gin',
-        'Vino',
-        'Cerveza',
-        'Licor',
-      ].map((category) {
-        return DropdownMenuItem(
-          value: category,
-          child: Text(category),
-        );
-      }).toList(),
+      items:
+          [
+            'Todas',
+            'Whiskey',
+            'Ron',
+            'Vodka',
+            'Tequila',
+            'Gin',
+            'Vino',
+            'Cerveza',
+            'Licor',
+          ].map((category) {
+            return DropdownMenuItem(value: category, child: Text(category));
+          }).toList(),
       onChanged: (value) {
         setState(() {
           _selectedCategory = value!;
@@ -273,11 +298,13 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
       children: [
         Expanded(
           child: DropdownButtonFormField<String>(
-            value: _sortBy,
+            initialValue: _sortBy,
             decoration: InputDecoration(
               labelText: 'Ordenar por',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                borderRadius: BorderRadius.circular(
+                  DesignTokens.borderRadiusMd,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: DesignTokens.spacingMd,
@@ -287,7 +314,10 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
             items: [
               DropdownMenuItem(value: 'name', child: const Text('Nombre')),
               DropdownMenuItem(value: 'brand', child: const Text('Marca')),
-              DropdownMenuItem(value: 'category', child: const Text('Categoría')),
+              DropdownMenuItem(
+                value: 'category',
+                child: const Text('Categoría'),
+              ),
               DropdownMenuItem(value: 'price', child: const Text('Precio')),
               DropdownMenuItem(value: 'stock', child: const Text('Stock')),
               DropdownMenuItem(value: 'createdAt', child: const Text('Fecha')),
@@ -324,22 +354,22 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
   Widget _buildFilterStats() {
     final filterService = FilterService();
     final stats = filterService.getFilterStats(_products, _filteredProducts);
-    final activeFiltersCount = filterService.getActiveFiltersCount(_advancedFilters);
-    
+    final activeFiltersCount = filterService.getActiveFiltersCount(
+      _advancedFilters,
+    );
+
     return Container(
       padding: const EdgeInsets.all(DesignTokens.spacingSm),
       decoration: BoxDecoration(
         color: DesignTokens.primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-        border: Border.all(color: DesignTokens.primaryColor.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: DesignTokens.primaryColor.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.filter_list,
-            size: 16,
-            color: DesignTokens.primaryColor,
-          ),
+          Icon(Icons.filter_list, size: 16, color: DesignTokens.primaryColor),
           const SizedBox(width: DesignTokens.spacingXs),
           Expanded(
             child: Text(
@@ -359,14 +389,21 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
   /// Construye la lista de productos
   Widget _buildProductsList() {
     final responsiveHelper = ResponsiveHelper.instance;
-    
+
     return ListView.builder(
-      padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+      padding: EdgeInsets.all(
+        responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd),
+      ),
       itemCount: _filteredProducts.length,
       itemBuilder: (context, index) {
         final product = _filteredProducts[index];
         return Padding(
-          padding: EdgeInsets.only(bottom: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+          padding: EdgeInsets.only(
+            bottom: responsiveHelper.getResponsiveSpacing(
+              context,
+              DesignTokens.spacingMd,
+            ),
+          ),
           child: ProductCard(
             product: product,
             onTap: () => context.push('/products/${product['id']}'),
@@ -374,54 +411,6 @@ class _ProductsPageState extends ConsumerState<ProductsPage> with LoadingMixin {
           ),
         );
       },
-    );
-  }
-
-  /// Construye el estado vacío
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.inventory_2_outlined,
-            size: 80,
-            color: DesignTokens.textSecondaryColor,
-          ),
-          const SizedBox(height: DesignTokens.spacingLg),
-          Text(
-            'No se encontraron productos',
-            style: TextStyle(
-              fontSize: DesignTokens.fontSizeLg,
-              fontWeight: DesignTokens.fontWeightMedium,
-              color: DesignTokens.textSecondaryColor,
-            ),
-          ),
-          const SizedBox(height: DesignTokens.spacingMd),
-          Text(
-            'Intenta ajustar los filtros o agregar nuevos productos',
-            style: TextStyle(
-              fontSize: DesignTokens.fontSizeMd,
-              color: DesignTokens.textSecondaryColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: DesignTokens.spacingLg),
-          ElevatedButton.icon(
-            onPressed: () => context.push('/products/new'),
-            icon: const Icon(Icons.add),
-            label: const Text('Agregar Producto'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: DesignTokens.primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingLg,
-                vertical: DesignTokens.spacingMd,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

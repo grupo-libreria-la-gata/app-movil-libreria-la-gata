@@ -29,48 +29,51 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   void _handleLogin() async {
-  if (_formKey.currentState!.validate()) {
-    final email = _emailController.text.trim().toLowerCase();
-    final password = _passwordController.text;
+    if (_formKey.currentState!.validate()) {
+      final email = _emailController.text.trim().toLowerCase();
+      final password = _passwordController.text;
 
-    final url = Uri.parse('http://localhost:5044/api/Auth/login');
+      final url = Uri.parse('http://localhost:5044/api/Auth/login');
 
-    try {
-      print('Enviando solicitud a: $url');
-      print('Payload: $email / $password');
+      try {
+        // Debug logging removed for production
 
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'passwordHash': password,
-        }),
-      );
-
-      print('Código de respuesta: ${response.statusCode}');
-      print('Cuerpo de respuesta: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print('Respuesta decodificada: $data');
-
-        final authNotifier = ref.read(authProvider.notifier);
-        authNotifier.signInWithEmailAndPassword(email, password);
-      } else {
-        final error = jsonDecode(response.body)['message'] ?? 'Credenciales incorrectas';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error), backgroundColor: Colors.red),
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'email': email, 'passwordHash': password}),
         );
+
+        // Debug logging removed for production
+
+        if (response.statusCode == 200) {
+          // Debug logging removed for production
+
+          final authNotifier = ref.read(authProvider.notifier);
+          authNotifier.signInWithEmailAndPassword(email, password);
+        } else {
+          final error =
+              jsonDecode(response.body)['message'] ??
+              'Credenciales incorrectas';
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error), backgroundColor: Colors.red),
+            );
+          }
+        }
+      } catch (e) {
+        // Debug logging removed for production
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error de conexión con la API'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
-    } catch (e) {
-      print('Error al conectar con la API: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error de conexión con la API'), backgroundColor: Colors.red),
-      );
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -81,10 +84,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
       if (next.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error!),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
         );
         ref.read(authProvider.notifier).clearError();
       }
@@ -127,11 +127,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: DesignTokens.elevatedShadow,
           ),
-          child: const Icon(
-            Icons.local_bar,
-            size: 40,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.local_bar, size: 40, color: Colors.white),
         ),
         const SizedBox(height: 16),
         Text(
@@ -166,7 +162,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             labelStyle: TextStyle(color: DesignTokens.textPrimaryColor),
             hintText: 'ejemplo@correo.com',
             hintStyle: TextStyle(color: DesignTokens.textSecondaryColor),
-            prefixIcon: Icon(Icons.email_outlined, color: DesignTokens.textSecondaryColor),
+            prefixIcon: Icon(
+              Icons.email,
+              color: DesignTokens.textSecondaryColor,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
               borderSide: BorderSide(color: DesignTokens.dividerColor),
@@ -177,7 +176,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              borderSide: BorderSide(color: DesignTokens.primaryColor, width: 2),
+              borderSide: BorderSide(
+                color: DesignTokens.primaryColor,
+                width: 2,
+              ),
             ),
             filled: true,
             fillColor: DesignTokens.cardColor,
@@ -202,7 +204,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             labelStyle: TextStyle(color: DesignTokens.textPrimaryColor),
             hintText: 'Ingresa tu contraseña',
             hintStyle: TextStyle(color: DesignTokens.textSecondaryColor),
-            prefixIcon: Icon(Icons.lock_outlined, color: DesignTokens.textSecondaryColor),
+            prefixIcon: Icon(
+              Icons.lock,
+              color: DesignTokens.textSecondaryColor,
+            ),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility : Icons.visibility_off,
@@ -224,7 +229,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              borderSide: BorderSide(color: DesignTokens.primaryColor, width: 2),
+              borderSide: BorderSide(
+                color: DesignTokens.primaryColor,
+                width: 2,
+              ),
             ),
             filled: true,
             fillColor: DesignTokens.cardColor,
@@ -283,10 +291,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               )
             : const Text(
                 'Iniciar Sesión',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
       ),
     );

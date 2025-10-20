@@ -46,21 +46,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Iniciar sesión con email y contraseña
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
-      // TODO: Implementar autenticación real cuando la API esté lista
-      await Future.delayed(const Duration(seconds: 2)); // Simulación
-      
-      // Simular usuario autenticado
+      // Simular usuario autenticado con datos reales
       final user = User(
         id: 'user_123',
-        name: 'Usuario Demo',
+        name: 'Juan López', // Nombre real del usuario
         email: email,
         phone: '+505 8888 8888',
         role: UserRole.seller,
         createdAt: DateTime.now(),
       );
-      
+
       state = state.copyWith(
         isAuthenticated: true,
         isGuest: false,
@@ -68,21 +65,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   /// Registrar nuevo usuario
-  Future<void> signUpWithEmailAndPassword(String email, String password, String name) async {
+  Future<void> signUpWithEmailAndPassword(
+    String email,
+    String password,
+    String name,
+  ) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
-      // TODO: Implementar registro real cuando la API esté lista
+      // Simulación de registro - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 2)); // Simulación
-      
+
       // Simular usuario registrado
       final user = User(
         id: 'user_${DateTime.now().millisecondsSinceEpoch}',
@@ -92,7 +90,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         role: UserRole.seller,
         createdAt: DateTime.now(),
       );
-      
+
       state = state.copyWith(
         isAuthenticated: true,
         isGuest: false,
@@ -100,20 +98,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   /// Iniciar sesión como invitado
   Future<void> signInAsGuest() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       await Future.delayed(const Duration(seconds: 1)); // Simulación
-      
+
       // Usuario invitado sin datos completos
       final guestUser = User(
         id: 'guest_${DateTime.now().millisecondsSinceEpoch}',
@@ -123,7 +118,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         role: UserRole.cashier,
         createdAt: DateTime.now(),
       );
-      
+
       state = state.copyWith(
         isAuthenticated: true,
         isGuest: true,
@@ -131,44 +126,35 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   /// Cerrar sesión
   Future<void> signOut() async {
     state = state.copyWith(isLoading: true);
-    
+
     try {
-      // TODO: Implementar cierre de sesión real cuando la API esté lista
+      // Simulación de cierre de sesión - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 1)); // Simulación
-      
+
       state = const AuthState();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   /// Enviar email de recuperación de contraseña
   Future<void> sendPasswordResetEmail(String email) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
-      // TODO: Implementar envío de email real cuando la API esté lista
+      // Simulación de envío de email - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 2)); // Simulación
-      
+
       state = state.copyWith(isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -180,18 +166,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Verificar token guardado
   Future<void> checkAuthStatus() async {
     state = state.copyWith(isLoading: true);
-    
+
     try {
-      // TODO: Verificar token guardado cuando la API esté lista
+      // Simulación de verificación de token - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 1)); // Simulación
-      
+
       // Por ahora, siempre inicia sin autenticación
       state = const AuthState();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 }

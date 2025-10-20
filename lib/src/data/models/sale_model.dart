@@ -3,6 +3,7 @@ import '../../domain/entities/sale.dart';
 
 /// Modelo de datos para Venta con serialización JSON
 class SaleModel extends BaseModel {
+  @override
   final String id;
   final String invoiceNumber;
   final String customerName;
@@ -17,7 +18,9 @@ class SaleModel extends BaseModel {
   final String sellerName;
   final SaleStatus status;
   final PaymentMethod paymentMethod;
+  @override
   final DateTime createdAt;
+  @override
   final DateTime? updatedAt;
   final String? notes;
   final Map<String, dynamic>? metadata;
@@ -44,11 +47,11 @@ class SaleModel extends BaseModel {
   });
 
   @override
-  bool get isValid => 
-      id.isNotEmpty && 
-      invoiceNumber.isNotEmpty && 
-      customerName.isNotEmpty && 
-      items.isNotEmpty && 
+  bool get isValid =>
+      id.isNotEmpty &&
+      invoiceNumber.isNotEmpty &&
+      customerName.isNotEmpty &&
+      items.isNotEmpty &&
       total > 0;
 
   /// Convierte el modelo a una entidad de dominio
@@ -186,10 +189,12 @@ class SaleModel extends BaseModel {
         orElse: () => PaymentMethod.cash,
       ),
       createdAt: DateTime.parse(map['createdAt']),
-      updatedAt: map['updatedAt'] != null ? DateTime.parse(map['updatedAt']) : null,
+      updatedAt: map['updatedAt'] != null
+          ? DateTime.parse(map['updatedAt'])
+          : null,
       notes: map['notes'],
-      metadata: map['metadata'] != null 
-          ? Map<String, dynamic>.from(map['metadata']) 
+      metadata: map['metadata'] != null
+          ? Map<String, dynamic>.from(map['metadata'])
           : null,
     );
   }
@@ -200,6 +205,7 @@ class SaleModel extends BaseModel {
   }
 
   /// Convierte el modelo a JSON
+  @override
   Map<String, dynamic> toJson() => toMap();
 
   @override
@@ -301,8 +307,8 @@ class SaleItemModel {
       quantity: map['quantity'] ?? 0,
       total: (map['total'] ?? 0.0).toDouble(),
       discount: map['discount']?.toDouble(),
-      metadata: map['metadata'] != null 
-          ? Map<String, dynamic>.from(map['metadata']) 
+      metadata: map['metadata'] != null
+          ? Map<String, dynamic>.from(map['metadata'])
           : null,
     );
   }
@@ -362,8 +368,8 @@ class CreateSaleDto {
         orElse: () => PaymentMethod.cash,
       ),
       notes: map['notes'],
-      metadata: map['metadata'] != null 
-          ? Map<String, dynamic>.from(map['metadata']) 
+      metadata: map['metadata'] != null
+          ? Map<String, dynamic>.from(map['metadata'])
           : null,
     );
   }
@@ -431,7 +437,9 @@ class UpdateSaleDto {
     if (customerName != null) map['customerName'] = customerName;
     if (customerEmail != null) map['customerEmail'] = customerEmail;
     if (customerPhone != null) map['customerPhone'] = customerPhone;
-    if (items != null) map['items'] = items!.map((item) => item.toMap()).toList();
+    if (items != null) {
+      map['items'] = items!.map((item) => item.toMap()).toList();
+    }
     if (discount != null) map['discount'] = discount;
     if (status != null) map['status'] = status!.name;
     if (paymentMethod != null) map['paymentMethod'] = paymentMethod!.name;
@@ -445,27 +453,27 @@ class UpdateSaleDto {
       customerName: map['customerName'],
       customerEmail: map['customerEmail'],
       customerPhone: map['customerPhone'],
-      items: map['items'] != null 
+      items: map['items'] != null
           ? List<CreateSaleItemDto>.from(
-              map['items'].map((x) => CreateSaleItemDto.fromMap(x))
+              map['items'].map((x) => CreateSaleItemDto.fromMap(x)),
             )
           : null,
       discount: map['discount']?.toDouble(),
-      status: map['status'] != null 
+      status: map['status'] != null
           ? SaleStatus.values.firstWhere(
               (e) => e.name == map['status'],
               orElse: () => SaleStatus.completed,
             )
           : null,
-      paymentMethod: map['paymentMethod'] != null 
+      paymentMethod: map['paymentMethod'] != null
           ? PaymentMethod.values.firstWhere(
               (e) => e.name == map['paymentMethod'],
               orElse: () => PaymentMethod.cash,
             )
           : null,
       notes: map['notes'],
-      metadata: map['metadata'] != null 
-          ? Map<String, dynamic>.from(map['metadata']) 
+      metadata: map['metadata'] != null
+          ? Map<String, dynamic>.from(map['metadata'])
           : null,
     );
   }
@@ -520,19 +528,21 @@ class SaleFilterDto {
       search: map['search'],
       customerName: map['customerName'],
       sellerId: map['sellerId'],
-      status: map['status'] != null 
+      status: map['status'] != null
           ? SaleStatus.values.firstWhere(
               (e) => e.name == map['status'],
               orElse: () => SaleStatus.completed,
             )
           : null,
-      paymentMethod: map['paymentMethod'] != null 
+      paymentMethod: map['paymentMethod'] != null
           ? PaymentMethod.values.firstWhere(
               (e) => e.name == map['paymentMethod'],
               orElse: () => PaymentMethod.cash,
             )
           : null,
-      startDate: map['startDate'] != null ? DateTime.parse(map['startDate']) : null,
+      startDate: map['startDate'] != null
+          ? DateTime.parse(map['startDate'])
+          : null,
       endDate: map['endDate'] != null ? DateTime.parse(map['endDate']) : null,
       minTotal: map['minTotal']?.toDouble(),
       maxTotal: map['maxTotal']?.toDouble(),

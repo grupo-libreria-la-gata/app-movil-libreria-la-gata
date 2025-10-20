@@ -7,7 +7,6 @@ import '../../../core/services/error_service.dart';
 import '../../../core/services/mock_data_service.dart';
 import '../../widgets/search_bar_widget.dart';
 import '../../widgets/product_card.dart';
-import '../../widgets/loading_widgets.dart';
 
 /// Página para crear una nueva venta
 class NewSalePage extends ConsumerStatefulWidget {
@@ -20,9 +19,10 @@ class NewSalePage extends ConsumerStatefulWidget {
 class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _customerNameController = TextEditingController();
-  final TextEditingController _customerPhoneController = TextEditingController();
+  final TextEditingController _customerPhoneController =
+      TextEditingController();
   final TextEditingController _discountController = TextEditingController();
-  
+
   final List<Map<String, dynamic>> _cartItems = [];
   String _selectedPaymentMethod = 'Efectivo';
   DiscountType _selectedDiscountType = DiscountType.none;
@@ -35,11 +35,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
     if (_searchController.text.isEmpty) {
       return _availableProducts;
     }
-    
+
     return _availableProducts.where((product) {
       final search = _searchController.text.toLowerCase();
       return product['name'].toLowerCase().contains(search) ||
-             product['brand'].toLowerCase().contains(search);
+          product['brand'].toLowerCase().contains(search);
     }).toList();
   }
 
@@ -52,7 +52,11 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
   }
 
   double get _discount {
-    return BusinessService().calculateDiscount(_subtotal, _selectedDiscountType, _discountValue);
+    return BusinessService().calculateDiscount(
+      _subtotal,
+      _selectedDiscountType,
+      _discountValue,
+    );
   }
 
   double get _total {
@@ -79,7 +83,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
     await executeWithErrorHandling(() async {
       // Simular carga de productos
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Cargar productos desde el servicio mock
       _availableProducts = MockDataService().mockProducts;
     });
@@ -92,10 +96,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
       appBar: AppBar(
         backgroundColor: DesignTokens.primaryColor,
         elevation: 0,
-        title: const Text(
-          'Nueva Venta',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Nueva Venta', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
@@ -105,12 +106,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
         children: [
           // Información del cliente
           _buildCustomerInfo(),
-          
+
           // Productos disponibles
-          Expanded(
-            child: _buildProductsSection(),
-          ),
-          
+          Expanded(child: _buildProductsSection()),
+
           // Carrito y total
           _buildCartSection(),
         ],
@@ -152,7 +151,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
                   decoration: InputDecoration(
                     labelText: 'Nombre del Cliente',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.borderRadiusMd,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: DesignTokens.spacingMd,
@@ -168,7 +169,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
                   decoration: InputDecoration(
                     labelText: 'Teléfono (opcional)',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.borderRadiusMd,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: DesignTokens.spacingMd,
@@ -197,7 +200,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
             onChanged: (value) => setState(() {}),
           ),
         ),
-        
+
         // Lista de productos
         Expanded(
           child: _filteredProducts.isEmpty
@@ -268,26 +271,23 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
       child: Column(
         children: [
           // Items del carrito
-          if (_cartItems.isNotEmpty) ...[
-            _buildCartItems(),
-            const Divider(),
-          ],
-          
+          if (_cartItems.isNotEmpty) ...[_buildCartItems(), const Divider()],
+
           // Totales
           _buildTotals(),
-          
+
           const SizedBox(height: DesignTokens.spacingMd),
-          
+
           // Método de pago
           _buildPaymentMethod(),
-          
+
           const SizedBox(height: DesignTokens.spacingMd),
-          
+
           // Configuración de descuentos
           _buildDiscountSection(),
-          
+
           const SizedBox(height: DesignTokens.spacingMd),
-          
+
           // Botón de finalizar venta
           _buildFinishSaleButton(),
         ],
@@ -321,7 +321,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                icon: const Icon(
+                  Icons.remove_circle_outline,
+                  color: Colors.red,
+                ),
                 onPressed: () => _removeFromCart(item['id']),
               ),
             ],
@@ -439,10 +442,12 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
           children: [
             Expanded(
               child: DropdownButtonFormField<DiscountType>(
-                value: _selectedDiscountType,
+                initialValue: _selectedDiscountType,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.borderRadiusMd,
+                    ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: DesignTokens.spacingMd,
@@ -471,9 +476,13 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
                   controller: _discountController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    hintText: _selectedDiscountType == DiscountType.percentage ? '15%' : '₡1000',
+                    hintText: _selectedDiscountType == DiscountType.percentage
+                        ? '15%'
+                        : '₡1000',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.borderRadiusMd,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: DesignTokens.spacingMd,
@@ -508,26 +517,22 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
         const SizedBox(width: DesignTokens.spacingMd),
         Expanded(
           child: DropdownButtonFormField<String>(
-            value: _selectedPaymentMethod,
+            initialValue: _selectedPaymentMethod,
             decoration: InputDecoration(
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                borderRadius: BorderRadius.circular(
+                  DesignTokens.borderRadiusMd,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: DesignTokens.spacingMd,
                 vertical: DesignTokens.spacingSm,
               ),
             ),
-            items: [
-              'Efectivo',
-              'Tarjeta',
-              'Transferencia',
-              'Móvil',
-            ].map((method) {
-              return DropdownMenuItem(
-                value: method,
-                child: Text(method),
-              );
+            items: ['Efectivo', 'Tarjeta', 'Transferencia', 'Móvil'].map((
+              method,
+            ) {
+              return DropdownMenuItem(value: method, child: Text(method));
             }).toList(),
             onChanged: (value) {
               setState(() {
@@ -545,13 +550,13 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _cartItems.isEmpty || loadingState.isLoading ? null : _finishSale,
+        onPressed: _cartItems.isEmpty || loadingState.isLoading
+            ? null
+            : _finishSale,
         style: ElevatedButton.styleFrom(
           backgroundColor: DesignTokens.primaryColor,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(
-            vertical: DesignTokens.spacingMd,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingMd),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
           ),
@@ -571,14 +576,17 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
 
   /// Agrega un producto al carrito
   void _addToCart(Map<String, dynamic> product) {
-    final existingIndex = _cartItems.indexWhere((item) => item['id'] == product['id']);
-    
+    final existingIndex = _cartItems.indexWhere(
+      (item) => item['id'] == product['id'],
+    );
+
     setState(() {
       if (existingIndex != -1) {
         // Incrementar cantidad
         _cartItems[existingIndex]['quantity']++;
-        _cartItems[existingIndex]['total'] = 
-            _cartItems[existingIndex]['quantity'] * _cartItems[existingIndex]['price'];
+        _cartItems[existingIndex]['total'] =
+            _cartItems[existingIndex]['quantity'] *
+            _cartItems[existingIndex]['price'];
       } else {
         // Agregar nuevo item
         _cartItems.add({
@@ -603,8 +611,8 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
   void _finishSale() async {
     if (_customerNameController.text.trim().isEmpty) {
       ErrorService().showErrorSnackBar(
-        context, 
-        'Por favor ingresa el nombre del cliente'
+        context,
+        'Por favor ingresa el nombre del cliente',
       );
       return;
     }
@@ -616,10 +624,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
       // Mostrar confirmación
       if (mounted) {
         ErrorService().showSuccessSnackBar(
-          context, 
-          'Venta completada - Total: ₡${_total.toStringAsFixed(0)}'
+          context,
+          'Venta completada - Total: ₡${_total.toStringAsFixed(0)}',
         );
-        
+
         // Regresar al dashboard
         context.go('/dashboard');
       }

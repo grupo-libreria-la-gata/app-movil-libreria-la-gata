@@ -7,6 +7,7 @@ import '../../../core/utils/responsive_helper.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/dashboard_card.dart';
 import '../../widgets/stats_card.dart';
+import '../../widgets/app_footer.dart';
 
 /// Página principal del dashboard del sistema de facturación
 class DashboardPage extends ConsumerWidget {
@@ -43,9 +44,9 @@ class DashboardPage extends ConsumerWidget {
                   ),
                   boxShadow: DesignTokens.cardShadow,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.local_bar, // Icono de licorería
-                  color: DesignTokens.primaryColor,
+                  color: Colors.green,
                   size: 20,
                 ),
               ),
@@ -122,6 +123,11 @@ class DashboardPage extends ConsumerWidget {
 
             // Acciones secundarias
             _buildSecondaryActionsSection(context, authState),
+
+            const SizedBox(height: DesignTokens.spacingXl),
+
+            // Footer
+            const AppFooter(),
           ],
         ),
       ),
@@ -328,31 +334,52 @@ class DashboardPage extends ConsumerWidget {
           children: [
             DashboardCard(
               title: 'Nueva Compra',
-              subtitle: 'Crear factura',
+              subtitle: 'Crear compra',
               icon: Icons.add_shopping_cart,
+              color: DesignTokens.successColor,
+              onTap: () => context.push('/compras/nueva'),
+            ),
+            DashboardCard(
+              title: 'Nueva Venta',
+              subtitle: 'Crear venta',
+              icon: Icons.shopping_cart,
               color: DesignTokens.successColor,
               onTap: () => context.push('/sales/new'),
             ),
             DashboardCard(
-              title: 'Productos',
+              title: 'Inventario',
               subtitle: 'Gestionar inventario',
-              icon: Icons.inventory_2,
+              icon: Icons.inventory,
               color: DesignTokens.infoColor,
-              onTap: () => context.push('/products'),
+              onTap: () => context.push('/detalle-productos'),
             ),
             DashboardCard(
               title: 'Compras',
               subtitle: 'Ver historial',
               icon: Icons.receipt_long,
               color: DesignTokens.primaryColor,
+              onTap: () => context.push('/compras'),
+            ),
+            DashboardCard(
+              title: 'Ventas',
+              subtitle: 'Ver historial',
+              icon: Icons.sell,
+              color: DesignTokens.primaryColor,
               onTap: () => context.push('/sales'),
             ),
             DashboardCard(
-              title: 'Reportes',
-              subtitle: 'Estadísticas',
-              icon: Icons.analytics,
+              title: 'Proveedores',
+              subtitle: 'Gestionar proveedores',
+              icon: Icons.business_center,
               color: DesignTokens.accentColor,
-              onTap: () => context.push('/reports'),
+              onTap: () => context.push('/proveedores'),
+            ),
+            DashboardCard(
+              title: 'Clientes',
+              subtitle: 'Gestionar clientes',
+              icon: Icons.people,
+              color: DesignTokens.accentColor,
+              onTap: () => context.push('/customers'),
             ),
           ],
         ),
@@ -411,11 +438,11 @@ class DashboardPage extends ConsumerWidget {
                 onTap: () => context.push('/inventory'),
               ),
             DashboardCard(
-              title: 'Proveedores',
-              subtitle: 'Gestionar proveedores',
-              icon: Icons.people_outline,
+              title: 'Reportes',
+              subtitle: 'Generar reportes',
+              icon: Icons.analytics,
               color: DesignTokens.warningColor,
-              onTap: () => context.push('/customers'),
+              onTap: () => context.push('/reports'),
             ),
             if (isAdmin)
               DashboardCard(
@@ -463,8 +490,8 @@ class DashboardPage extends ConsumerWidget {
           case 'profile':
             context.push('/profile');
             break;
-          case 'admin':
-            context.push('/admin');
+          case 'settings':
+            context.push('/settings');
             break;
           case 'logout':
             _showLogoutDialog(context, ref);
@@ -483,12 +510,12 @@ class DashboardPage extends ConsumerWidget {
           ),
         ),
         PopupMenuItem(
-          value: 'admin',
+          value: 'settings',
           child: Row(
             children: [
-              const Icon(Icons.admin_panel_settings),
+              const Icon(Icons.settings),
               const SizedBox(width: DesignTokens.spacingSm),
-              const Text('Administración'),
+              const Text('Configuración'),
             ],
           ),
         ),

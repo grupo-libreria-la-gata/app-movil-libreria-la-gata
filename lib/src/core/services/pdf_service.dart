@@ -5,7 +5,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../config/app_config.dart';
-import 'business_service.dart';
 
 /// Servicio para generar PDFs
 class PdfService {
@@ -16,7 +15,7 @@ class PdfService {
   /// Genera una factura en PDF
   Future<File> generateInvoicePdf(Map<String, dynamic> sale) async {
     final pdf = pw.Document();
-    
+
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
@@ -27,23 +26,23 @@ class PdfService {
               // Encabezado
               _buildHeader(),
               pw.SizedBox(height: 20),
-              
+
               // Información de la factura
               _buildInvoiceInfo(sale),
               pw.SizedBox(height: 20),
-              
+
               // Información del cliente
               _buildCustomerInfo(sale),
               pw.SizedBox(height: 20),
-              
+
               // Tabla de productos
               _buildProductsTable(sale),
               pw.SizedBox(height: 20),
-              
+
               // Totales
               _buildTotals(sale),
               pw.SizedBox(height: 30),
-              
+
               // Pie de página
               _buildFooter(),
             ],
@@ -51,7 +50,7 @@ class PdfService {
         },
       ),
     );
-    
+
     return await _savePdf(pdf, 'factura_${sale['invoiceNumber']}.pdf');
   }
 
@@ -63,7 +62,7 @@ class PdfService {
     DateTime endDate,
   ) async {
     final pdf = pw.Document();
-    
+
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
@@ -74,7 +73,7 @@ class PdfService {
               // Encabezado
               _buildHeader(),
               pw.SizedBox(height: 20),
-              
+
               // Título del reporte
               pw.Text(
                 'Reporte de Ventas',
@@ -84,24 +83,22 @@ class PdfService {
                 ),
               ),
               pw.SizedBox(height: 10),
-              
+
               // Período del reporte
               pw.Text(
                 'Período: ${startDate.day}/${startDate.month}/${startDate.year} - ${endDate.day}/${endDate.month}/${endDate.year}',
-                style: pw.TextStyle(
-                  fontSize: 14,
-                ),
+                style: pw.TextStyle(fontSize: 14),
               ),
               pw.SizedBox(height: 20),
-              
+
               // Estadísticas resumidas
               _buildSalesStats(stats),
               pw.SizedBox(height: 20),
-              
+
               // Tabla de ventas
               _buildSalesTable(sales),
               pw.SizedBox(height: 20),
-              
+
               // Pie de página
               _buildFooter(),
             ],
@@ -109,8 +106,11 @@ class PdfService {
         },
       ),
     );
-    
-    return await _savePdf(pdf, 'reporte_ventas_${startDate.day}_${startDate.month}_${startDate.year}.pdf');
+
+    return await _savePdf(
+      pdf,
+      'reporte_ventas_${startDate.day}_${startDate.month}_${startDate.year}.pdf',
+    );
   }
 
   /// Genera un reporte de inventario en PDF
@@ -119,7 +119,7 @@ class PdfService {
     Map<String, dynamic> stats,
   ) async {
     final pdf = pw.Document();
-    
+
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
@@ -130,7 +130,7 @@ class PdfService {
               // Encabezado
               _buildHeader(),
               pw.SizedBox(height: 20),
-              
+
               // Título del reporte
               pw.Text(
                 'Reporte de Inventario',
@@ -140,15 +140,15 @@ class PdfService {
                 ),
               ),
               pw.SizedBox(height: 20),
-              
+
               // Estadísticas del inventario
               _buildInventoryStats(stats),
               pw.SizedBox(height: 20),
-              
+
               // Tabla de productos
               _buildInventoryTable(products),
               pw.SizedBox(height: 20),
-              
+
               // Pie de página
               _buildFooter(),
             ],
@@ -156,8 +156,11 @@ class PdfService {
         },
       ),
     );
-    
-    return await _savePdf(pdf, 'reporte_inventario_${DateTime.now().day}_${DateTime.now().month}_${DateTime.now().year}.pdf');
+
+    return await _savePdf(
+      pdf,
+      'reporte_inventario_${DateTime.now().day}_${DateTime.now().month}_${DateTime.now().year}.pdf',
+    );
   }
 
   /// Construye el encabezado del PDF
@@ -170,28 +173,19 @@ class PdfService {
           children: [
             pw.Text(
               AppConfig.businessName,
-              style: pw.TextStyle(
-                fontSize: 20,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
             ),
             pw.Text(
               AppConfig.businessAddress,
-              style: pw.TextStyle(
-                fontSize: 12,
-              ),
+              style: pw.TextStyle(fontSize: 12),
             ),
             pw.Text(
               'Tel: ${AppConfig.businessPhone}',
-              style: pw.TextStyle(
-                fontSize: 12,
-              ),
+              style: pw.TextStyle(fontSize: 12),
             ),
             pw.Text(
               'RUC: ${AppConfig.businessRuc}',
-              style: pw.TextStyle(
-                fontSize: 12,
-              ),
+              style: pw.TextStyle(fontSize: 12),
             ),
           ],
         ),
@@ -200,16 +194,11 @@ class PdfService {
           children: [
             pw.Text(
               'La Gata',
-              style: pw.TextStyle(
-                fontSize: 16,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
             ),
             pw.Text(
               'Sistema de Facturación',
-              style: pw.TextStyle(
-                fontSize: 10,
-              ),
+              style: pw.TextStyle(fontSize: 10),
             ),
           ],
         ),
@@ -227,16 +216,11 @@ class PdfService {
           children: [
             pw.Text(
               'FACTURA',
-              style: pw.TextStyle(
-                fontSize: 18,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
             ),
             pw.Text(
               'No. ${sale['invoiceNumber']}',
-              style: pw.TextStyle(
-                fontSize: 14,
-              ),
+              style: pw.TextStyle(fontSize: 14),
             ),
           ],
         ),
@@ -245,15 +229,11 @@ class PdfService {
           children: [
             pw.Text(
               'Fecha: ${DateTime.parse(sale['createdAt']).day}/${DateTime.parse(sale['createdAt']).month}/${DateTime.parse(sale['createdAt']).year}',
-              style: pw.TextStyle(
-                fontSize: 12,
-              ),
+              style: pw.TextStyle(fontSize: 12),
             ),
             pw.Text(
               'Hora: ${DateTime.parse(sale['createdAt']).hour}:${DateTime.parse(sale['createdAt']).minute.toString().padLeft(2, '0')}',
-              style: pw.TextStyle(
-                fontSize: 12,
-              ),
+              style: pw.TextStyle(fontSize: 12),
             ),
           ],
         ),
@@ -265,31 +245,22 @@ class PdfService {
   pw.Widget _buildCustomerInfo(Map<String, dynamic> sale) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(10),
-      decoration: pw.BoxDecoration(
-        border: pw.Border.all(),
-      ),
+      decoration: pw.BoxDecoration(border: pw.Border.all()),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Text(
             'CLIENTE',
-            style: pw.TextStyle(
-              fontSize: 14,
-              fontWeight: pw.FontWeight.bold,
-            ),
+            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 5),
           pw.Text(
             'Nombre: ${sale['customerName']}',
-            style: pw.TextStyle(
-              fontSize: 12,
-            ),
+            style: pw.TextStyle(fontSize: 12),
           ),
           pw.Text(
             'Vendedor: ${sale['sellerName']}',
-            style: pw.TextStyle(
-              fontSize: 12,
-            ),
+            style: pw.TextStyle(fontSize: 12),
           ),
         ],
       ),
@@ -299,7 +270,7 @@ class PdfService {
   /// Construye la tabla de productos
   pw.Widget _buildProductsTable(Map<String, dynamic> sale) {
     final items = sale['items'] as List<dynamic>;
-    
+
     return pw.Table(
       border: pw.TableBorder.all(),
       columnWidths: {
@@ -359,49 +330,43 @@ class PdfService {
           ],
         ),
         // Productos
-        ...items.map((item) => pw.TableRow(
-          children: [
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                item['productName'],
-                style: pw.TextStyle(
-                  fontSize: 10,
+        ...items.map(
+          (item) => pw.TableRow(
+            children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  item['productName'],
+                  style: pw.TextStyle(fontSize: 10),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                item['quantity'].toString(),
-                style: pw.TextStyle(
-                  fontSize: 10,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  item['quantity'].toString(),
+                  style: pw.TextStyle(fontSize: 10),
+                  textAlign: pw.TextAlign.center,
                 ),
-                textAlign: pw.TextAlign.center,
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                '₡${item['price'].toStringAsFixed(0)}',
-                style: pw.TextStyle(
-                  fontSize: 10,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  '₡${item['price'].toStringAsFixed(0)}',
+                  style: pw.TextStyle(fontSize: 10),
+                  textAlign: pw.TextAlign.right,
                 ),
-                textAlign: pw.TextAlign.right,
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                '₡${item['total'].toStringAsFixed(0)}',
-                style: pw.TextStyle(
-                  fontSize: 10,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  '₡${item['total'].toStringAsFixed(0)}',
+                  style: pw.TextStyle(fontSize: 10),
+                  textAlign: pw.TextAlign.right,
                 ),
-                textAlign: pw.TextAlign.right,
               ),
-            ),
-          ],
-        )).toList(),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -410,25 +375,16 @@ class PdfService {
   pw.Widget _buildTotals(Map<String, dynamic> sale) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(10),
-      decoration: pw.BoxDecoration(
-        border: pw.Border.all(),
-      ),
+      decoration: pw.BoxDecoration(border: pw.Border.all()),
       child: pw.Column(
         children: [
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Text(
-                'Subtotal:',
-                style: pw.TextStyle(
-                  fontSize: 12,
-                ),
-              ),
+              pw.Text('Subtotal:', style: pw.TextStyle(fontSize: 12)),
               pw.Text(
                 '₡${sale['subtotal'].toStringAsFixed(0)}',
-                style: pw.TextStyle(
-                  fontSize: 12,
-                ),
+                style: pw.TextStyle(fontSize: 12),
               ),
             ],
           ),
@@ -436,17 +392,10 @@ class PdfService {
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Text(
-                'IVA (15%):',
-                style: pw.TextStyle(
-                  fontSize: 12,
-                ),
-              ),
+              pw.Text('IVA (15%):', style: pw.TextStyle(fontSize: 12)),
               pw.Text(
                 '₡${sale['tax'].toStringAsFixed(0)}',
-                style: pw.TextStyle(
-                  fontSize: 12,
-                ),
+                style: pw.TextStyle(fontSize: 12),
               ),
             ],
           ),
@@ -455,17 +404,10 @@ class PdfService {
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Text(
-                  'Descuento:',
-                  style: pw.TextStyle(
-                    fontSize: 12,
-                  ),
-                ),
+                pw.Text('Descuento:', style: pw.TextStyle(fontSize: 12)),
                 pw.Text(
                   '-₡${sale['discount'].toStringAsFixed(0)}',
-                  style: pw.TextStyle(
-                    fontSize: 12,
-                  ),
+                  style: pw.TextStyle(fontSize: 12),
                 ),
               ],
             ),
@@ -508,10 +450,7 @@ class PdfService {
         children: [
           pw.Text(
             'ESTADÍSTICAS DEL PERÍODO',
-            style: pw.TextStyle(
-              fontSize: 14,
-              fontWeight: pw.FontWeight.bold,
-            ),
+            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 10),
           pw.Row(
@@ -522,15 +461,11 @@ class PdfService {
                   children: [
                     pw.Text(
                       'Total de ventas: ${stats['totalSales']}',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: pw.TextStyle(fontSize: 12),
                     ),
                     pw.Text(
                       'Ingresos totales: ₡${stats['totalRevenue'].toStringAsFixed(0)}',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: pw.TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
@@ -541,15 +476,11 @@ class PdfService {
                   children: [
                     pw.Text(
                       'Ticket promedio: ₡${stats['averageTicket'].toStringAsFixed(0)}',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: pw.TextStyle(fontSize: 12),
                     ),
                     pw.Text(
                       'Productos vendidos: ${stats['totalItems']}',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: pw.TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
@@ -630,55 +561,47 @@ class PdfService {
           ],
         ),
         // Ventas
-        ...sales.map((sale) => pw.TableRow(
-          children: [
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                sale['invoiceNumber'],
-                style: pw.TextStyle(
-                  fontSize: 8,
+        ...sales.map(
+          (sale) => pw.TableRow(
+            children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  sale['invoiceNumber'],
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                sale['customerName'],
-                style: pw.TextStyle(
-                  fontSize: 8,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  sale['customerName'],
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                '${DateTime.parse(sale['createdAt']).day}/${DateTime.parse(sale['createdAt']).month}',
-                style: pw.TextStyle(
-                  fontSize: 8,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  '${DateTime.parse(sale['createdAt']).day}/${DateTime.parse(sale['createdAt']).month}',
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                sale['status'],
-                style: pw.TextStyle(
-                  fontSize: 8,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  sale['status'],
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                '₡${sale['total'].toStringAsFixed(0)}',
-                style: pw.TextStyle(
-                  fontSize: 8,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  '₡${sale['total'].toStringAsFixed(0)}',
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-          ],
-        )).toList(),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -696,10 +619,7 @@ class PdfService {
         children: [
           pw.Text(
             'ESTADÍSTICAS DEL INVENTARIO',
-            style: pw.TextStyle(
-              fontSize: 14,
-              fontWeight: pw.FontWeight.bold,
-            ),
+            style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 10),
           pw.Row(
@@ -710,15 +630,11 @@ class PdfService {
                   children: [
                     pw.Text(
                       'Total de productos: ${stats['totalProducts']}',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: pw.TextStyle(fontSize: 12),
                     ),
                     pw.Text(
                       'Valor total: ₡${stats['totalValue'].toStringAsFixed(0)}',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: pw.TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
@@ -729,15 +645,11 @@ class PdfService {
                   children: [
                     pw.Text(
                       'Productos con stock bajo: ${stats['lowStockProducts']}',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: pw.TextStyle(fontSize: 12),
                     ),
                     pw.Text(
                       'Productos agotados: ${stats['outOfStockProducts']}',
-                      style: pw.TextStyle(
-                        fontSize: 12,
-                      ),
+                      style: pw.TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
@@ -818,55 +730,47 @@ class PdfService {
           ],
         ),
         // Productos
-        ...products.map((product) => pw.TableRow(
-          children: [
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                product['name'],
-                style: pw.TextStyle(
-                  fontSize: 8,
+        ...products.map(
+          (product) => pw.TableRow(
+            children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  product['name'],
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                product['category'],
-                style: pw.TextStyle(
-                  fontSize: 8,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  product['category'],
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                product['stock'].toString(),
-                style: pw.TextStyle(
-                  fontSize: 8,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  product['stock'].toString(),
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                '₡${product['price'].toStringAsFixed(0)}',
-                style: pw.TextStyle(
-                  fontSize: 8,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  '₡${product['price'].toStringAsFixed(0)}',
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(5),
-              child: pw.Text(
-                '₡${(product['price'] * product['stock']).toStringAsFixed(0)}',
-                style: pw.TextStyle(
-                  fontSize: 8,
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  '₡${(product['price'] * product['stock']).toStringAsFixed(0)}',
+                  style: pw.TextStyle(fontSize: 8),
                 ),
               ),
-            ),
-          ],
-        )).toList(),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -883,23 +787,16 @@ class PdfService {
         children: [
           pw.Text(
             '¡Gracias por su compra!',
-            style: pw.TextStyle(
-              fontSize: 12,
-              fontWeight: pw.FontWeight.bold,
-            ),
+            style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
           ),
           pw.SizedBox(height: 5),
           pw.Text(
             'La Gata - Sistema de Facturación',
-            style: pw.TextStyle(
-              fontSize: 10,
-            ),
+            style: pw.TextStyle(fontSize: 10),
           ),
           pw.Text(
             'Generado el ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} a las ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}',
-            style: pw.TextStyle(
-              fontSize: 8,
-            ),
+            style: pw.TextStyle(fontSize: 8),
           ),
         ],
       ),
@@ -921,6 +818,8 @@ class PdfService {
 
   /// Comparte el PDF
   Future<void> sharePdf(File file) async {
-    await Share.shareXFiles([XFile(file.path)], text: 'Reporte generado por La Gata');
+    await Share.shareXFiles([
+      XFile(file.path),
+    ], text: 'Reporte generado por La Gata');
   }
 }

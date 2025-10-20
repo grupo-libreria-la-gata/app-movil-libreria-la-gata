@@ -34,14 +34,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           _isLoading = false;
           _emailSent = true;
         });
-        
-        // TODO: Implementar lógica de recuperación real
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email de recuperación enviado'),
-            backgroundColor: Colors.green,
-          ),
-        );
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Email de recuperación enviado'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       });
     }
   }
@@ -56,13 +57,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       setState(() {
         _isLoading = false;
       });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Email reenviado correctamente'),
-          backgroundColor: Colors.green,
-        ),
-      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Email reenviado correctamente'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     });
   }
 
@@ -71,7 +74,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Scaffold(
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        title: Text('Recuperar Contraseña', style: TextStyle(color: DesignTokens.textPrimaryColor)),
+        title: Text(
+          'Recuperar Contraseña',
+          style: TextStyle(color: DesignTokens.textPrimaryColor),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: DesignTokens.primaryColor,
@@ -85,15 +91,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                
+
                 // Header
                 _buildHeader(),
                 const SizedBox(height: 32),
-                
+
                 // Contenido según estado
                 _emailSent ? _buildEmailSentContent() : _buildResetForm(),
                 const SizedBox(height: 32),
-                
+
                 // Enlaces adicionales
                 _buildAdditionalLinks(),
               ],
@@ -112,7 +118,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: const Color(AppConfig.primaryColor).withOpacity(0.1),
+            color: const Color(AppConfig.primaryColor).withAlpha(25),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Icon(
@@ -132,12 +138,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ),
         const SizedBox(height: 8),
         Text(
-          _emailSent 
-            ? 'Hemos enviado un enlace de recuperación a tu correo electrónico'
-            : 'No te preocupes, te ayudaremos a recuperar tu contraseña',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Colors.grey[600],
-          ),
+          _emailSent
+              ? 'Hemos enviado un enlace de recuperación a tu correo electrónico'
+              : 'No te preocupes, te ayudaremos a recuperar tu contraseña',
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
           textAlign: TextAlign.center,
         ),
       ],
@@ -157,26 +163,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.info_outline,
-                color: Colors.blue[700],
-                size: 24,
-              ),
+              Icon(Icons.info_outline, color: Colors.blue[700], size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.',
-                  style: TextStyle(
-                    color: Colors.blue[700],
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.blue[700], fontSize: 14),
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 24),
-        
+
         // Campo de email
         TextFormField(
           controller: _emailController,
@@ -185,9 +184,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             labelText: 'Correo electrónico',
             hintText: 'ejemplo@correo.com',
             prefixIcon: const Icon(Icons.email_outlined),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[50],
           ),
@@ -202,7 +199,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           },
         ),
         const SizedBox(height: 24),
-        
+
         // Botón de envío
         SizedBox(
           height: 50,
@@ -226,10 +223,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   )
                 : const Text(
                     'Enviar Email de Recuperación',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
           ),
         ),
@@ -273,20 +267,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               const SizedBox(height: 12),
               Text(
                 'Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.',
-                style: TextStyle(
-                  color: Colors.green[700],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.green[700], fontSize: 14),
               ),
             ],
           ),
         ),
         const SizedBox(height: 24),
-        
+
         // Instrucciones adicionales
         _buildInstructionsCard(),
         const SizedBox(height: 24),
-        
+
         // Botón de reenvío
         SizedBox(
           height: 50,
@@ -305,15 +296,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     width: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(AppConfig.primaryColor)),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(AppConfig.primaryColor),
+                      ),
                     ),
                   )
                 : const Text(
                     'Reenviar Email',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
           ),
         ),
@@ -363,19 +353,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: Colors.grey[600],
-          ),
+          Icon(icon, size: 16, color: Colors.grey[600]),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey[700], fontSize: 14),
             ),
           ),
         ],

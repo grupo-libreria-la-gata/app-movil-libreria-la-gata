@@ -10,8 +10,8 @@ class MarcaService {
     final url = Uri.parse('$baseUrl/activos');
     final response = await http.get(url);
 
-    print('GET /activos → ${response.statusCode}');
-    print('Response: ${response.body}');
+    // Debug logging removed for production
+    // Debug logging removed for production
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -25,7 +25,7 @@ class MarcaService {
     final url = Uri.parse('$baseUrl?nombre=$nombre&usuarioId=$usuarioId');
     final response = await http.post(url);
 
-    print('POST /crear → ${response.statusCode}');
+    // Debug logging removed for production
     if (response.statusCode != 201) {
       throw Exception('Error al crear marca: ${response.body}');
     }
@@ -35,7 +35,7 @@ class MarcaService {
     final url = Uri.parse('$baseUrl?marcaId=$marcaId&nombre=$nombre&usuarioId=$usuarioId');
     final response = await http.put(url);
 
-    print('PUT /editar → ${response.statusCode}');
+    // Debug logging removed for production
     if (response.statusCode != 204) {
       throw Exception('Error al editar marca: ${response.body}');
     }
@@ -45,7 +45,7 @@ class MarcaService {
     final url = Uri.parse('$baseUrl/desactivar?marcaId=$marcaId&usuarioId=$usuarioId');
     final response = await http.post(url);
 
-    print('POST /desactivar → ${response.statusCode}');
+    // Debug logging removed for production
     if (response.statusCode != 204) {
       throw Exception('Error al desactivar marca: ${response.body}');
     }

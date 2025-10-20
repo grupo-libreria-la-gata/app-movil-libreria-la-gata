@@ -47,19 +47,19 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
         children: [
           // Barra de búsqueda
           _buildSearchBar(),
-          
+
           // Filtros activos
-          if (_searchQuery.isNotEmpty || _selectedCategory != 'Todas' || _stockFilter != 'Todos')
+          if (_searchQuery.isNotEmpty ||
+              _selectedCategory != 'Todas' ||
+              _stockFilter != 'Todos')
             _buildActiveFilters(),
-          
+
           // Alertas de stock
           if (lowStockProducts.isNotEmpty || outOfStockProducts.isNotEmpty)
             _buildStockAlerts(lowStockProducts, outOfStockProducts),
-          
+
           // Lista de productos
-          Expanded(
-            child: _buildProductsList(products),
-          ),
+          Expanded(child: _buildProductsList(products)),
         ],
       ),
     );
@@ -143,7 +143,10 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
     );
   }
 
-  Widget _buildStockAlerts(List<Product> lowStockProducts, List<Product> outOfStockProducts) {
+  Widget _buildStockAlerts(
+    List<Product> lowStockProducts,
+    List<Product> outOfStockProducts,
+  ) {
     return Container(
       margin: const EdgeInsets.all(DesignTokens.spacingMd),
       child: Column(
@@ -163,7 +166,10 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
               '${lowStockProducts.length} productos con stock bajo',
               Icons.warning,
               DesignTokens.warningColor,
-              () => _showProductsList(lowStockProducts, 'Productos con Stock Bajo'),
+              () => _showProductsList(
+                lowStockProducts,
+                'Productos con Stock Bajo',
+              ),
             ),
           ],
         ],
@@ -171,7 +177,13 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
     );
   }
 
-  Widget _buildAlertCard(String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildAlertCard(
+    String title,
+    String subtitle,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return Card(
       elevation: DesignTokens.elevationSm,
       child: InkWell(
@@ -189,13 +201,11 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
                 padding: const EdgeInsets.all(DesignTokens.spacingSm),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                  borderRadius: BorderRadius.circular(
+                    DesignTokens.borderRadiusSm,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 24,
-                ),
+                child: Icon(icon, color: color, size: 24),
               ),
               const SizedBox(width: DesignTokens.spacingMd),
               Expanded(
@@ -220,11 +230,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
                   ],
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: color,
-                size: 16,
-              ),
+              Icon(Icons.arrow_forward_ios, color: color, size: 16),
             ],
           ),
         ),
@@ -287,9 +293,9 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
                   _buildStockStatusChip(product),
                 ],
               ),
-              
+
               const SizedBox(height: DesignTokens.spacingMd),
-              
+
               // Información del producto
               Row(
                 children: [
@@ -338,9 +344,9 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: DesignTokens.spacingMd),
-              
+
               // Acciones
               Row(
                 children: [
@@ -379,7 +385,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
   Widget _buildStockStatusChip(Product product) {
     Color color;
     String text;
-    
+
     if (product.outOfStock) {
       color = DesignTokens.errorColor;
       text = 'Agotado';
@@ -390,7 +396,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
       color = DesignTokens.successColor;
       text = 'Disponible';
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingSm,
@@ -455,20 +461,32 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
           children: [
             // Filtro por categoría
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               decoration: const InputDecoration(
                 labelText: 'Categoría',
                 border: OutlineInputBorder(),
               ),
               items: [
-                const DropdownMenuItem(value: 'Todas', child: Text('Todas las categorías')),
-                const DropdownMenuItem(value: 'Whiskey', child: Text('Whiskey')),
+                const DropdownMenuItem(
+                  value: 'Todas',
+                  child: Text('Todas las categorías'),
+                ),
+                const DropdownMenuItem(
+                  value: 'Whiskey',
+                  child: Text('Whiskey'),
+                ),
                 const DropdownMenuItem(value: 'Vodka', child: Text('Vodka')),
                 const DropdownMenuItem(value: 'Ron', child: Text('Ron')),
-                const DropdownMenuItem(value: 'Tequila', child: Text('Tequila')),
+                const DropdownMenuItem(
+                  value: 'Tequila',
+                  child: Text('Tequila'),
+                ),
                 const DropdownMenuItem(value: 'Gin', child: Text('Gin')),
                 const DropdownMenuItem(value: 'Vino', child: Text('Vino')),
-                const DropdownMenuItem(value: 'Cerveza', child: Text('Cerveza')),
+                const DropdownMenuItem(
+                  value: 'Cerveza',
+                  child: Text('Cerveza'),
+                ),
                 const DropdownMenuItem(value: 'Licor', child: Text('Licor')),
                 const DropdownMenuItem(value: 'Otros', child: Text('Otros')),
               ],
@@ -478,19 +496,22 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
                 });
               },
             ),
-            
+
             const SizedBox(height: DesignTokens.spacingMd),
-            
+
             // Filtro por estado de stock
             DropdownButtonFormField<String>(
-              value: _stockFilter,
+              initialValue: _stockFilter,
               decoration: const InputDecoration(
                 labelText: 'Estado de Stock',
                 border: OutlineInputBorder(),
               ),
               items: const [
                 DropdownMenuItem(value: 'Todos', child: Text('Todos')),
-                DropdownMenuItem(value: 'Disponible', child: Text('Disponible')),
+                DropdownMenuItem(
+                  value: 'Disponible',
+                  child: Text('Disponible'),
+                ),
                 DropdownMenuItem(value: 'Bajo', child: Text('Stock Bajo')),
                 DropdownMenuItem(value: 'Agotado', child: Text('Agotado')),
               ],
@@ -536,7 +557,9 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
               final product = products[index];
               return ListTile(
                 title: Text(product.name),
-                subtitle: Text('Stock: ${product.stock} | Mínimo: ${product.minStock}'),
+                subtitle: Text(
+                  'Stock: ${product.stock} | Mínimo: ${product.minStock}',
+                ),
                 trailing: Text('₡${_formatCurrency(product.price)}'),
                 onTap: () {
                   Navigator.of(context).pop();
@@ -557,9 +580,11 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
   }
 
   void _showAdjustStockDialog(Product product) {
-    final stockController = TextEditingController(text: product.stock.toString());
+    final stockController = TextEditingController(
+      text: product.stock.toString(),
+    );
     final reasonController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -624,7 +649,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
   void _showRestockDialog(Product product) {
     final quantityController = TextEditingController();
     final costController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -771,34 +796,47 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
 
   List<Product> _getFilteredProducts() {
     List<Product> products = _getMockProducts();
-    
+
     // Filtro por búsqueda
     if (_searchQuery.isNotEmpty) {
-      products = products.where((product) =>
-        product.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-        (product.barcode?.contains(_searchQuery) ?? false)
-      ).toList();
+      products = products
+          .where(
+            (product) =>
+                product.name.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                product.brand.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                (product.barcode?.contains(_searchQuery) ?? false),
+          )
+          .toList();
     }
-    
+
     // Filtro por categoría
     if (_selectedCategory != 'Todas') {
-      products = products.where((product) => product.category == _selectedCategory).toList();
+      products = products
+          .where((product) => product.category == _selectedCategory)
+          .toList();
     }
-    
+
     // Filtro por estado de stock
     switch (_stockFilter) {
       case 'Disponible':
-        products = products.where((product) => !product.lowStock && !product.outOfStock).toList();
+        products = products
+            .where((product) => !product.lowStock && !product.outOfStock)
+            .toList();
         break;
       case 'Bajo':
-        products = products.where((product) => product.lowStock && !product.outOfStock).toList();
+        products = products
+            .where((product) => product.lowStock && !product.outOfStock)
+            .toList();
         break;
       case 'Agotado':
         products = products.where((product) => product.outOfStock).toList();
         break;
     }
-    
+
     return products;
   }
 

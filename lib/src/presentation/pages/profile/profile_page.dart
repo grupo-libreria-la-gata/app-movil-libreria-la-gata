@@ -96,10 +96,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 4,
-                              ),
+                              border: Border.all(color: Colors.white, width: 4),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withValues(alpha: 0.2),
@@ -140,7 +137,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: DesignTokens.spacingLg),
-                    
+
                     // Nombre del usuario
                     Text(
                       _user.name,
@@ -151,7 +148,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: DesignTokens.spacingSm),
-                    
+
                     // Email
                     Text(
                       _user.email,
@@ -161,7 +158,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: DesignTokens.spacingMd),
-                    
+
                     // Badge de estado activo
                     if (_user.isActive)
                       Container(
@@ -171,7 +168,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.green,
-                          borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                          borderRadius: BorderRadius.circular(
+                            DesignTokens.borderRadiusMd,
+                          ),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
@@ -197,7 +196,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
               ),
             ),
-            
+
             // Información del perfil
             Padding(
               padding: const EdgeInsets.all(DesignTokens.spacingLg),
@@ -250,16 +249,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         label: 'Rol',
                         value: _getRoleDisplayName(_user.role),
                         icon: Icons.work_outline,
-                        isEditing: false, // El rol no se puede editar desde el perfil
+                        isEditing:
+                            false, // El rol no se puede editar desde el perfil
                         onChanged: (value) {
                           // No se puede cambiar el rol desde aquí
                         },
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: DesignTokens.spacingXl),
-                  
+
                   // Estadísticas
                   _buildSection(
                     context,
@@ -291,9 +291,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: DesignTokens.spacingXl),
-                  
+
                   // Opciones de cuenta
                   _buildSection(
                     context,
@@ -308,7 +308,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Configuración de notificaciones próximamente'),
+                              content: Text(
+                                'Configuración de notificaciones próximamente',
+                              ),
                             ),
                           );
                         },
@@ -317,11 +319,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         context,
                         icon: Icons.security,
                         title: 'Seguridad',
-                        subtitle: 'Cambiar contraseña y configuración de seguridad',
+                        subtitle:
+                            'Cambiar contraseña y configuración de seguridad',
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Configuración de seguridad próximamente'),
+                              content: Text(
+                                'Configuración de seguridad próximamente',
+                              ),
                             ),
                           );
                         },
@@ -334,7 +339,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Configuración de privacidad próximamente'),
+                              content: Text(
+                                'Configuración de privacidad próximamente',
+                              ),
                             ),
                           );
                         },
@@ -354,9 +361,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: DesignTokens.spacingXl),
-                  
+
                   // Botón de cerrar sesión
                   SizedBox(
                     width: double.infinity,
@@ -369,11 +376,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.red,
                         side: BorderSide(color: Colors.red),
-                        padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingLg),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: DesignTokens.spacingLg,
+                        ),
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: DesignTokens.spacingXl),
                 ],
               ),
@@ -395,11 +404,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 24,
-            ),
+            Icon(icon, color: Colors.white, size: 24),
             const SizedBox(width: DesignTokens.spacingSm),
             Text(
               title,
@@ -428,11 +433,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       padding: const EdgeInsets.only(bottom: DesignTokens.spacingMd),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 20,
-          ),
+          Icon(icon, color: Colors.white, size: 20),
           const SizedBox(width: DesignTokens.spacingSm),
           Expanded(
             child: Column(
@@ -483,9 +484,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -496,11 +495,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 20,
-            ),
+            child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(width: DesignTokens.spacingMd),
           Expanded(
@@ -538,28 +533,24 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(
-        icon,
-        color: Colors.white,
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(color: Colors.white),
-      ),
+      leading: Icon(icon, color: Colors.white),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
       subtitle: Text(
         subtitle,
         style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Colors.white,
+      ),
       onTap: onTap,
     );
   }
 
   void _changeProfilePicture() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Cambiar foto de perfil próximamente'),
-      ),
+      const SnackBar(content: Text('Cambiar foto de perfil próximamente')),
     );
   }
 
@@ -610,8 +601,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         return 'Inventario';
       case UserRole.cashier:
         return 'Cajero';
-      default:
-        return 'Usuario';
     }
   }
 }

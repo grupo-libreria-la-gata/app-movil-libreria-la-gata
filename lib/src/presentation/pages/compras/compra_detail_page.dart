@@ -3,15 +3,11 @@ import 'package:provider/provider.dart';
 import '../../../data/models/compra_model.dart';
 import '../../../data/services/compra_service.dart';
 import '../../providers/auth_provider_legacy.dart';
-import '../../widgets/loading_widgets.dart';
 
 class CompraDetailPage extends StatefulWidget {
   final int compraId;
 
-  const CompraDetailPage({
-    super.key,
-    required this.compraId,
-  });
+  const CompraDetailPage({super.key, required this.compraId});
 
   @override
   State<CompraDetailPage> createState() => _CompraDetailPageState();
@@ -30,10 +26,10 @@ class _CompraDetailPageState extends State<CompraDetailPage> {
 
   Future<void> _cargarCompra() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final response = await _compraService.obtenerCompra(widget.compraId);
-      
+
       if (response.success && response.data != null) {
         setState(() {
           _compra = response.data!;
@@ -50,21 +46,22 @@ class _CompraDetailPageState extends State<CompraDetailPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
     );
   }
 
   Future<void> _anularCompra() async {
-    if (_compra == null) return;
+    if (_compra == null) {
+      return;
+    }
 
     final confirmacion = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Anular Compra'),
-        content: Text('¿Está seguro de que desea anular la compra #${_compra!.compraId}?'),
+        content: Text(
+          '¿Está seguro de que desea anular la compra #${_compra!.compraId}?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -80,26 +77,31 @@ class _CompraDetailPageState extends State<CompraDetailPage> {
 
     if (confirmacion == true) {
       setState(() => _isLoading = true);
-      
+
       try {
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final usuarioId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
-        
+        final usuarioId =
+            int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
+
         final request = AnularCompraRequest(
           compraId: _compra!.compraId,
           usuarioId: usuarioId,
         );
-        
+
         final response = await _compraService.anularCompra(request);
-        
+
         if (response.success) {
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Compra anulada exitosamente'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Compra anulada exitosamente'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
           _cargarCompra(); // Recargar para actualizar el estado
         } else {
           _mostrarError(response.message ?? 'Error al anular la compra');
@@ -137,40 +139,40 @@ class _CompraDetailPageState extends State<CompraDetailPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _compra == null
-              ? const Center(
-                  child: Text(
-                    'No se pudo cargar la compra',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _cargarCompra,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Información general
-                        _InformacionGeneralCard(compra: _compra!),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // Información del proveedor
-                        _ProveedorCard(compra: _compra!),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // Detalles de productos
-                        _DetallesProductosCard(compra: _compra!),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // Resumen
-                        _ResumenCard(compra: _compra!),
-                      ],
-                    ),
-                  ),
+          ? const Center(
+              child: Text(
+                'No se pudo cargar la compra',
+                style: TextStyle(fontSize: 16),
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _cargarCompra,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Información general
+                    _InformacionGeneralCard(compra: _compra!),
+
+                    const SizedBox(height: 16),
+
+                    // Información del proveedor
+                    _ProveedorCard(compra: _compra!),
+
+                    const SizedBox(height: 16),
+
+                    // Detalles de productos
+                    _DetallesProductosCard(compra: _compra!),
+
+                    const SizedBox(height: 16),
+
+                    // Resumen
+                    _ResumenCard(compra: _compra!),
+                  ],
                 ),
+              ),
+            ),
     );
   }
 }
@@ -193,13 +195,13 @@ class _InformacionGeneralCard extends StatelessWidget {
               children: [
                 const Text(
                   'Información General',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: compra.activo ? Colors.green : Colors.red,
                     borderRadius: BorderRadius.circular(12),
@@ -219,7 +221,8 @@ class _InformacionGeneralCard extends StatelessWidget {
             _infoRow('ID de Compra', compra.compraId.toString()),
             _infoRow('Fecha', _formatearFecha(compra.fechaCompra)),
             _infoRow('Usuario', compra.usuarioNombre),
-            if (compra.observaciones != null && compra.observaciones!.isNotEmpty)
+            if (compra.observaciones != null &&
+                compra.observaciones!.isNotEmpty)
               _infoRow('Observaciones', compra.observaciones!),
           ],
         ),
@@ -240,9 +243,7 @@ class _InformacionGeneralCard extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          Expanded(
-            child: Text(value),
-          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );
@@ -268,10 +269,7 @@ class _ProveedorCard extends StatelessWidget {
           children: [
             const Text(
               'Información del Proveedor',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             _infoRow('Nombre', compra.proveedorNombre),
@@ -298,9 +296,7 @@ class _ProveedorCard extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          Expanded(
-            child: Text(value),
-          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );
@@ -322,23 +318,17 @@ class _DetallesProductosCard extends StatelessWidget {
           children: [
             const Text(
               'Productos Comprados',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            
+
             if (compra.detalles.isEmpty)
               const Center(
                 child: Padding(
                   padding: EdgeInsets.all(32.0),
                   child: Text(
                     'No hay productos en esta compra',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 ),
               )
@@ -378,10 +368,7 @@ class _DetalleProductoItem extends StatelessWidget {
         children: [
           Text(
             detalle.productoNombre,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 4),
           Text('${detalle.marcaNombre} - ${detalle.categoriaNombre}'),
@@ -423,10 +410,7 @@ class _ResumenCard extends StatelessWidget {
           children: [
             const Text(
               'Resumen',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
@@ -451,10 +435,7 @@ class _ResumenCard extends StatelessWidget {
               children: [
                 const Text(
                   'Total de la compra:',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   '\$${compra.total.toStringAsFixed(2)}',

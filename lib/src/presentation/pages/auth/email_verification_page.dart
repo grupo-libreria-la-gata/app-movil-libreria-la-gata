@@ -5,7 +5,7 @@ import '../../../core/design/design_tokens.dart';
 
 class EmailVerificationPage extends StatefulWidget {
   final String email;
-  
+
   const EmailVerificationPage({super.key, required this.email});
 
   @override
@@ -57,15 +57,17 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
       setState(() {
         _isLoading = false;
       });
-      
+
       _startResendCountdown();
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Email de verificación reenviado'),
-          backgroundColor: Colors.green,
-        ),
-      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Email de verificación reenviado'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     });
   }
 
@@ -80,13 +82,15 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
         _isLoading = false;
         _emailVerified = true;
       });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Email verificado correctamente!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('¡Email verificado correctamente!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     });
   }
 
@@ -95,7 +99,10 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     return Scaffold(
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        title: Text('Verificar Email', style: TextStyle(color: DesignTokens.textPrimaryColor)),
+        title: Text(
+          'Verificar Email',
+          style: TextStyle(color: DesignTokens.textPrimaryColor),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: DesignTokens.primaryColor,
@@ -107,15 +114,17 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              
+
               // Header
               _buildHeader(),
               const SizedBox(height: 32),
-              
+
               // Contenido principal
-              _emailVerified ? _buildVerifiedContent() : _buildVerificationContent(),
+              _emailVerified
+                  ? _buildVerifiedContent()
+                  : _buildVerificationContent(),
               const SizedBox(height: 32),
-              
+
               // Enlaces adicionales
               _buildAdditionalLinks(),
             ],
@@ -133,15 +142,17 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: _emailVerified 
-                ? Colors.green[100] 
-                : const Color(AppConfig.primaryColor).withOpacity(0.1),
+            color: _emailVerified
+                ? Colors.green[100]
+                : const Color(AppConfig.primaryColor).withAlpha(25),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Icon(
             _emailVerified ? Icons.verified : Icons.mark_email_unread,
             size: 40,
-            color: _emailVerified ? Colors.green[700] : const Color(AppConfig.primaryColor),
+            color: _emailVerified
+                ? Colors.green[700]
+                : const Color(AppConfig.primaryColor),
           ),
         ),
         const SizedBox(height: 16),
@@ -149,18 +160,20 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
           _emailVerified ? '¡Email Verificado!' : 'Verifica tu Email',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
-            color: _emailVerified ? Colors.green[700] : const Color(AppConfig.primaryColor),
+            color: _emailVerified
+                ? Colors.green[700]
+                : const Color(AppConfig.primaryColor),
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
-          _emailVerified 
+          _emailVerified
               ? 'Tu cuenta ha sido verificada correctamente'
               : 'Hemos enviado un enlace de verificación a tu correo',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Colors.grey[600],
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
           textAlign: TextAlign.center,
         ),
       ],
@@ -180,11 +193,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.email_outlined,
-                color: Colors.blue[700],
-                size: 24,
-              ),
+              Icon(Icons.email_outlined, color: Colors.blue[700], size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -213,11 +222,11 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
           ),
         ),
         const SizedBox(height: 24),
-        
+
         // Instrucciones
         _buildInstructionsCard(),
         const SizedBox(height: 24),
-        
+
         // Botones de acción
         Row(
           children: [
@@ -239,7 +248,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : const Text(
@@ -257,10 +268,14 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               child: SizedBox(
                 height: 50,
                 child: OutlinedButton(
-                  onPressed: (_isLoading || !_canResend) ? null : _handleResendEmail,
+                  onPressed: (_isLoading || !_canResend)
+                      ? null
+                      : _handleResendEmail,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(AppConfig.primaryColor),
-                    side: const BorderSide(color: Color(AppConfig.primaryColor)),
+                    side: const BorderSide(
+                      color: Color(AppConfig.primaryColor),
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -271,11 +286,15 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(AppConfig.primaryColor)),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(AppConfig.primaryColor),
+                            ),
                           ),
                         )
                       : Text(
-                          _canResend ? 'Reenviar' : 'Reenviar ($_resendCountdown)',
+                          _canResend
+                              ? 'Reenviar'
+                              : 'Reenviar ($_resendCountdown)',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -326,16 +345,13 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
               const SizedBox(height: 12),
               Text(
                 'Tu cuenta ha sido verificada correctamente. Ya puedes acceder a todas las funcionalidades de AveTurismo.',
-                style: TextStyle(
-                  color: Colors.green[700],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.green[700], fontSize: 14),
               ),
             ],
           ),
         ),
         const SizedBox(height: 24),
-        
+
         // Botón para continuar
         SizedBox(
           height: 50,
@@ -350,10 +366,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
             ),
             child: const Text(
               'Continuar',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -407,19 +420,12 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: Colors.grey[600],
-          ),
+          Icon(icon, size: 16, color: Colors.grey[600]),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey[700], fontSize: 14),
             ),
           ),
         ],

@@ -10,8 +10,7 @@ class CategoriaService {
     final url = Uri.parse('$baseUrl/activos');
     final response = await http.get(url);
 
-    print('GET /Categorias/activos → ${response.statusCode}');
-    print('Response: ${response.body}');
+    // Debug logging removed for production
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -25,27 +24,31 @@ class CategoriaService {
     final url = Uri.parse('$baseUrl?nombre=$nombre&usuarioId=$usuarioId');
     final response = await http.post(url);
 
-    print('POST /Categorias → ${response.statusCode}');
+    // Debug logging removed for production
     if (response.statusCode != 201) {
       throw Exception('Error al crear categoría: ${response.body}');
     }
   }
 
   Future<void> editarCategoria(int categoriaId, String nombre) async {
-    final url = Uri.parse('$baseUrl?categoriaId=$categoriaId&nombre=$nombre&usuarioId=$usuarioId');
+    final url = Uri.parse(
+      '$baseUrl?categoriaId=$categoriaId&nombre=$nombre&usuarioId=$usuarioId',
+    );
     final response = await http.put(url);
 
-    print('PUT /Categorias → ${response.statusCode}');
+    // Debug logging removed for production
     if (response.statusCode != 204) {
       throw Exception('Error al editar categoría: ${response.body}');
     }
   }
 
   Future<void> desactivarCategoria(int categoriaId) async {
-    final url = Uri.parse('$baseUrl/desactivar?categoriaId=$categoriaId&usuarioId=$usuarioId');
+    final url = Uri.parse(
+      '$baseUrl/desactivar?categoriaId=$categoriaId&usuarioId=$usuarioId',
+    );
     final response = await http.post(url);
 
-    print('POST /Categorias/desactivar → ${response.statusCode}');
+    // Debug logging removed for production
     if (response.statusCode != 204) {
       throw Exception('Error al desactivar categoría: ${response.body}');
     }

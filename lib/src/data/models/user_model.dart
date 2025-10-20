@@ -3,13 +3,16 @@ import '../../domain/entities/user.dart';
 
 /// Modelo de datos para Usuario con serialización JSON
 class UserModel extends BaseModel {
+  @override
   final String id;
   final String name;
   final String email;
   final String? phone;
   final UserRole role;
   final bool isActive;
+  @override
   final DateTime createdAt;
+  @override
   final DateTime? updatedAt;
   final DateTime? lastLogin;
   final String? avatarUrl;
@@ -30,10 +33,10 @@ class UserModel extends BaseModel {
   });
 
   @override
-  bool get isValid => 
-      id.isNotEmpty && 
-      name.isNotEmpty && 
-      email.isNotEmpty && 
+  bool get isValid =>
+      id.isNotEmpty &&
+      name.isNotEmpty &&
+      email.isNotEmpty &&
       email.contains('@');
 
   /// Convierte el modelo a una entidad de dominio
@@ -123,11 +126,15 @@ class UserModel extends BaseModel {
       ),
       isActive: map['isActive'] ?? true,
       createdAt: DateTime.parse(map['createdAt']),
-      updatedAt: map['updatedAt'] != null ? DateTime.parse(map['updatedAt']) : null,
-      lastLogin: map['lastLogin'] != null ? DateTime.parse(map['lastLogin']) : null,
+      updatedAt: map['updatedAt'] != null
+          ? DateTime.parse(map['updatedAt'])
+          : null,
+      lastLogin: map['lastLogin'] != null
+          ? DateTime.parse(map['lastLogin'])
+          : null,
       avatarUrl: map['avatarUrl'],
-      preferences: map['preferences'] != null 
-          ? Map<String, dynamic>.from(map['preferences']) 
+      preferences: map['preferences'] != null
+          ? Map<String, dynamic>.from(map['preferences'])
           : null,
     );
   }
@@ -138,6 +145,7 @@ class UserModel extends BaseModel {
   }
 
   /// Convierte el modelo a JSON
+  @override
   Map<String, dynamic> toJson() => toMap();
 
   @override
@@ -185,8 +193,8 @@ class CreateUserDto {
         orElse: () => UserRole.seller,
       ),
       password: map['password'],
-      preferences: map['preferences'] != null 
-          ? Map<String, dynamic>.from(map['preferences']) 
+      preferences: map['preferences'] != null
+          ? Map<String, dynamic>.from(map['preferences'])
           : null,
     );
   }
@@ -229,7 +237,7 @@ class UpdateUserDto {
       name: map['name'],
       email: map['email'],
       phone: map['phone'],
-      role: map['role'] != null 
+      role: map['role'] != null
           ? UserRole.values.firstWhere(
               (e) => e.name == map['role'],
               orElse: () => UserRole.seller,
@@ -237,8 +245,8 @@ class UpdateUserDto {
           : null,
       isActive: map['isActive'],
       avatarUrl: map['avatarUrl'],
-      preferences: map['preferences'] != null 
-          ? Map<String, dynamic>.from(map['preferences']) 
+      preferences: map['preferences'] != null
+          ? Map<String, dynamic>.from(map['preferences'])
           : null,
     );
   }
@@ -257,11 +265,7 @@ class LoginDto {
   });
 
   Map<String, dynamic> toMap() {
-    return {
-      'email': email,
-      'password': password,
-      'rememberMe': rememberMe,
-    };
+    return {'email': email, 'password': password, 'rememberMe': rememberMe};
   }
 
   factory LoginDto.fromMap(Map<String, dynamic> map) {

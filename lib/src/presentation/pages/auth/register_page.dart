@@ -21,7 +21,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
@@ -42,17 +42,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
       await executeWithErrorHandling(() async {
         // Simular proceso de registro
         await Future.delayed(const Duration(seconds: 2));
-        
-        // TODO: Implementar lógica de registro real
-        ErrorService().showWarningSnackBar(
-          context, 
-          'Funcionalidad de registro en desarrollo'
-        );
+
+        // Simulación de registro - implementar lógica real
+        if (mounted) {
+          ErrorService().showWarningSnackBar(
+            context,
+            'Funcionalidad de registro en desarrollo',
+          );
+        }
       });
     } else if (!_acceptTerms) {
       ErrorService().showErrorSnackBar(
-        context, 
-        'Debes aceptar los términos y condiciones'
+        context,
+        'Debes aceptar los términos y condiciones',
       );
     }
   }
@@ -61,12 +63,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
     await executeWithErrorHandling(() async {
       // Simular registro con Google
       await Future.delayed(const Duration(seconds: 2));
-      
-      // TODO: Implementar registro con Google
-      ErrorService().showWarningSnackBar(
-        context, 
-        'Registro con Google en desarrollo'
-      );
+
+      // Simulación de registro con Google - implementar funcionalidad real
+      if (mounted) {
+        ErrorService().showWarningSnackBar(
+          context,
+          'Registro con Google en desarrollo',
+        );
+      }
     });
   }
 
@@ -78,14 +82,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
         // Redirigir al dashboard después del registro exitoso
         context.go('/dashboard');
       }
-      
+
       if (next.error != null) {
         // Mostrar error si existe
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error!),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
         );
         // Limpiar el error
         ref.read(authProvider.notifier).clearError();
@@ -95,7 +96,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
     return Scaffold(
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        title: Text('Crear Cuenta', style: TextStyle(color: DesignTokens.textPrimaryColor)),
+        title: Text(
+          'Crear Cuenta',
+          style: TextStyle(color: DesignTokens.textPrimaryColor),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: DesignTokens.primaryColor,
@@ -111,27 +115,27 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
                 // Header
                 _buildHeader(),
                 const SizedBox(height: 32),
-                
+
                 // Formulario de registro
                 _buildRegisterForm(),
                 const SizedBox(height: 24),
-                
+
                 // Términos y condiciones
                 _buildTermsSection(),
                 const SizedBox(height: 24),
-                
+
                 // Botón de registro
                 _buildRegisterButton(),
                 const SizedBox(height: 16),
-                
+
                 // Divider
                 _buildDivider(),
                 const SizedBox(height: 16),
-                
+
                 // Botón de Google
                 _buildGoogleButton(),
                 const SizedBox(height: 32),
-                
+
                 // Enlace a login
                 _buildLoginLink(),
               ],
@@ -154,11 +158,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             borderRadius: BorderRadius.circular(20),
             boxShadow: DesignTokens.elevatedShadow,
           ),
-          child: const Icon(
-            Icons.local_bar,
-            size: 40,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.local_bar, size: 40, color: Colors.white),
         ),
         const SizedBox(height: 16),
         Text(
@@ -193,9 +193,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             labelText: 'Nombre completo',
             hintText: 'Juan Pérez',
             prefixIcon: const Icon(Icons.person_outlined),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[50],
           ),
@@ -204,7 +202,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Campo de email
         TextFormField(
           controller: _emailController,
@@ -213,9 +211,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             labelText: 'Correo electrónico',
             hintText: 'juan@ejemplo.com',
             prefixIcon: const Icon(Icons.email_outlined),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[50],
           ),
@@ -224,7 +220,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Campo de teléfono
         TextFormField(
           controller: _phoneController,
@@ -233,15 +229,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             labelText: 'Teléfono (opcional)',
             hintText: '+505 8888-8888',
             prefixIcon: const Icon(Icons.phone_outlined),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[50],
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Campo de contraseña
         TextFormField(
           controller: _passwordController,
@@ -260,9 +254,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
                 });
               },
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[50],
           ),
@@ -271,7 +263,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
           },
         ),
         const SizedBox(height: 16),
-        
+
         // Campo de confirmar contraseña
         TextFormField(
           controller: _confirmPasswordController,
@@ -282,7 +274,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             prefixIcon: const Icon(Icons.lock_outlined),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                _obscureConfirmPassword
+                    ? Icons.visibility
+                    : Icons.visibility_off,
               ),
               onPressed: () {
                 setState(() {
@@ -290,9 +284,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
                 });
               },
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[50],
           ),
@@ -332,10 +324,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
                 children: [
                   RichText(
                     text: TextSpan(
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.grey[700], fontSize: 14),
                       children: [
                         const TextSpan(text: 'Acepto los '),
                         TextSpan(
@@ -362,7 +351,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
           ],
         ),
         const SizedBox(height: 12),
-        
+
         // Newsletter
         Row(
           children: [
@@ -378,10 +367,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             Expanded(
               child: Text(
                 'Recibir notificaciones sobre eventos y ofertas especiales',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey[700], fontSize: 14),
               ),
             ),
           ],
@@ -403,28 +389,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
   Widget _buildDivider() {
     return Row(
       children: [
-        Expanded(
-          child: Divider(
-            color: Colors.grey[300],
-            thickness: 1,
-          ),
-        ),
+        Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'o regístrate con',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Colors.grey[600], fontSize: 14),
           ),
         ),
-        Expanded(
-          child: Divider(
-            color: Colors.grey[300],
-            thickness: 1,
-          ),
-        ),
+        Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
       ],
     );
   }
@@ -444,10 +417,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
         ),
         label: const Text(
           'Registrarse con Google',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.grey[800],
@@ -466,9 +436,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
       children: [
         Text(
           '¿Ya tienes una cuenta? ',
-          style: TextStyle(
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(color: Colors.grey[600]),
         ),
         TextButton(
           onPressed: () => context.go('/login'),

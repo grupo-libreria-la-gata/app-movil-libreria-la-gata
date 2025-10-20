@@ -95,15 +95,13 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
         children: [
           // Barra de búsqueda
           _buildSearchBar(),
-          
+
           // Filtros activos
           if (_searchQuery.isNotEmpty || !_showOnlyActive)
             _buildActiveFilters(),
-          
+
           // Lista de clientes
-          Expanded(
-            child: _buildCustomersList(),
-          ),
+          Expanded(child: _buildCustomersList()),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -184,7 +182,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
 
   Widget _buildCustomersList() {
     final customers = _getFilteredCustomers();
-    
+
     if (customers.isEmpty) {
       return _buildEmptyState();
     }
@@ -254,12 +252,14 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                       vertical: DesignTokens.spacingXs,
                     ),
                     decoration: BoxDecoration(
-                      color: customer.isActive 
+                      color: customer.isActive
                           ? DesignTokens.successColor.withValues(alpha: 0.1)
                           : DesignTokens.errorColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                      borderRadius: BorderRadius.circular(
+                        DesignTokens.borderRadiusSm,
+                      ),
                       border: Border.all(
-                        color: customer.isActive 
+                        color: customer.isActive
                             ? DesignTokens.successColor.withValues(alpha: 0.3)
                             : DesignTokens.errorColor.withValues(alpha: 0.3),
                       ),
@@ -267,7 +267,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                     child: Text(
                       customer.isActive ? 'Activo' : 'Inactivo',
                       style: TextStyle(
-                        color: customer.isActive 
+                        color: customer.isActive
                             ? DesignTokens.successColor
                             : DesignTokens.errorColor,
                         fontSize: DesignTokens.fontSizeSm,
@@ -277,9 +277,9 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: DesignTokens.spacingMd),
-              
+
               // Información de contacto
               Row(
                 children: [
@@ -298,9 +298,9 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: DesignTokens.spacingSm),
-              
+
               // Estadísticas
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -332,11 +332,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: DesignTokens.textSecondaryColor,
-        ),
+        Icon(icon, size: 16, color: DesignTokens.textSecondaryColor),
         const SizedBox(height: DesignTokens.spacingXs),
         Text(
           value,
@@ -362,11 +358,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.people,
-            size: 64,
-            color: DesignTokens.textSecondaryColor,
-          ),
+          Icon(Icons.people, size: 64, color: DesignTokens.textSecondaryColor),
           const SizedBox(height: DesignTokens.spacingMd),
           Text(
             'No se encontraron clientes',
@@ -408,12 +400,12 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                 });
               },
             ),
-            
+
             const SizedBox(height: DesignTokens.spacingMd),
-            
+
             // Ordenamiento
             DropdownButtonFormField<String>(
-              value: _sortBy,
+              initialValue: _sortBy,
               decoration: const InputDecoration(
                 labelText: 'Ordenar por',
                 border: OutlineInputBorder(),
@@ -421,8 +413,14 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
               items: const [
                 DropdownMenuItem(value: 'name', child: Text('Nombre')),
                 DropdownMenuItem(value: 'email', child: Text('Email')),
-                DropdownMenuItem(value: 'totalSpent', child: Text('Total gastado')),
-                DropdownMenuItem(value: 'lastPurchase', child: Text('Última compra')),
+                DropdownMenuItem(
+                  value: 'totalSpent',
+                  child: Text('Total gastado'),
+                ),
+                DropdownMenuItem(
+                  value: 'lastPurchase',
+                  child: Text('Última compra'),
+                ),
               ],
               onChanged: (value) {
                 setState(() {
@@ -457,9 +455,11 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
     final nameController = TextEditingController(text: customer?.name ?? '');
     final emailController = TextEditingController(text: customer?.email ?? '');
     final phoneController = TextEditingController(text: customer?.phone ?? '');
-    final addressController = TextEditingController(text: customer?.address ?? '');
+    final addressController = TextEditingController(
+      text: customer?.address ?? '',
+    );
     bool isActive = customer?.isActive ?? true;
-    
+
     final formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -487,7 +487,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                   },
                 ),
                 const SizedBox(height: DesignTokens.spacingMd),
-                
+
                 TextFormField(
                   controller: emailController,
                   decoration: const InputDecoration(
@@ -507,7 +507,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                   },
                 ),
                 const SizedBox(height: DesignTokens.spacingMd),
-                
+
                 TextFormField(
                   controller: phoneController,
                   decoration: const InputDecoration(
@@ -524,7 +524,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                   },
                 ),
                 const SizedBox(height: DesignTokens.spacingMd),
-                
+
                 TextFormField(
                   controller: addressController,
                   decoration: const InputDecoration(
@@ -535,7 +535,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                   maxLines: 2,
                 ),
                 const SizedBox(height: DesignTokens.spacingMd),
-                
+
                 if (isEditing)
                   SwitchListTile(
                     title: const Text('Cliente activo'),
@@ -557,23 +557,29 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
             onPressed: () {
               if (formKey.currentState!.validate()) {
                 // Aquí se guardaría en la API
-                final newCustomer = Customer(
-                  id: customer?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+                Customer(
+                  id:
+                      customer?.id ??
+                      DateTime.now().millisecondsSinceEpoch.toString(),
                   name: nameController.text,
                   email: emailController.text,
                   phone: phoneController.text,
-                  address: addressController.text.isNotEmpty ? addressController.text : null,
+                  address: addressController.text.isNotEmpty
+                      ? addressController.text
+                      : null,
                   isActive: isActive,
                   createdAt: customer?.createdAt ?? DateTime.now(),
                   updatedAt: DateTime.now(),
                   totalPurchases: customer?.totalPurchases ?? 0,
                   totalSpent: customer?.totalSpent ?? 0.0,
                 );
-                
+
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(isEditing ? 'Cliente actualizado' : 'Cliente agregado'),
+                    content: Text(
+                      isEditing ? 'Cliente actualizado' : 'Cliente agregado',
+                    ),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -599,13 +605,37 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
               _buildDetailRow('Email', customer.email, Icons.email),
               _buildDetailRow('Teléfono', customer.phone, Icons.phone),
               if (customer.address != null)
-                _buildDetailRow('Dirección', customer.address!, Icons.location_on),
-              _buildDetailRow('Estado', customer.isActive ? 'Activo' : 'Inactivo', Icons.circle),
-              _buildDetailRow('Compras totales', '${customer.totalPurchases}', Icons.shopping_cart),
-              _buildDetailRow('Total gastado', '₡${_formatCurrency(customer.totalSpent)}', Icons.attach_money),
-              _buildDetailRow('Registrado', _formatDate(customer.createdAt), Icons.calendar_today),
+                _buildDetailRow(
+                  'Dirección',
+                  customer.address!,
+                  Icons.location_on,
+                ),
+              _buildDetailRow(
+                'Estado',
+                customer.isActive ? 'Activo' : 'Inactivo',
+                Icons.circle,
+              ),
+              _buildDetailRow(
+                'Compras totales',
+                '${customer.totalPurchases}',
+                Icons.shopping_cart,
+              ),
+              _buildDetailRow(
+                'Total gastado',
+                '₡${_formatCurrency(customer.totalSpent)}',
+                Icons.attach_money,
+              ),
+              _buildDetailRow(
+                'Registrado',
+                _formatDate(customer.createdAt),
+                Icons.calendar_today,
+              ),
               if (customer.updatedAt != null)
-                _buildDetailRow('Actualizado', _formatDate(customer.updatedAt!), Icons.update),
+                _buildDetailRow(
+                  'Actualizado',
+                  _formatDate(customer.updatedAt!),
+                  Icons.update,
+                ),
             ],
           ),
         ),
@@ -631,11 +661,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
       padding: const EdgeInsets.only(bottom: DesignTokens.spacingMd),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: DesignTokens.textSecondaryColor,
-          ),
+          Icon(icon, size: 20, color: DesignTokens.textSecondaryColor),
           const SizedBox(width: DesignTokens.spacingSm),
           Expanded(
             child: Column(
@@ -715,21 +741,28 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
 
   List<Customer> _getFilteredCustomers() {
     List<Customer> customers = _getMockCustomers();
-    
+
     // Filtro por búsqueda
     if (_searchQuery.isNotEmpty) {
-      customers = customers.where((customer) =>
-        customer.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-        customer.email.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-        customer.phone.contains(_searchQuery)
-      ).toList();
+      customers = customers
+          .where(
+            (customer) =>
+                customer.name.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                customer.email.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                customer.phone.contains(_searchQuery),
+          )
+          .toList();
     }
-    
+
     // Filtro por estado
     if (_showOnlyActive) {
       customers = customers.where((customer) => customer.isActive).toList();
     }
-    
+
     // Ordenamiento
     switch (_sortBy) {
       case 'name':
@@ -745,7 +778,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
         customers.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         break;
     }
-    
+
     return customers;
   }
 

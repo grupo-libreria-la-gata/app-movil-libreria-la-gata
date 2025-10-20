@@ -16,11 +16,11 @@ class AuthProvider extends ChangeNotifier {
   Future<void> signInWithEmailAndPassword(String email, String password) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
-      // TODO: Implementar autenticación real cuando la API esté lista
+      // Simulación de autenticación - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 2)); // Simulación
-      
+
       // Simular usuario autenticado
       _currentUser = User(
         id: 'user_123',
@@ -30,7 +30,7 @@ class AuthProvider extends ChangeNotifier {
         role: UserRole.seller,
         createdAt: DateTime.now(),
       );
-      
+
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -40,14 +40,18 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Registrar nuevo usuario
-  Future<void> signUpWithEmailAndPassword(String email, String password, String name) async {
+  Future<void> signUpWithEmailAndPassword(
+    String email,
+    String password,
+    String name,
+  ) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
-      // TODO: Implementar registro real cuando la API esté lista
+      // Simulación de registro - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 2)); // Simulación
-      
+
       // Simular usuario registrado
       _currentUser = User(
         id: 'user_${DateTime.now().millisecondsSinceEpoch}',
@@ -57,7 +61,7 @@ class AuthProvider extends ChangeNotifier {
         role: UserRole.seller,
         createdAt: DateTime.now(),
       );
-      
+
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -70,10 +74,10 @@ class AuthProvider extends ChangeNotifier {
   Future<void> signInAsGuest() async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       await Future.delayed(const Duration(seconds: 1)); // Simulación
-      
+
       // Usuario invitado sin datos completos
       _currentUser = User(
         id: 'guest_${DateTime.now().millisecondsSinceEpoch}',
@@ -83,7 +87,7 @@ class AuthProvider extends ChangeNotifier {
         role: UserRole.cashier,
         createdAt: DateTime.now(),
       );
-      
+
       notifyListeners();
     } catch (e) {
       _setError(e.toString());
@@ -95,11 +99,11 @@ class AuthProvider extends ChangeNotifier {
   /// Cerrar sesión
   Future<void> signOut() async {
     _setLoading(true);
-    
+
     try {
-      // TODO: Implementar cierre de sesión real cuando la API esté lista
+      // Simulación de cierre de sesión - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 1)); // Simulación
-      
+
       _currentUser = null;
       _clearError();
       notifyListeners();
@@ -114,11 +118,10 @@ class AuthProvider extends ChangeNotifier {
   Future<void> sendPasswordResetEmail(String email) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
-      // TODO: Implementar envío de email real cuando la API esté lista
+      // Simulación de envío de email - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 2)); // Simulación
-      
     } catch (e) {
       _setError(e.toString());
     } finally {
@@ -129,11 +132,11 @@ class AuthProvider extends ChangeNotifier {
   /// Verificar token guardado
   Future<void> checkAuthStatus() async {
     _setLoading(true);
-    
+
     try {
-      // TODO: Verificar token guardado cuando la API esté lista
+      // Simulación de verificación de token - implementar cuando la API esté lista
       await Future.delayed(const Duration(seconds: 1)); // Simulación
-      
+
       // Por ahora, siempre inicia sin autenticación
       _currentUser = null;
       _clearError();

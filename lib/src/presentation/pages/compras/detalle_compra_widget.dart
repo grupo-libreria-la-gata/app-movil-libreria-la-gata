@@ -7,11 +7,11 @@ class DetalleCompraWidget extends StatelessWidget {
   final VoidCallback onDelete;
 
   const DetalleCompraWidget({
-    Key? key,
+    super.key,
     required this.detalle,
     required this.onEdit,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +37,14 @@ class DetalleCompraWidget extends StatelessWidget {
                     children: [
                       Text('Cantidad: ${detalle.cantidad}'),
                       const SizedBox(width: 16),
-                      Text('Precio: \$${detalle.precioUnitario.toStringAsFixed(2)}'),
+                      Text(
+                        'Precio: \$${detalle.precioUnitario.toStringAsFixed(2)}',
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Subtotal: \$${detalle.subtotal.toStringAsFixed(2)}',
+                    'Subtotal: \$${(detalle.cantidad * detalle.precioUnitario).toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
@@ -64,7 +66,9 @@ class DetalleCompraWidget extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Eliminar Producto'),
-                        content: const Text('¿Está seguro de que desea eliminar este producto?'),
+                        content: const Text(
+                          '¿Está seguro de que desea eliminar este producto?',
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),

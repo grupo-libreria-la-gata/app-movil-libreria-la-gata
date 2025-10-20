@@ -11,6 +11,7 @@ dependencies:
 
   # UI & Icons
   cupertino_icons: ^1.0.8
+  material_design_icons_flutter: ^7.0.7296
 
   # State Management
   provider: ^6.1.1
@@ -64,3 +65,17 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  
+  # Fonts configuration for web
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700

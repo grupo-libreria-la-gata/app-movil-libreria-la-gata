@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../../data/models/compra_model.dart';
 import '../../../data/services/compra_service.dart';
 import '../../providers/auth_provider_legacy.dart';
-import '../../widgets/loading_widgets.dart';
 import 'nueva_compra_page.dart';
 import 'compra_detail_page.dart';
 import 'compras_filters_page.dart';
@@ -33,14 +32,14 @@ class _ComprasPageState extends State<ComprasPage> {
 
   Future<void> _cargarCompras() async {
     setState(() => _isLoading = true);
-    
+
     try {
       if (!mounted) return;
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final usuarioId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
-      
+
       ApiResponse<List<CompraListModel>> response;
-      
+
       if (_fechaInicio != null && _fechaFin != null) {
         response = await _compraService.listarPorFechas(
           fechaInicio: _fechaInicio!,
@@ -55,7 +54,7 @@ class _ComprasPageState extends State<ComprasPage> {
       } else {
         response = await _compraService.listarCompras(usuarioId);
       }
-      
+
       if (response.success && response.data != null) {
         setState(() {
           _compras = response.data!;
@@ -72,29 +71,30 @@ class _ComprasPageState extends State<ComprasPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
     );
   }
 
   void _mostrarExito(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        backgroundColor: Colors.green,
-      ),
+      SnackBar(content: Text(mensaje), backgroundColor: Colors.green),
     );
   }
 
   List<CompraListModel> get _comprasFiltradas {
     if (_searchQuery.isEmpty) return _compras;
-    
+
     return _compras.where((compra) {
-      return compra.proveedorNombre.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-             compra.usuarioNombre.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-             compra.observaciones?.toLowerCase().contains(_searchQuery.toLowerCase()) == true;
+      return compra.proveedorNombre.toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          ) ||
+          compra.usuarioNombre.toLowerCase().contains(
+            _searchQuery.toLowerCase(),
+          ) ||
+          compra.observaciones?.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ==
+              true;
     }).toList();
   }
 
@@ -103,7 +103,9 @@ class _ComprasPageState extends State<ComprasPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Anular Compra'),
-        content: Text('¿Está seguro de que desea anular la compra #${compra.compraId}?'),
+        content: Text(
+          '¿Está seguro de que desea anular la compra #${compra.compraId}?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -119,19 +121,20 @@ class _ComprasPageState extends State<ComprasPage> {
 
     if (confirmacion == true) {
       setState(() => _isLoading = true);
-      
+
       try {
         if (!mounted) return;
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final usuarioId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
-        
+        final usuarioId =
+            int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
+
         final request = AnularCompraRequest(
           compraId: compra.compraId,
           usuarioId: usuarioId,
         );
-        
+
         final response = await _compraService.anularCompra(request);
-        
+
         if (response.success) {
           _mostrarExito('Compra anulada exitosamente');
           _cargarCompras();
@@ -165,7 +168,7 @@ class _ComprasPageState extends State<ComprasPage> {
                   ),
                 ),
               );
-              
+
               if (result != null) {
                 setState(() {
                   _fechaInicio = result['fechaInicio'];
@@ -200,7 +203,7 @@ class _ComprasPageState extends State<ComprasPage> {
               },
             ),
           ),
-          
+
           // Indicadores de filtros activos
           if (_fechaInicio != null || _fechaFin != null || _proveedorId != null)
             Container(
@@ -210,7 +213,9 @@ class _ComprasPageState extends State<ComprasPage> {
                 children: [
                   if (_fechaInicio != null && _fechaFin != null)
                     Chip(
-                      label: Text('${_fechaInicio!.day}/${_fechaInicio!.month} - ${_fechaFin!.day}/${_fechaFin!.month}'),
+                      label: Text(
+                        '${_fechaInicio!.day}/${_fechaInicio!.month} - ${_fechaFin!.day}/${_fechaFin!.month}',
+                      ),
                       onDeleted: () {
                         setState(() {
                           _fechaInicio = null;
@@ -232,40 +237,43 @@ class _ComprasPageState extends State<ComprasPage> {
                 ],
               ),
             ),
-          
+
           // Lista de compras
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _comprasFiltradas.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'No hay compras registradas',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _cargarCompras,
-                        child: ListView.builder(
-                          itemCount: _comprasFiltradas.length,
-                          itemBuilder: (context, index) {
-                            final compra = _comprasFiltradas[index];
-                            return _CompraCard(
-                              compra: compra,
-                              onTap: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CompraDetailPage(compraId: compra.compraId),
-                                  ),
-                                );
-                                _cargarCompras(); // Recargar en caso de cambios
-                              },
-                              onAnular: compra.activo ? () => _anularCompra(compra) : null,
+                ? const Center(
+                    child: Text(
+                      'No hay compras registradas',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _cargarCompras,
+                    child: ListView.builder(
+                      itemCount: _comprasFiltradas.length,
+                      itemBuilder: (context, index) {
+                        final compra = _comprasFiltradas[index];
+                        return _CompraCard(
+                          compra: compra,
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    CompraDetailPage(compraId: compra.compraId),
+                              ),
                             );
+                            _cargarCompras(); // Recargar en caso de cambios
                           },
-                        ),
-                      ),
+                          onAnular: compra.activo
+                              ? () => _anularCompra(compra)
+                              : null,
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
@@ -273,9 +281,7 @@ class _ComprasPageState extends State<ComprasPage> {
         onPressed: () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const NuevaCompraPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const NuevaCompraPage()),
           );
           _cargarCompras(); // Recargar después de crear una nueva compra
         },
@@ -290,11 +296,7 @@ class _CompraCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onAnular;
 
-  const _CompraCard({
-    required this.compra,
-    required this.onTap,
-    this.onAnular,
-  });
+  const _CompraCard({required this.compra, required this.onTap, this.onAnular});
 
   @override
   Widget build(BuildContext context) {
@@ -333,10 +335,7 @@ class _CompraCard extends StatelessWidget {
         trailing: compra.activo && onAnular != null
             ? PopupMenuButton(
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'anular',
-                    child: Text('Anular'),
-                  ),
+                  const PopupMenuItem(value: 'anular', child: Text('Anular')),
                 ],
                 onSelected: (value) {
                   if (value == 'anular') {

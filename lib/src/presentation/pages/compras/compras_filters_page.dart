@@ -6,11 +6,11 @@ class ComprasFiltersPage extends StatefulWidget {
   final int? proveedorId;
 
   const ComprasFiltersPage({
-    Key? key,
+    super.key,
     this.fechaInicio,
     this.fechaFin,
     this.proveedorId,
-  }) : super(key: key);
+  });
 
   @override
   State<ComprasFiltersPage> createState() => _ComprasFiltersPageState();
@@ -36,7 +36,7 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    
+
     if (fecha != null) {
       setState(() {
         _fechaInicio = fecha;
@@ -55,7 +55,7 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
       firstDate: _fechaInicio ?? DateTime(2020),
       lastDate: DateTime.now(),
     );
-    
+
     if (fecha != null) {
       setState(() {
         _fechaFin = fecha;
@@ -87,10 +87,7 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
         actions: [
           TextButton(
             onPressed: _limpiarFiltros,
-            child: const Text(
-              'Limpiar',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Limpiar', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -114,7 +111,7 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Fecha inicio
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
@@ -136,9 +133,9 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                           : null,
                       onTap: _seleccionarFechaInicio,
                     ),
-                    
+
                     const Divider(),
-                    
+
                     // Fecha fin
                     ListTile(
                       leading: const Icon(Icons.calendar_today),
@@ -164,9 +161,9 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Filtros por proveedor
             Card(
               child: Padding(
@@ -182,9 +179,9 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     DropdownButtonFormField<int>(
-                      value: _proveedorId,
+                      initialValue: _proveedorId,
                       decoration: const InputDecoration(
                         labelText: 'Proveedor',
                         border: OutlineInputBorder(),
@@ -194,10 +191,19 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                           value: null,
                           child: Text('Todos los proveedores'),
                         ),
-                        // TODO: Cargar proveedores desde el servicio
-                        const DropdownMenuItem(value: 1, child: Text('Proveedor 1')),
-                        const DropdownMenuItem(value: 2, child: Text('Proveedor 2')),
-                        const DropdownMenuItem(value: 3, child: Text('Proveedor 3')),
+                        // Simulación de proveedores - cargar desde el servicio
+                        const DropdownMenuItem(
+                          value: 1,
+                          child: Text('Proveedor 1'),
+                        ),
+                        const DropdownMenuItem(
+                          value: 2,
+                          child: Text('Proveedor 2'),
+                        ),
+                        const DropdownMenuItem(
+                          value: 3,
+                          child: Text('Proveedor 3'),
+                        ),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -209,9 +215,9 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Filtros rápidos
             Card(
               child: Padding(
@@ -227,7 +233,7 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     Wrap(
                       spacing: 8.0,
                       runSpacing: 8.0,
@@ -237,8 +243,19 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                           onTap: () {
                             final hoy = DateTime.now();
                             setState(() {
-                              _fechaInicio = DateTime(hoy.year, hoy.month, hoy.day);
-                              _fechaFin = DateTime(hoy.year, hoy.month, hoy.day, 23, 59, 59);
+                              _fechaInicio = DateTime(
+                                hoy.year,
+                                hoy.month,
+                                hoy.day,
+                              );
+                              _fechaFin = DateTime(
+                                hoy.year,
+                                hoy.month,
+                                hoy.day,
+                                23,
+                                59,
+                                59,
+                              );
                             });
                           },
                         ),
@@ -246,10 +263,23 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                           label: 'Esta Semana',
                           onTap: () {
                             final hoy = DateTime.now();
-                            final inicioSemana = hoy.subtract(Duration(days: hoy.weekday - 1));
+                            final inicioSemana = hoy.subtract(
+                              Duration(days: hoy.weekday - 1),
+                            );
                             setState(() {
-                              _fechaInicio = DateTime(inicioSemana.year, inicioSemana.month, inicioSemana.day);
-                              _fechaFin = DateTime(hoy.year, hoy.month, hoy.day, 23, 59, 59);
+                              _fechaInicio = DateTime(
+                                inicioSemana.year,
+                                inicioSemana.month,
+                                inicioSemana.day,
+                              );
+                              _fechaFin = DateTime(
+                                hoy.year,
+                                hoy.month,
+                                hoy.day,
+                                23,
+                                59,
+                                59,
+                              );
                             });
                           },
                         ),
@@ -259,7 +289,14 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                             final hoy = DateTime.now();
                             setState(() {
                               _fechaInicio = DateTime(hoy.year, hoy.month, 1);
-                              _fechaFin = DateTime(hoy.year, hoy.month, hoy.day, 23, 59, 59);
+                              _fechaFin = DateTime(
+                                hoy.year,
+                                hoy.month,
+                                hoy.day,
+                                23,
+                                59,
+                                59,
+                              );
                             });
                           },
                         ),
@@ -267,10 +304,23 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
                           label: 'Últimos 30 días',
                           onTap: () {
                             final hoy = DateTime.now();
-                            final hace30Dias = hoy.subtract(const Duration(days: 30));
+                            final hace30Dias = hoy.subtract(
+                              const Duration(days: 30),
+                            );
                             setState(() {
-                              _fechaInicio = DateTime(hace30Dias.year, hace30Dias.month, hace30Dias.day);
-                              _fechaFin = DateTime(hoy.year, hoy.month, hoy.day, 23, 59, 59);
+                              _fechaInicio = DateTime(
+                                hace30Dias.year,
+                                hace30Dias.month,
+                                hace30Dias.day,
+                              );
+                              _fechaFin = DateTime(
+                                hoy.year,
+                                hoy.month,
+                                hoy.day,
+                                23,
+                                59,
+                                59,
+                              );
                             });
                           },
                         ),
@@ -289,7 +339,7 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
           color: Theme.of(context).cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, -2),
             ),
@@ -321,10 +371,7 @@ class _FiltroRapidoChip extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _FiltroRapidoChip({
-    required this.label,
-    required this.onTap,
-  });
+  const _FiltroRapidoChip({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

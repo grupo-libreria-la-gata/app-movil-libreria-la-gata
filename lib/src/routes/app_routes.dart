@@ -14,10 +14,19 @@ import '../presentation/pages/customers/customers_page.dart';
 import '../presentation/pages/inventory/inventory_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/admin/admin_page.dart';
-import '../presentation/pages/settings/settings_page.dart';
 import '../presentation/pages/brand_management/brand_management_page.dart';
 import '../presentation/pages/category_management/category_management_page.dart';
 import '../presentation/pages/producto_management/product_management_page.dart';
+import '../presentation/pages/compras/compras_page.dart';
+import '../presentation/pages/compras/nueva_compra_page.dart';
+import '../presentation/pages/compras/compra_detail_page.dart';
+import '../presentation/pages/proveedores/proveedores_page.dart';
+import '../presentation/pages/proveedores/crear_proveedor_page.dart';
+import '../presentation/pages/proveedores/editar_proveedor_page.dart';
+import '../data/models/proveedor_model.dart';
+import '../presentation/pages/detalle_productos/detalle_productos_page.dart';
+import '../presentation/pages/reports/reports_page.dart';
+import '../presentation/pages/settings/settings_page.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -137,6 +146,53 @@ class AppRoutes {
         },
       ),
 
+      // Compras
+      GoRoute(
+        path: '/compras',
+        name: 'compras',
+        builder: (context, state) => const ComprasPage(),
+      ),
+      GoRoute(
+        path: '/compras/nueva',
+        name: 'nuevaCompra',
+        builder: (context, state) => const NuevaCompraPage(),
+      ),
+      GoRoute(
+        path: '/compras/:id',
+        name: 'compraDetail',
+        builder: (context, state) {
+          final compraId = state.pathParameters['id']!;
+          return CompraDetailPage(compraId: int.parse(compraId));
+        },
+      ),
+
+      // Proveedores
+      GoRoute(
+        path: '/proveedores',
+        name: 'proveedores',
+        builder: (context, state) => const ProveedoresPage(),
+      ),
+      GoRoute(
+        path: '/proveedores/nuevo',
+        name: 'nuevoProveedor',
+        builder: (context, state) => const CrearProveedorPage(),
+      ),
+      GoRoute(
+        path: '/proveedores/editar',
+        name: 'editarProveedor',
+        builder: (context, state) {
+          final proveedor = state.extra as Proveedor;
+          return EditarProveedorPage(proveedor: proveedor);
+        },
+      ),
+
+      // Detalle de Productos
+      GoRoute(
+        path: '/detalle-productos',
+        name: 'detalleProductos',
+        builder: (context, state) => const DetalleProductosPage(),
+      ),
+
       // Ventas
       GoRoute(
         path: newSale,
@@ -187,15 +243,6 @@ class AppRoutes {
             ),
           );
         },
-      ),
-
-      // Reportes
-      GoRoute(
-        path: reports,
-        name: 'reports',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Reportes y Estadísticas - En desarrollo')),
-        ),
       ),
 
       // Usuarios
@@ -260,6 +307,20 @@ class AppRoutes {
         path: '/admin/products',
         name: 'productManagement',
         builder: (context, state) => const ProductManagementPage(),
+      ),
+
+      // Reportes
+      GoRoute(
+        path: reports,
+        name: 'reports',
+        builder: (context, state) => const ReportsPage(),
+      ),
+
+      // Configuración
+      GoRoute(
+        path: settings,
+        name: 'settings',
+        builder: (context, state) => const SettingsPage(),
       ),
     ],
   );

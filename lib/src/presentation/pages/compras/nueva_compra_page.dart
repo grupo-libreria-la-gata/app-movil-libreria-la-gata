@@ -1,31 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/compra_model.dart';
 import '../../../data/services/compra_service.dart';
-import '../../providers/auth_provider_legacy.dart';
+import '../../../data/services/proveedor_service.dart';
+import '../../../data/models/proveedor_model.dart';
+import '../../../data/services/detalle_producto_service.dart';
+import '../../../data/models/detalle_producto_model.dart';
+import '../../providers/auth_provider.dart';
 import 'detalle_compra_widget.dart';
 
-class NuevaCompraPage extends StatefulWidget {
+class NuevaCompraPage extends ConsumerStatefulWidget {
   const NuevaCompraPage({super.key});
 
   @override
-  State<NuevaCompraPage> createState() => _NuevaCompraPageState();
+  ConsumerState<NuevaCompraPage> createState() => _NuevaCompraPageState();
 }
 
-class _NuevaCompraPageState extends State<NuevaCompraPage> {
+class _NuevaCompraPageState extends ConsumerState<NuevaCompraPage> {
   final CompraService _compraService = CompraService();
+  final ProveedorService _proveedorService = ProveedorService();
+  final DetalleProductoService _detalleProductoService =
+      DetalleProductoService();
   final _formKey = GlobalKey<FormState>();
   final _observacionesController = TextEditingController();
-  
+
   int? _proveedorId;
+  List<Proveedor> _proveedores = [];
+  List<DetalleProducto> _detalleProductos = [];
   final List<CrearDetalleCompraRequest> _detalles = [];
   bool _isLoading = false;
+  bool _cargandoProveedores = true;
   double _total = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarProveedores();
+    _cargarDetalleProductos();
+  }
 
   @override
   void dispose() {
     _observacionesController.dispose();
     super.dispose();
+  }
+
+  Future<void> _cargarProveedores() async {
+    try {
+      final proveedores = await _proveedorService.obtenerActivos();
+      setState(() {
+        _proveedores = proveedores;
+        _cargandoProveedores = false;
+      });
+    } catch (e) {
+      setState(() {
+        _cargandoProveedores = false;
+      });
+      _mostrarError('Error al cargar proveedores: ${e.toString()}');
+    }
+  }
+
+  Future<void> _cargarDetalleProductos() async {
+    try {
+      final detalleProductos = await _detalleProductoService.obtenerActivos();
+      setState(() {
+        _detalleProductos = detalleProductos;
+      });
+    } catch (e) {
+      _mostrarError('Error al cargar productos: ${e.toString()}');
+    }
   }
 
   void _calcularTotal() {
@@ -38,6 +81,7 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
     showDialog(
       context: context,
       builder: (context) => _AgregarDetalleDialog(
+        detalleProductos: _detalleProductos,
         onDetalleAgregado: (detalle) {
           setState(() {
             _detalles.add(detalle);
@@ -53,6 +97,7 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
       context: context,
       builder: (context) => _AgregarDetalleDialog(
         detalleExistente: _detalles[index],
+        detalleProductos: _detalleProductos,
         onDetalleAgregado: (detalle) {
           setState(() {
             _detalles[index] = detalle;
@@ -86,7 +131,9 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
     }
 
     if (!_compraService.validarDetalles(_detalles)) {
-      _mostrarError('Verifique que todos los detalles tengan cantidad y precio válidos');
+      _mostrarError(
+        'Verifique que todos los detalles tengan cantidad y precio válidos',
+      );
       return;
     }
 
@@ -94,15 +141,15 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
 
     try {
       if (!mounted) return;
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final usuarioId = int.tryParse(authProvider.currentUser?.id ?? '0') ?? 0;
+      final authState = ref.read(authProvider);
+      final usuarioId = int.tryParse(authState.user?.id ?? '0') ?? 0;
 
       final request = CrearCompraRequest(
         proveedorId: _proveedorId!,
         usuarioId: usuarioId,
         total: _total,
-        observaciones: _observacionesController.text.trim().isEmpty 
-            ? null 
+        observaciones: _observacionesController.text.trim().isEmpty
+            ? null
             : _observacionesController.text.trim(),
         detalles: _detalles,
       );
@@ -110,10 +157,14 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
       final response = await _compraService.crearCompra(request);
 
       if (response.success) {
-        if (mounted) _mostrarExito('Compra creada exitosamente');
-        Navigator.of(context).pop(true);
+        if (mounted) {
+          _mostrarExito('Compra creada exitosamente');
+          Navigator.of(context).pop(true);
+        }
       } else {
-        if (mounted) _mostrarError(response.message ?? 'Error al crear la compra');
+        if (mounted) {
+          _mostrarError(response.message ?? 'Error al crear la compra');
+        }
       }
     } catch (e) {
       if (mounted) _mostrarError('Error inesperado: ${e.toString()}');
@@ -124,19 +175,13 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
     );
   }
 
   void _mostrarExito(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        backgroundColor: Colors.green,
-      ),
+      SnackBar(content: Text(mensaje), backgroundColor: Colors.green),
     );
   }
 
@@ -191,22 +236,32 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
                             ),
                             const SizedBox(height: 8),
                             DropdownButtonFormField<int>(
-                              value: _proveedorId,
-                              decoration: const InputDecoration(
+                              initialValue: _proveedorId,
+                              decoration: InputDecoration(
                                 labelText: 'Seleccionar proveedor',
-                                border: OutlineInputBorder(),
+                                prefixIcon: const Icon(Icons.business_center),
+                                border: const OutlineInputBorder(),
                               ),
-                              items: const [
-                                // Cargar proveedores desde el servicio
-                                DropdownMenuItem(value: 1, child: Text('Proveedor 1')),
-                                DropdownMenuItem(value: 2, child: Text('Proveedor 2')),
-                                DropdownMenuItem(value: 3, child: Text('Proveedor 3')),
-                              ],
-                              onChanged: (value) {
-                                setState(() {
-                                  _proveedorId = value;
-                                });
-                              },
+                              items: _cargandoProveedores
+                                  ? [
+                                      const DropdownMenuItem(
+                                        value: null,
+                                        child: Text('Cargando...'),
+                                      ),
+                                    ]
+                                  : _proveedores.map((proveedor) {
+                                      return DropdownMenuItem<int>(
+                                        value: proveedor.proveedorId,
+                                        child: Text(proveedor.nombre),
+                                      );
+                                    }).toList(),
+                              onChanged: _cargandoProveedores
+                                  ? null
+                                  : (value) {
+                                      setState(() {
+                                        _proveedorId = value;
+                                      });
+                                    },
                               validator: (value) {
                                 if (value == null) {
                                   return 'Seleccione un proveedor';
@@ -218,9 +273,9 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Observaciones
                     Card(
                       child: Padding(
@@ -248,9 +303,9 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Detalles de la compra
                     Card(
                       child: Padding(
@@ -276,7 +331,7 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            
+
                             if (_detalles.isEmpty)
                               const Center(
                                 child: Padding(
@@ -312,7 +367,7 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
                 ),
               ),
             ),
-            
+
             // Total y botón guardar
             Container(
               padding: const EdgeInsets.all(16.0),
@@ -377,10 +432,12 @@ class _NuevaCompraPageState extends State<NuevaCompraPage> {
 class _AgregarDetalleDialog extends StatefulWidget {
   final CrearDetalleCompraRequest? detalleExistente;
   final Function(CrearDetalleCompraRequest) onDetalleAgregado;
+  final List<DetalleProducto> detalleProductos;
 
   const _AgregarDetalleDialog({
     this.detalleExistente,
     required this.onDetalleAgregado,
+    required this.detalleProductos,
   });
 
   @override
@@ -391,7 +448,7 @@ class _AgregarDetalleDialogState extends State<_AgregarDetalleDialog> {
   final _formKey = GlobalKey<FormState>();
   final _cantidadController = TextEditingController();
   final _precioController = TextEditingController();
-  
+
   int? _detalleProductoId;
   double _subtotal = 0.0;
 
@@ -401,8 +458,11 @@ class _AgregarDetalleDialogState extends State<_AgregarDetalleDialog> {
     if (widget.detalleExistente != null) {
       _detalleProductoId = widget.detalleExistente!.detalleProductoId;
       _cantidadController.text = widget.detalleExistente!.cantidad.toString();
-      _precioController.text = widget.detalleExistente!.precioUnitario.toString();
-      _subtotal = widget.detalleExistente!.subtotal;
+      _precioController.text = widget.detalleExistente!.precioUnitario
+          .toString();
+      _subtotal =
+          widget.detalleExistente!.cantidad *
+          widget.detalleExistente!.precioUnitario;
     }
   }
 
@@ -436,11 +496,16 @@ class _AgregarDetalleDialogState extends State<_AgregarDetalleDialog> {
       return;
     }
 
+    // Buscar el producto seleccionado para obtener su código de barras
+    final productoSeleccionado = widget.detalleProductos.firstWhere(
+      (p) => p.detalleProductoId == _detalleProductoId,
+    );
+
     final detalle = CrearDetalleCompraRequest(
       detalleProductoId: _detalleProductoId!,
       cantidad: int.parse(_cantidadController.text),
       precioUnitario: double.parse(_precioController.text),
-      subtotal: _subtotal,
+      codigoBarra: productoSeleccionado.codigoBarra,
     );
 
     widget.onDetalleAgregado(detalle);
@@ -450,24 +515,28 @@ class _AgregarDetalleDialogState extends State<_AgregarDetalleDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.detalleExistente != null ? 'Editar Producto' : 'Agregar Producto'),
+      title: Text(
+        widget.detalleExistente != null
+            ? 'Editar Producto'
+            : 'Agregar Producto',
+      ),
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             DropdownButtonFormField<int>(
-              value: _detalleProductoId,
+              initialValue: _detalleProductoId,
               decoration: const InputDecoration(
                 labelText: 'Producto',
                 border: OutlineInputBorder(),
               ),
-              items: const [
-                // Cargar productos desde el servicio
-                DropdownMenuItem(value: 1, child: Text('Producto 1')),
-                DropdownMenuItem(value: 2, child: Text('Producto 2')),
-                DropdownMenuItem(value: 3, child: Text('Producto 3')),
-              ],
+              items: widget.detalleProductos.map((producto) {
+                return DropdownMenuItem<int>(
+                  value: producto.detalleProductoId,
+                  child: Text('${producto.producto} - ${producto.marca}'),
+                );
+              }).toList(),
               onChanged: (value) {
                 setState(() {
                   _detalleProductoId = value;
@@ -480,9 +549,9 @@ class _AgregarDetalleDialogState extends State<_AgregarDetalleDialog> {
                 return null;
               },
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             TextFormField(
               controller: _cantidadController,
               decoration: const InputDecoration(
@@ -502,9 +571,9 @@ class _AgregarDetalleDialogState extends State<_AgregarDetalleDialog> {
                 return null;
               },
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             TextFormField(
               controller: _precioController,
               decoration: const InputDecoration(
@@ -524,9 +593,9 @@ class _AgregarDetalleDialogState extends State<_AgregarDetalleDialog> {
                 return null;
               },
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -560,7 +629,9 @@ class _AgregarDetalleDialogState extends State<_AgregarDetalleDialog> {
         ),
         ElevatedButton(
           onPressed: _guardarDetalle,
-          child: Text(widget.detalleExistente != null ? 'Actualizar' : 'Agregar'),
+          child: Text(
+            widget.detalleExistente != null ? 'Actualizar' : 'Agregar',
+          ),
         ),
       ],
     );

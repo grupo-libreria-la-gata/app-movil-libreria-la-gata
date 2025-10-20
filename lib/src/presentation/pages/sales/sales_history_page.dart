@@ -43,15 +43,13 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
         children: [
           // Barra de búsqueda
           _buildSearchBar(),
-          
+
           // Filtros activos
           if (_selectedStatus != null || _selectedDate != null)
             _buildActiveFilters(),
-          
+
           // Lista de ventas
-          Expanded(
-            child: _buildSalesList(),
-          ),
+          Expanded(child: _buildSalesList()),
         ],
       ),
     );
@@ -127,7 +125,7 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
 
   Widget _buildSalesList() {
     final sales = _getFilteredSales();
-    
+
     if (sales.isEmpty) {
       return _buildEmptyState();
     }
@@ -169,9 +167,9 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
                   _buildStatusChip(sale.status),
                 ],
               ),
-              
+
               const SizedBox(height: DesignTokens.spacingSm),
-              
+
               // Información del cliente
               Row(
                 children: [
@@ -192,9 +190,9 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: DesignTokens.spacingSm),
-              
+
               // Información de la venta
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -250,7 +248,7 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
   Widget _buildStatusChip(SaleStatus status) {
     Color color;
     String text;
-    
+
     switch (status) {
       case SaleStatus.completed:
         color = DesignTokens.successColor;
@@ -269,7 +267,7 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
         text = 'Reembolsada';
         break;
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: DesignTokens.spacingSm,
@@ -334,7 +332,7 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
           children: [
             // Filtro por estado
             DropdownButtonFormField<SaleStatus?>(
-              value: _selectedStatus,
+              initialValue: _selectedStatus,
               decoration: const InputDecoration(
                 labelText: 'Estado',
                 border: OutlineInputBorder(),
@@ -344,10 +342,12 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
                   value: null,
                   child: Text('Todos los estados'),
                 ),
-                ...SaleStatus.values.map((status) => DropdownMenuItem(
-                  value: status,
-                  child: Text(_getStatusDisplayName(status)),
-                )),
+                ...SaleStatus.values.map(
+                  (status) => DropdownMenuItem(
+                    value: status,
+                    child: Text(_getStatusDisplayName(status)),
+                  ),
+                ),
               ],
               onChanged: (value) {
                 setState(() {
@@ -355,15 +355,17 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
                 });
               },
             ),
-            
+
             const SizedBox(height: DesignTokens.spacingMd),
-            
+
             // Filtro por fecha
             ListTile(
               title: const Text('Fecha específica'),
-              subtitle: Text(_selectedDate != null 
-                ? _formatDate(_selectedDate!) 
-                : 'Seleccionar fecha'),
+              subtitle: Text(
+                _selectedDate != null
+                    ? _formatDate(_selectedDate!)
+                    : 'Seleccionar fecha',
+              ),
               trailing: _selectedDate != null
                   ? IconButton(
                       icon: const Icon(Icons.clear),
@@ -495,30 +497,42 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
 
   List<Sale> _getFilteredSales() {
     List<Sale> sales = _getMockSales();
-    
+
     // Filtro por búsqueda
     if (_searchQuery.isNotEmpty) {
-      sales = sales.where((sale) =>
-        sale.customerName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-        sale.invoiceNumber.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-        sale.sellerName.toLowerCase().contains(_searchQuery.toLowerCase())
-      ).toList();
+      sales = sales
+          .where(
+            (sale) =>
+                sale.customerName.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                sale.invoiceNumber.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ) ||
+                sale.sellerName.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+          )
+          .toList();
     }
-    
+
     // Filtro por estado
     if (_selectedStatus != null) {
       sales = sales.where((sale) => sale.status == _selectedStatus).toList();
     }
-    
+
     // Filtro por fecha
     if (_selectedDate != null) {
-      sales = sales.where((sale) =>
-        sale.createdAt.year == _selectedDate!.year &&
-        sale.createdAt.month == _selectedDate!.month &&
-        sale.createdAt.day == _selectedDate!.day
-      ).toList();
+      sales = sales
+          .where(
+            (sale) =>
+                sale.createdAt.year == _selectedDate!.year &&
+                sale.createdAt.month == _selectedDate!.month &&
+                sale.createdAt.day == _selectedDate!.day,
+          )
+          .toList();
     }
-    
+
     return sales;
   }
 

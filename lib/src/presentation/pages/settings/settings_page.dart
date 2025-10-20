@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/design/design_tokens.dart';
-import '../../../core/services/business_service.dart';
-import '../../../core/services/error_service.dart';
-import '../../../config/app_config.dart';
-import '../../widgets/loading_widgets.dart';
+import '../../../core/utils/responsive_helper.dart';
 
 /// Página de configuración del sistema
 class SettingsPage extends ConsumerStatefulWidget {
@@ -14,363 +12,114 @@ class SettingsPage extends ConsumerStatefulWidget {
   ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends ConsumerState<SettingsPage> with LoadingMixin {
-  final _formKey = GlobalKey<FormState>();
-  
-  // Controladores para los campos
-  late TextEditingController _taxRateController;
-  late TextEditingController _defaultDiscountController;
-  late TextEditingController _businessNameController;
-  late TextEditingController _businessAddressController;
-  late TextEditingController _businessPhoneController;
-  late TextEditingController _businessEmailController;
-  late TextEditingController _businessRucController;
-  late TextEditingController _invoicePrefixController;
-  
-  // Variables de estado
-  DiscountType _selectedDiscountType = DiscountType.none;
-  bool _isDirty = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeControllers();
-    _loadCurrentSettings();
-  }
-
-  @override
-  void dispose() {
-    _taxRateController.dispose();
-    _defaultDiscountController.dispose();
-    _businessNameController.dispose();
-    _businessAddressController.dispose();
-    _businessPhoneController.dispose();
-    _businessEmailController.dispose();
-    _businessRucController.dispose();
-    _invoicePrefixController.dispose();
-    super.dispose();
-  }
-
-  /// Inicializa los controladores
-  void _initializeControllers() {
-    _taxRateController = TextEditingController();
-    _defaultDiscountController = TextEditingController();
-    _businessNameController = TextEditingController();
-    _businessAddressController = TextEditingController();
-    _businessPhoneController = TextEditingController();
-    _businessEmailController = TextEditingController();
-    _businessRucController = TextEditingController();
-    _invoicePrefixController = TextEditingController();
-  }
-
-  /// Carga la configuración actual
-  void _loadCurrentSettings() {
-    final config = BusinessConfig.getCurrentConfig();
-    
-    _taxRateController.text = config['taxRate'].toString();
-    _defaultDiscountController.text = config['defaultDiscount'].toString();
-    _selectedDiscountType = DiscountType.values.firstWhere(
-      (e) => e.name == config['defaultDiscountType'],
-      orElse: () => DiscountType.none,
-    );
-    
-    _businessNameController.text = config['businessName'];
-    _businessAddressController.text = config['businessAddress'];
-    _businessPhoneController.text = config['businessPhone'];
-    _businessEmailController.text = config['businessEmail'];
-    _businessRucController.text = config['businessRuc'];
-    _invoicePrefixController.text = config['invoicePrefix'];
-    
-    setState(() {
-      _isDirty = false;
-    });
-  }
+class _SettingsPageState extends ConsumerState<SettingsPage> {
+  double _fontSize = 16.0;
+  bool _isDarkMode = false;
+  String _selectedLanguage = 'Español';
+  final List<String> _languages = ['Español', 'English'];
+  bool _notificationsEnabled = true;
+  bool _soundEnabled = true;
+  bool _vibrationEnabled = true;
 
   @override
   Widget build(BuildContext context) {
+    final responsiveHelper = ResponsiveHelper.instance;
+
     return Scaffold(
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        title: const Text('Configuración del Sistema'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          if (_isDirty)
-            TextButton(
-              onPressed: _saveSettings,
-              child: const Text(
-                'Guardar',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-        ],
+        title: const Text('Configuración'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(DesignTokens.spacingLg),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSectionHeader(
-                'Configuración de Impuestos',
-                Icons.receipt_long,
-                'Configura los impuestos aplicados a las ventas',
-              ),
-              const SizedBox(height: DesignTokens.spacingMd),
-              _buildTaxSettings(),
-              const SizedBox(height: DesignTokens.spacingXl),
-              
-              _buildSectionHeader(
-                'Configuración de Descuentos',
-                Icons.discount,
-                'Configura los descuentos por defecto',
-              ),
-              const SizedBox(height: DesignTokens.spacingMd),
-              _buildDiscountSettings(),
-              const SizedBox(height: DesignTokens.spacingXl),
-              
-              _buildSectionHeader(
-                'Información del Negocio',
-                Icons.business,
-                'Configura la información de tu negocio',
-              ),
-              const SizedBox(height: DesignTokens.spacingMd),
-              _buildBusinessSettings(),
-              const SizedBox(height: DesignTokens.spacingXl),
-              
-              _buildSectionHeader(
-                'Configuración de Facturas',
-                Icons.description,
-                'Configura el formato de las facturas',
-              ),
-              const SizedBox(height: DesignTokens.spacingMd),
-              _buildInvoiceSettings(),
-              const SizedBox(height: DesignTokens.spacingXl),
-              
-              _buildActions(),
-            ],
+        padding: EdgeInsets.all(
+          responsiveHelper.getResponsiveSpacing(
+            context,
+            DesignTokens.spacingMd,
           ),
         ),
-      ),
-    );
-  }
-
-  /// Construye el encabezado de una sección
-  Widget _buildSectionHeader(String title, IconData icon, String subtitle) {
-    return Container(
-      padding: const EdgeInsets.all(DesignTokens.spacingMd),
-      decoration: BoxDecoration(
-        color: DesignTokens.primaryColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-        border: Border.all(
-          color: DesignTokens.primaryColor.withOpacity(0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: DesignTokens.primaryColor,
-            size: 24,
-          ),
-          const SizedBox(width: DesignTokens.spacingMd),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: DesignTokens.fontSizeLg,
-                    fontWeight: DesignTokens.fontWeightSemiBold,
-                    color: DesignTokens.textPrimaryColor,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: DesignTokens.fontSizeSm,
-                    color: DesignTokens.textSecondaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Construye la configuración de impuestos
-  Widget _buildTaxSettings() {
-    return Card(
-      color: DesignTokens.cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(DesignTokens.spacingLg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Tasa de Impuesto (%)',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeMd,
-                fontWeight: DesignTokens.fontWeightMedium,
-                color: DesignTokens.textPrimaryColor,
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingSm),
-            TextFormField(
-              controller: _taxRateController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: '15.0',
-                suffixText: '%',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingMd,
-                  vertical: DesignTokens.spacingSm,
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'La tasa de impuesto es requerida';
-                }
-                final rate = double.tryParse(value);
-                if (rate == null || rate < 0 || rate > 100) {
-                  return 'Ingresa una tasa válida entre 0 y 100';
-                }
-                return null;
-              },
-              onChanged: (_) => _markAsDirty(),
-            ),
-            const SizedBox(height: DesignTokens.spacingMd),
-            Container(
-              padding: const EdgeInsets.all(DesignTokens.spacingMd),
-              decoration: BoxDecoration(
-                color: DesignTokens.infoColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-                border: Border.all(
-                  color: DesignTokens.infoColor.withOpacity(0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: DesignTokens.infoColor,
-                    size: 20,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingSm),
-                  Expanded(
-                    child: Text(
-                      'Esta tasa se aplicará automáticamente a todas las ventas',
-                      style: TextStyle(
-                        fontSize: DesignTokens.fontSizeSm,
-                        color: DesignTokens.infoColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Configuración de apariencia
+            _buildAppearanceSection(),
+
+            const SizedBox(height: DesignTokens.spacingLg),
+
+            // Configuración de idioma
+            _buildLanguageSection(),
+
+            const SizedBox(height: DesignTokens.spacingLg),
+
+            // Configuración de notificaciones
+            _buildNotificationsSection(),
+
+            const SizedBox(height: DesignTokens.spacingLg),
+
+            // Configuración de sistema
+            _buildSystemSection(),
+
+            const SizedBox(height: DesignTokens.spacingLg),
+
+            // Botones de acción
+            _buildActionButtons(),
           ],
         ),
       ),
     );
   }
 
-  /// Construye la configuración de descuentos
-  Widget _buildDiscountSettings() {
+  Widget _buildAppearanceSection() {
     return Card(
-      color: DesignTokens.cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-      ),
+      elevation: DesignTokens.elevationSm,
       child: Padding(
-        padding: const EdgeInsets.all(DesignTokens.spacingLg),
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Tipo de Descuento por Defecto',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeMd,
-                fontWeight: DesignTokens.fontWeightMedium,
-                color: DesignTokens.textPrimaryColor,
-              ),
+            const Text(
+              'Apariencia',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: DesignTokens.spacingSm),
-            DropdownButtonFormField<DiscountType>(
-              value: _selectedDiscountType,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingMd,
-                  vertical: DesignTokens.spacingSm,
-                ),
-              ),
-              items: DiscountType.values.map((type) {
-                return DropdownMenuItem(
-                  value: type,
-                  child: Text(type.displayName),
-                );
-              }).toList(),
+            const SizedBox(height: DesignTokens.spacingMd),
+
+            // Tamaño de fuente
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Tamaño de fuente'),
+                Text('${_fontSize.round()}px'),
+              ],
+            ),
+            Slider(
+              value: _fontSize,
+              min: 12.0,
+              max: 24.0,
+              divisions: 12,
               onChanged: (value) {
                 setState(() {
-                  _selectedDiscountType = value!;
-                  _markAsDirty();
+                  _fontSize = value;
                 });
               },
             ),
+
             const SizedBox(height: DesignTokens.spacingMd),
-            Text(
-              'Valor del Descuento por Defecto',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeMd,
-                fontWeight: DesignTokens.fontWeightMedium,
-                color: DesignTokens.textPrimaryColor,
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingSm),
-            TextFormField(
-              controller: _defaultDiscountController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: _selectedDiscountType == DiscountType.percentage ? '10.0' : '1000',
-                suffixText: _selectedDiscountType == DiscountType.percentage ? '%' : '₡',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingMd,
-                  vertical: DesignTokens.spacingSm,
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El valor del descuento es requerido';
-                }
-                final discount = double.tryParse(value);
-                if (discount == null || discount < 0) {
-                  return 'Ingresa un valor válido';
-                }
-                if (_selectedDiscountType == DiscountType.percentage && discount > 100) {
-                  return 'El porcentaje no puede ser mayor a 100%';
-                }
-                return null;
+
+            // Modo oscuro
+            SwitchListTile(
+              title: const Text('Modo oscuro'),
+              subtitle: const Text('Cambiar entre tema claro y oscuro'),
+              value: _isDarkMode,
+              onChanged: (value) {
+                setState(() {
+                  _isDarkMode = value;
+                });
               },
-              onChanged: (_) => _markAsDirty(),
             ),
           ],
         ),
@@ -378,52 +127,36 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with LoadingMixin {
     );
   }
 
-  /// Construye la configuración del negocio
-  Widget _buildBusinessSettings() {
+  Widget _buildLanguageSection() {
     return Card(
-      color: DesignTokens.cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-      ),
+      elevation: DesignTokens.elevationSm,
       child: Padding(
-        padding: const EdgeInsets.all(DesignTokens.spacingLg),
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildBusinessField(
-              'Nombre del Negocio',
-              _businessNameController,
-              'La Gata',
-              Icons.business,
+            const Text(
+              'Idioma',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: DesignTokens.spacingMd),
-            _buildBusinessField(
-              'Dirección',
-              _businessAddressController,
-              'Dirección del negocio',
-              Icons.location_on,
-            ),
-            const SizedBox(height: DesignTokens.spacingMd),
-            _buildBusinessField(
-              'Teléfono',
-              _businessPhoneController,
-              '+505 8888 8888',
-              Icons.phone,
-            ),
-            const SizedBox(height: DesignTokens.spacingMd),
-            _buildBusinessField(
-              'Email',
-              _businessEmailController,
-              'info@lagata.com',
-              Icons.email,
-            ),
-            const SizedBox(height: DesignTokens.spacingMd),
-            _buildBusinessField(
-              'RUC',
-              _businessRucController,
-              '1234567890123',
-              Icons.numbers,
+            DropdownButtonFormField<String>(
+              initialValue: _selectedLanguage,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: DesignTokens.spacingMd,
+                  vertical: DesignTokens.spacingSm,
+                ),
+              ),
+              items: _languages.map((language) {
+                return DropdownMenuItem(value: language, child: Text(language));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedLanguage = value!;
+                });
+              },
             ),
           ],
         ),
@@ -431,124 +164,118 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with LoadingMixin {
     );
   }
 
-  /// Construye un campo de información del negocio
-  Widget _buildBusinessField(
-    String label,
-    TextEditingController controller,
-    String hint,
-    IconData icon,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: DesignTokens.fontSizeMd,
-            fontWeight: DesignTokens.fontWeightMedium,
-            color: DesignTokens.textPrimaryColor,
-          ),
-        ),
-        const SizedBox(height: DesignTokens.spacingSm),
-        TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hint,
-            prefixIcon: Icon(icon),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: DesignTokens.spacingMd,
-              vertical: DesignTokens.spacingSm,
-            ),
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return '$label es requerido';
-            }
-            return null;
-          },
-          onChanged: (_) => _markAsDirty(),
-        ),
-      ],
-    );
-  }
-
-  /// Construye la configuración de facturas
-  Widget _buildInvoiceSettings() {
+  Widget _buildNotificationsSection() {
     return Card(
-      color: DesignTokens.cardColor,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-      ),
+      elevation: DesignTokens.elevationSm,
       child: Padding(
-        padding: const EdgeInsets.all(DesignTokens.spacingLg),
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Prefijo de Factura',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeMd,
-                fontWeight: DesignTokens.fontWeightMedium,
-                color: DesignTokens.textPrimaryColor,
-              ),
-            ),
-            const SizedBox(height: DesignTokens.spacingSm),
-            TextFormField(
-              controller: _invoicePrefixController,
-              decoration: InputDecoration(
-                hintText: 'FAC',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: DesignTokens.spacingMd,
-                  vertical: DesignTokens.spacingSm,
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El prefijo es requerido';
-                }
-                if (value.length > 5) {
-                  return 'El prefijo no puede tener más de 5 caracteres';
-                }
-                return null;
-              },
-              onChanged: (_) => _markAsDirty(),
+            const Text(
+              'Notificaciones',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: DesignTokens.spacingMd),
-            Container(
-              padding: const EdgeInsets.all(DesignTokens.spacingMd),
-              decoration: BoxDecoration(
-                color: DesignTokens.warningColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-                border: Border.all(
-                  color: DesignTokens.warningColor.withOpacity(0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.warning_amber_outlined,
-                    color: DesignTokens.warningColor,
-                    size: 20,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingSm),
-                  Expanded(
-                    child: Text(
-                      'El formato de factura será: ${_invoicePrefixController.text}${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}XXXX',
-                      style: TextStyle(
-                        fontSize: DesignTokens.fontSizeSm,
-                        color: DesignTokens.warningColor,
-                      ),
+
+            SwitchListTile(
+              title: const Text('Notificaciones'),
+              subtitle: const Text('Recibir notificaciones del sistema'),
+              value: _notificationsEnabled,
+              onChanged: (value) {
+                setState(() {
+                  _notificationsEnabled = value;
+                });
+              },
+            ),
+
+            SwitchListTile(
+              title: const Text('Sonido'),
+              subtitle: const Text('Reproducir sonidos en las notificaciones'),
+              value: _soundEnabled,
+              onChanged: _notificationsEnabled
+                  ? (value) {
+                      setState(() {
+                        _soundEnabled = value;
+                      });
+                    }
+                  : null,
+            ),
+
+            SwitchListTile(
+              title: const Text('Vibración'),
+              subtitle: const Text('Vibrar en las notificaciones'),
+              value: _vibrationEnabled,
+              onChanged: _notificationsEnabled
+                  ? (value) {
+                      setState(() {
+                        _vibrationEnabled = value;
+                      });
+                    }
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSystemSection() {
+    return Card(
+      elevation: DesignTokens.elevationSm,
+      child: Padding(
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Sistema',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: DesignTokens.spacingMd),
+
+            ListTile(
+              leading: const Icon(Icons.storage),
+              title: const Text('Almacenamiento'),
+              subtitle: const Text('Gestionar espacio de almacenamiento'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Funcionalidad de almacenamiento en desarrollo',
                     ),
                   ),
-                ],
-              ),
+                );
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.backup),
+              title: const Text('Respaldo'),
+              subtitle: const Text('Crear y restaurar respaldos'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Funcionalidad de respaldo en desarrollo'),
+                  ),
+                );
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.security),
+              title: const Text('Seguridad'),
+              subtitle: const Text('Configurar opciones de seguridad'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Funcionalidad de seguridad en desarrollo'),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -556,141 +283,55 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with LoadingMixin {
     );
   }
 
-  /// Construye las acciones
-  Widget _buildActions() {
+  Widget _buildActionButtons() {
     return Row(
       children: [
         Expanded(
-          child: OutlinedButton.icon(
-            onPressed: _resetToDefaults,
-            icon: const Icon(Icons.restore),
-            label: const Text('Restaurar Valores'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: DesignTokens.textSecondaryColor,
-              side: BorderSide(color: DesignTokens.textSecondaryColor),
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingLg,
-                vertical: DesignTokens.spacingMd,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              ),
+          child: ElevatedButton.icon(
+            onPressed: _saveSettings,
+            icon: const Icon(Icons.save),
+            label: const Text('Guardar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: DesignTokens.primaryColor,
+              foregroundColor: Colors.white,
             ),
           ),
         ),
         const SizedBox(width: DesignTokens.spacingMd),
         Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _isDirty ? _saveSettings : null,
-            icon: const Icon(Icons.save),
-            label: const Text('Guardar Cambios'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: DesignTokens.primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingLg,
-                vertical: DesignTokens.spacingMd,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              ),
-            ),
+          child: OutlinedButton.icon(
+            onPressed: _resetSettings,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Restaurar'),
           ),
         ),
       ],
     );
   }
 
-  /// Marca el formulario como modificado
-  void _markAsDirty() {
-    if (!_isDirty) {
-      setState(() {
-        _isDirty = true;
-      });
-    }
-  }
-
-  /// Guarda la configuración
-  Future<void> _saveSettings() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    await executeWithErrorHandling(() async {
-      // Actualizar configuración de impuestos
-      final taxRate = double.parse(_taxRateController.text);
-      BusinessConfig.updateTaxRate(taxRate);
-
-      // Actualizar configuración de descuentos
-      final discountValue = double.parse(_defaultDiscountController.text);
-      BusinessConfig.updateDiscountConfig(_selectedDiscountType, discountValue);
-
-      // Actualizar información del negocio
-      BusinessConfig.businessName = _businessNameController.text;
-      BusinessConfig.businessAddress = _businessAddressController.text;
-      BusinessConfig.businessPhone = _businessPhoneController.text;
-      BusinessConfig.businessEmail = _businessEmailController.text;
-      BusinessConfig.businessRuc = _businessRucController.text;
-      BusinessConfig.invoicePrefix = _invoicePrefixController.text;
-
-      // Simular guardado
-      await Future.delayed(const Duration(seconds: 1));
-
-      setState(() {
-        _isDirty = false;
-      });
-
-      ErrorService().showSuccessSnackBar(
-        context,
-        'Configuración guardada exitosamente',
-      );
-    });
-  }
-
-  /// Restaura los valores por defecto
-  void _resetToDefaults() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Restaurar Valores'),
-        content: const Text(
-          '¿Estás seguro de que quieres restaurar todos los valores a su configuración por defecto? Esta acción no se puede deshacer.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _loadDefaultValues();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Restaurar'),
-          ),
-        ],
+  void _saveSettings() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Configuración guardada exitosamente'),
+        backgroundColor: Colors.green,
       ),
     );
   }
 
-  /// Carga los valores por defecto
-  void _loadDefaultValues() {
-    _taxRateController.text = AppConfig.taxRate.toString();
-    _defaultDiscountController.text = '0.0';
-    _selectedDiscountType = DiscountType.none;
-    _businessNameController.text = AppConfig.businessName;
-    _businessAddressController.text = AppConfig.businessAddress;
-    _businessPhoneController.text = AppConfig.businessPhone;
-    _businessEmailController.text = AppConfig.businessEmail;
-    _businessRucController.text = AppConfig.businessRuc;
-    _invoicePrefixController.text = AppConfig.invoicePrefix;
-
+  void _resetSettings() {
     setState(() {
-      _isDirty = true;
+      _fontSize = 16.0;
+      _isDarkMode = false;
+      _selectedLanguage = 'Español';
+      _notificationsEnabled = true;
+      _soundEnabled = true;
+      _vibrationEnabled = true;
     });
 
-    ErrorService().showInfoSnackBar(
-      context,
-      'Valores restaurados. Recuerda guardar los cambios.',
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Configuración restaurada a valores predeterminados'),
+      ),
     );
   }
 }

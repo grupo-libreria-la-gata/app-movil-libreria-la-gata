@@ -40,7 +40,8 @@ class CompraModel extends BaseModel {
   DateTime? get updatedAt => null;
 
   @override
-  bool get isValid => compraId > 0 && proveedorId > 0 && usuarioId > 0 && total > 0;
+  bool get isValid =>
+      compraId > 0 && proveedorId > 0 && usuarioId > 0 && total > 0;
 
   @override
   Map<String, dynamic> toMap() {
@@ -71,15 +72,23 @@ class CompraModel extends BaseModel {
       usuarioNombre: map['usuarioNombre'] ?? '',
       total: (map['total'] ?? 0.0).toDouble(),
       observaciones: map['observaciones'],
-      fechaCompra: DateTime.parse(map['fechaCompra'] ?? DateTime.now().toIso8601String()),
+      fechaCompra: DateTime.parse(
+        map['fechaCompra'] ?? DateTime.now().toIso8601String(),
+      ),
       activo: map['activo'] ?? true,
-      detalles: (map['detalles'] as List<dynamic>?)
-          ?.map((detalle) => DetalleCompraModel.fromMap(detalle as Map<String, dynamic>))
-          .toList() ?? [],
+      detalles:
+          (map['detalles'] as List<dynamic>?)
+              ?.map(
+                (detalle) =>
+                    DetalleCompraModel.fromMap(detalle as Map<String, dynamic>),
+              )
+              .toList() ??
+          [],
     );
   }
 
-  factory CompraModel.fromJson(Map<String, dynamic> json) => CompraModel.fromMap(json);
+  factory CompraModel.fromJson(Map<String, dynamic> json) =>
+      CompraModel.fromMap(json);
 
   CompraModel copyWith({
     int? compraId,
@@ -151,7 +160,11 @@ class DetalleCompraModel extends BaseModel {
   DateTime? get updatedAt => null;
 
   @override
-  bool get isValid => detalleCompraId > 0 && detalleProductoId > 0 && cantidad > 0 && precioUnitario > 0;
+  bool get isValid =>
+      detalleCompraId > 0 &&
+      detalleProductoId > 0 &&
+      cantidad > 0 &&
+      precioUnitario > 0;
 
   @override
   Map<String, dynamic> toMap() {
@@ -182,7 +195,8 @@ class DetalleCompraModel extends BaseModel {
     );
   }
 
-  factory DetalleCompraModel.fromJson(Map<String, dynamic> json) => DetalleCompraModel.fromMap(json);
+  factory DetalleCompraModel.fromJson(Map<String, dynamic> json) =>
+      DetalleCompraModel.fromMap(json);
 
   DetalleCompraModel copyWith({
     int? detalleCompraId,
@@ -246,13 +260,20 @@ class CrearCompraRequest {
       usuarioId: map['usuarioId']?.toInt() ?? 0,
       total: (map['total'] ?? 0.0).toDouble(),
       observaciones: map['observaciones'],
-      detalles: (map['detalles'] as List<dynamic>?)
-          ?.map((detalle) => CrearDetalleCompraRequest.fromMap(detalle as Map<String, dynamic>))
-          .toList() ?? [],
+      detalles:
+          (map['detalles'] as List<dynamic>?)
+              ?.map(
+                (detalle) => CrearDetalleCompraRequest.fromMap(
+                  detalle as Map<String, dynamic>,
+                ),
+              )
+              .toList() ??
+          [],
     );
   }
 
-  factory CrearCompraRequest.fromJson(Map<String, dynamic> json) => CrearCompraRequest.fromMap(json);
+  factory CrearCompraRequest.fromJson(Map<String, dynamic> json) =>
+      CrearCompraRequest.fromMap(json);
 }
 
 /// Modelo para crear detalle de compra
@@ -260,13 +281,13 @@ class CrearDetalleCompraRequest {
   final int detalleProductoId;
   final int cantidad;
   final double precioUnitario;
-  final double subtotal;
+  final String? codigoBarra;
 
   const CrearDetalleCompraRequest({
     required this.detalleProductoId,
     required this.cantidad,
     required this.precioUnitario,
-    required this.subtotal,
+    this.codigoBarra,
   });
 
   Map<String, dynamic> toMap() {
@@ -274,7 +295,7 @@ class CrearDetalleCompraRequest {
       'detalleProductoId': detalleProductoId,
       'cantidad': cantidad,
       'precioUnitario': precioUnitario,
-      'subtotal': subtotal,
+      'codigoBarra': codigoBarra,
     };
   }
 
@@ -283,11 +304,12 @@ class CrearDetalleCompraRequest {
       detalleProductoId: map['detalleProductoId']?.toInt() ?? 0,
       cantidad: map['cantidad']?.toInt() ?? 0,
       precioUnitario: (map['precioUnitario'] ?? 0.0).toDouble(),
-      subtotal: (map['subtotal'] ?? 0.0).toDouble(),
+      codigoBarra: map['codigoBarra'],
     );
   }
 
-  factory CrearDetalleCompraRequest.fromJson(Map<String, dynamic> json) => CrearDetalleCompraRequest.fromMap(json);
+  factory CrearDetalleCompraRequest.fromJson(Map<String, dynamic> json) =>
+      CrearDetalleCompraRequest.fromMap(json);
 }
 
 /// Modelo para listar compras
@@ -340,13 +362,16 @@ class CompraListModel {
       usuarioNombre: map['usuarioNombre'] ?? '',
       total: (map['total'] ?? 0.0).toDouble(),
       observaciones: map['observaciones'],
-      fechaCompra: DateTime.parse(map['fechaCompra'] ?? DateTime.now().toIso8601String()),
+      fechaCompra: DateTime.parse(
+        map['fechaCompra'] ?? DateTime.now().toIso8601String(),
+      ),
       activo: map['activo'] ?? true,
       totalItems: map['totalItems']?.toInt() ?? 0,
     );
   }
 
-  factory CompraListModel.fromJson(Map<String, dynamic> json) => CompraListModel.fromMap(json);
+  factory CompraListModel.fromJson(Map<String, dynamic> json) =>
+      CompraListModel.fromMap(json);
 }
 
 /// Modelo para filtros de compras
@@ -377,15 +402,20 @@ class CompraFiltrosRequest {
 
   factory CompraFiltrosRequest.fromMap(Map<String, dynamic> map) {
     return CompraFiltrosRequest(
-      fechaInicio: map['fechaInicio'] != null ? DateTime.parse(map['fechaInicio']) : null,
-      fechaFin: map['fechaFin'] != null ? DateTime.parse(map['fechaFin']) : null,
+      fechaInicio: map['fechaInicio'] != null
+          ? DateTime.parse(map['fechaInicio'])
+          : null,
+      fechaFin: map['fechaFin'] != null
+          ? DateTime.parse(map['fechaFin'])
+          : null,
       proveedorId: map['proveedorId']?.toInt(),
       usuarioId: map['usuarioId']?.toInt(),
       activo: map['activo'],
     );
   }
 
-  factory CompraFiltrosRequest.fromJson(Map<String, dynamic> json) => CompraFiltrosRequest.fromMap(json);
+  factory CompraFiltrosRequest.fromJson(Map<String, dynamic> json) =>
+      CompraFiltrosRequest.fromMap(json);
 }
 
 /// Modelo para resumen de compras
@@ -424,7 +454,8 @@ class CompraResumenModel {
     );
   }
 
-  factory CompraResumenModel.fromJson(Map<String, dynamic> json) => CompraResumenModel.fromMap(json);
+  factory CompraResumenModel.fromJson(Map<String, dynamic> json) =>
+      CompraResumenModel.fromMap(json);
 }
 
 /// Modelo para top productos comprados
@@ -467,7 +498,8 @@ class TopProductoCompradoModel {
     );
   }
 
-  factory TopProductoCompradoModel.fromJson(Map<String, dynamic> json) => TopProductoCompradoModel.fromMap(json);
+  factory TopProductoCompradoModel.fromJson(Map<String, dynamic> json) =>
+      TopProductoCompradoModel.fromMap(json);
 }
 
 /// Modelo para anular compra
@@ -475,16 +507,10 @@ class AnularCompraRequest {
   final int compraId;
   final int usuarioId;
 
-  const AnularCompraRequest({
-    required this.compraId,
-    required this.usuarioId,
-  });
+  const AnularCompraRequest({required this.compraId, required this.usuarioId});
 
   Map<String, dynamic> toMap() {
-    return {
-      'compraId': compraId,
-      'usuarioId': usuarioId,
-    };
+    return {'compraId': compraId, 'usuarioId': usuarioId};
   }
 
   factory AnularCompraRequest.fromMap(Map<String, dynamic> map) {
@@ -494,5 +520,6 @@ class AnularCompraRequest {
     );
   }
 
-  factory AnularCompraRequest.fromJson(Map<String, dynamic> json) => AnularCompraRequest.fromMap(json);
+  factory AnularCompraRequest.fromJson(Map<String, dynamic> json) =>
+      AnularCompraRequest.fromMap(json);
 }

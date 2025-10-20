@@ -50,8 +50,10 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
                 Container(
                   padding: const EdgeInsets.all(DesignTokens.spacingSm),
                   decoration: BoxDecoration(
-                    color: DesignTokens.primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                    color: DesignTokens.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.borderRadiusSm,
+                    ),
                   ),
                   child: Icon(
                     widget.icon,
@@ -127,10 +129,10 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
         Container(
           padding: const EdgeInsets.all(DesignTokens.spacingMd),
           decoration: BoxDecoration(
-            color: DesignTokens.successColor.withOpacity(0.1),
+            color: DesignTokens.successColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
             border: Border.all(
-              color: DesignTokens.successColor.withOpacity(0.3),
+              color: DesignTokens.successColor.withValues(alpha: 0.3),
             ),
           ),
           child: Row(
@@ -170,7 +172,9 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
                     vertical: DesignTokens.spacingSm,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.borderRadiusMd,
+                    ),
                   ),
                 ),
               ),
@@ -189,7 +193,9 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
                     vertical: DesignTokens.spacingSm,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                    borderRadius: BorderRadius.circular(
+                      DesignTokens.borderRadiusMd,
+                    ),
                   ),
                 ),
               ),
@@ -224,29 +230,33 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
       });
 
       final file = await widget.generatePdf();
-      
+
       setState(() {
         _generatedFile = file;
         _isGenerating = false;
       });
 
       widget.onSuccess?.call();
-      
-      ErrorService().showSuccessSnackBar(
-        context,
-        'PDF generado exitosamente',
-      );
+
+      if (mounted) {
+        ErrorService().showSuccessSnackBar(
+          context,
+          'PDF generado exitosamente',
+        );
+      }
     } catch (e) {
       setState(() {
         _isGenerating = false;
       });
 
       widget.onError?.call();
-      
-      ErrorService().showErrorSnackBar(
-        context,
-        'Error al generar PDF: ${e.toString()}',
-      );
+
+      if (mounted) {
+        ErrorService().showErrorSnackBar(
+          context,
+          'Error al generar PDF: ${e.toString()}',
+        );
+      }
     }
   }
 
@@ -257,10 +267,12 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
     try {
       await PdfService().openPdf(_generatedFile!);
     } catch (e) {
-      ErrorService().showErrorSnackBar(
-        context,
-        'Error al abrir PDF: ${e.toString()}',
-      );
+      if (mounted) {
+        ErrorService().showErrorSnackBar(
+          context,
+          'Error al abrir PDF: ${e.toString()}',
+        );
+      }
     }
   }
 
@@ -271,10 +283,12 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
     try {
       await PdfService().sharePdf(_generatedFile!);
     } catch (e) {
-      ErrorService().showErrorSnackBar(
-        context,
-        'Error al compartir PDF: ${e.toString()}',
-      );
+      if (mounted) {
+        ErrorService().showErrorSnackBar(
+          context,
+          'Error al compartir PDF: ${e.toString()}',
+        );
+      }
     }
   }
 
@@ -337,12 +351,8 @@ class SalesReportPdfExportWidget extends StatelessWidget {
       title: 'Reporte de Ventas PDF',
       subtitle: 'Genera reporte de ventas del período seleccionado',
       icon: Icons.analytics,
-      generatePdf: () => PdfService().generateSalesReportPdf(
-        sales,
-        stats,
-        startDate,
-        endDate,
-      ),
+      generatePdf: () =>
+          PdfService().generateSalesReportPdf(sales, stats, startDate, endDate),
       onSuccess: onSuccess,
       onError: onError,
     );
@@ -370,10 +380,8 @@ class InventoryReportPdfExportWidget extends StatelessWidget {
       title: 'Reporte de Inventario PDF',
       subtitle: 'Genera reporte completo del inventario actual',
       icon: Icons.inventory,
-      generatePdf: () => PdfService().generateInventoryReportPdf(
-        products,
-        stats,
-      ),
+      generatePdf: () =>
+          PdfService().generateInventoryReportPdf(products, stats),
       onSuccess: onSuccess,
       onError: onError,
     );

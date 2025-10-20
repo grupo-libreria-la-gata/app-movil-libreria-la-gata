@@ -11,7 +11,9 @@ class CompraService {
   final ApiService _apiService = ApiService();
 
   /// Crea una nueva compra
-  Future<ApiResponse<CompraModel>> crearCompra(CrearCompraRequest request) async {
+  Future<ApiResponse<CompraModel>> crearCompra(
+    CrearCompraRequest request,
+  ) async {
     try {
       final response = await _apiService.post<Map<String, dynamic>>(
         '/api/compras',
@@ -66,7 +68,9 @@ class CompraService {
   }
 
   /// Lista todas las compras
-  Future<ApiResponse<List<CompraListModel>>> listarCompras(int usuarioId) async {
+  Future<ApiResponse<List<CompraListModel>>> listarCompras(
+    int usuarioId,
+  ) async {
     try {
       final response = await _apiService.get<List<dynamic>>(
         '/api/compras',
@@ -75,9 +79,11 @@ class CompraService {
 
       if (response.success && response.data != null) {
         final compras = (response.data as List)
-            .map((item) => CompraListModel.fromMap(item as Map<String, dynamic>))
+            .map(
+              (item) => CompraListModel.fromMap(item as Map<String, dynamic>),
+            )
             .toList();
-        
+
         return ApiResponse.success(
           data: compras,
           message: 'Compras obtenidas exitosamente',
@@ -114,9 +120,11 @@ class CompraService {
 
       if (response.success && response.data != null) {
         final compras = (response.data as List)
-            .map((item) => CompraListModel.fromMap(item as Map<String, dynamic>))
+            .map(
+              (item) => CompraListModel.fromMap(item as Map<String, dynamic>),
+            )
             .toList();
-        
+
         return ApiResponse.success(
           data: compras,
           message: 'Compras obtenidas exitosamente',
@@ -148,9 +156,11 @@ class CompraService {
 
       if (response.success && response.data != null) {
         final compras = (response.data as List)
-            .map((item) => CompraListModel.fromMap(item as Map<String, dynamic>))
+            .map(
+              (item) => CompraListModel.fromMap(item as Map<String, dynamic>),
+            )
             .toList();
-        
+
         return ApiResponse.success(
           data: compras,
           message: 'Compras obtenidas exitosamente',
@@ -183,9 +193,11 @@ class CompraService {
 
       if (response.success && response.data != null) {
         final compras = (response.data as List)
-            .map((item) => CompraListModel.fromMap(item as Map<String, dynamic>))
+            .map(
+              (item) => CompraListModel.fromMap(item as Map<String, dynamic>),
+            )
             .toList();
-        
+
         return ApiResponse.success(
           data: compras,
           message: 'Compras obtenidas exitosamente',
@@ -285,9 +297,13 @@ class CompraService {
 
       if (response.success && response.data != null) {
         final productos = (response.data as List)
-            .map((item) => TopProductoCompradoModel.fromMap(item as Map<String, dynamic>))
+            .map(
+              (item) => TopProductoCompradoModel.fromMap(
+                item as Map<String, dynamic>,
+              ),
+            )
             .toList();
-        
+
         return ApiResponse.success(
           data: productos,
           message: 'Top productos obtenidos exitosamente',
@@ -335,12 +351,18 @@ class CompraService {
 
   /// Calcula el total de una compra basado en los detalles
   double calcularTotal(List<CrearDetalleCompraRequest> detalles) {
-    return detalles.fold(0.0, (total, detalle) => total + detalle.subtotal);
+    return detalles.fold(
+      0.0,
+      (total, detalle) => total + (detalle.cantidad * detalle.precioUnitario),
+    );
   }
 
   /// Valida que una compra tenga al menos un detalle
   bool validarDetalles(List<CrearDetalleCompraRequest> detalles) {
-    return detalles.isNotEmpty && detalles.every((detalle) => detalle.cantidad > 0 && detalle.precioUnitario > 0);
+    return detalles.isNotEmpty &&
+        detalles.every(
+          (detalle) => detalle.cantidad > 0 && detalle.precioUnitario > 0,
+        );
   }
 
   /// Crea un detalle de compra
@@ -348,12 +370,13 @@ class CompraService {
     required int detalleProductoId,
     required int cantidad,
     required double precioUnitario,
+    String? codigoBarra,
   }) {
     return CrearDetalleCompraRequest(
       detalleProductoId: detalleProductoId,
       cantidad: cantidad,
       precioUnitario: precioUnitario,
-      subtotal: cantidad * precioUnitario,
+      codigoBarra: codigoBarra,
     );
   }
 }
