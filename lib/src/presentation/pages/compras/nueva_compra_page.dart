@@ -116,27 +116,34 @@ class _NuevaCompraPageState extends ConsumerState<NuevaCompraPage> {
   }
 
   Future<void> _guardarCompra() async {
+    print('🔍 [DEBUG] Iniciando proceso de guardar compra...');
+
     if (!_formKey.currentState!.validate()) {
+      print('❌ [DEBUG] Validación del formulario falló');
       return;
     }
 
     if (_proveedorId == null) {
+      print('❌ [DEBUG] No se ha seleccionado un proveedor');
       _mostrarError('Seleccione un proveedor');
       return;
     }
 
     if (_detalles.isEmpty) {
+      print('❌ [DEBUG] No hay detalles de productos');
       _mostrarError('Agregue al menos un producto');
       return;
     }
 
     if (!_compraService.validarDetalles(_detalles)) {
+      print('❌ [DEBUG] Validación de detalles falló');
       _mostrarError(
         'Verifique que todos los detalles tengan cantidad y precio válidos',
       );
       return;
     }
 
+    print('✅ [DEBUG] Validaciones pasaron correctamente');
     setState(() => _isLoading = true);
 
     try {
@@ -144,17 +151,26 @@ class _NuevaCompraPageState extends ConsumerState<NuevaCompraPage> {
       final authState = ref.read(authProvider);
       final usuarioId = int.tryParse(authState.user?.id ?? '0') ?? 0;
 
+      print('🔍 [DEBUG] Usuario ID: $usuarioId');
+      print('🔍 [DEBUG] Proveedor ID: $_proveedorId');
+      print('🔍 [DEBUG] Total: $_total');
+      print('🔍 [DEBUG] Cantidad de detalles: ${_detalles.length}');
+
       final request = CrearCompraRequest(
         proveedorId: _proveedorId!,
         usuarioId: usuarioId,
         total: _total,
         observaciones: _observacionesController.text.trim().isEmpty
-            ? null
+            ? ""
             : _observacionesController.text.trim(),
         detalles: _detalles,
       );
 
+      print('🔍 [DEBUG] Request creado, enviando a la API...');
       final response = await _compraService.crearCompra(request);
+      print(
+        '🔍 [DEBUG] Respuesta recibida: success=${response.success}, message=${response.message}',
+      );
 
       if (response.success) {
         if (mounted) {

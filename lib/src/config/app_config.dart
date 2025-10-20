@@ -1,6 +1,6 @@
 class AppConfig {
   // API Configuration
-  static const String baseUrl = 'https://api.lagata.com/api/v1';
+  static const String baseUrl = 'http://localhost:5044';
   static const String apiKey = 'your_api_key_here';
 
   // Database Configuration

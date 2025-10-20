@@ -15,10 +15,19 @@ class CompraService {
     CrearCompraRequest request,
   ) async {
     try {
+      print('🔍 [DEBUG] CompraService: Enviando request a /api/compras');
+      print('🔍 [DEBUG] CompraService: Request data: ${request.toMap()}');
+
       final response = await _apiService.post<Map<String, dynamic>>(
         '/api/compras',
         data: request.toMap(),
       );
+
+      print('🔍 [DEBUG] CompraService: Respuesta recibida');
+      print('🔍 [DEBUG] CompraService: Success: ${response.success}');
+      print('🔍 [DEBUG] CompraService: Status Code: ${response.statusCode}');
+      print('🔍 [DEBUG] CompraService: Message: ${response.message}');
+      print('🔍 [DEBUG] CompraService: Data: ${response.data}');
 
       if (response.success && response.data != null) {
         final compra = CompraModel.fromMap(response.data!);
@@ -33,6 +42,7 @@ class CompraService {
         );
       }
     } catch (e) {
+      print('❌ [DEBUG] CompraService: Error capturado: ${e.toString()}');
       return ApiResponse.error(
         message: 'Error inesperado al crear compra: ${e.toString()}',
         statusCode: 500,

@@ -161,17 +161,27 @@ class ApiService {
     Map<String, dynamic>? headers,
   }) async {
     try {
+      print('🔍 [DEBUG] ApiService: Iniciando POST a $endpoint');
+      print('🔍 [DEBUG] ApiService: URL base: ${AppConfig.baseUrl}');
+      print(
+        '🔍 [DEBUG] ApiService: URL completa: ${AppConfig.baseUrl}$endpoint',
+      );
+
       if (_dio == null) {
+        print('🔍 [DEBUG] ApiService: Inicializando Dio...');
         initialize();
       }
 
+      print('🔍 [DEBUG] ApiService: Verificando conexión a internet...');
       if (!await hasInternetConnection()) {
+        print('❌ [DEBUG] ApiService: Sin conexión a internet');
         return ApiResponse.error(
           message: 'Sin conexión a internet',
           statusCode: 0,
         );
       }
 
+      print('🔍 [DEBUG] ApiService: Enviando petición POST...');
       final response = await _dio!.post(
         endpoint,
         data: data,
@@ -179,8 +189,15 @@ class ApiService {
         options: Options(headers: headers),
       );
 
+      print(
+        '🔍 [DEBUG] ApiService: Respuesta recibida - Status: ${response.statusCode}',
+      );
       return _handleResponse<T>(response);
     } on DioException catch (e) {
+      print('❌ [DEBUG] ApiService: DioException capturada: ${e.toString()}');
+      print('❌ [DEBUG] ApiService: Error type: ${e.type}');
+      print('❌ [DEBUG] ApiService: Error message: ${e.message}');
+      print('❌ [DEBUG] ApiService: Response data: ${e.response?.data}');
       return _handleDioError<T>(e);
     } catch (e) {
       return ApiResponse.error(
