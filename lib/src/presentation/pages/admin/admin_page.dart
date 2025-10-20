@@ -87,16 +87,6 @@ class AdminPage extends ConsumerWidget {
 
         _buildAdminCard(
           context,
-          title: 'Configuración del Sistema',
-          subtitle: 'Ajustar parámetros generales',
-          icon: Icons.settings,
-          color: DesignTokens.infoColor,
-          onTap: () => context.push('/settings'),
-        ),
-        const SizedBox(height: DesignTokens.spacingMd),
-
-        _buildAdminCard(
-          context,
           title: 'Respaldo y Restauración',
           subtitle: 'Gestionar copias de seguridad',
           icon: Icons.backup,
@@ -130,7 +120,7 @@ class AdminPage extends ConsumerWidget {
           subtitle: 'Administrar productos',
           icon: Icons.precision_manufacturing,
           color: DesignTokens.infoColor,
-          onTap: () => context.push('/admin/products')
+          onTap: () => context.push('/admin/products'),
         ),
 
         const SizedBox(height: DesignTokens.spacingMd),
@@ -141,7 +131,7 @@ class AdminPage extends ConsumerWidget {
           subtitle: 'Organizar productos por categoría',
           icon: Icons.category,
           color: DesignTokens.warningColor,
-          onTap: () => context.push('/admin/categories')
+          onTap: () => context.push('/admin/categories'),
         ),
       ],
     );

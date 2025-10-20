@@ -315,13 +315,6 @@ class AppRoutes {
         name: 'reports',
         builder: (context, state) => const ReportsPage(),
       ),
-
-      // Configuración
-      GoRoute(
-        path: settings,
-        name: 'settings',
-        builder: (context, state) => const SettingsPage(),
-      ),
     ],
   );
 }

@@ -22,7 +22,7 @@ class DashboardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final responsiveHelper = ResponsiveHelper.instance;
-    
+
     return Card(
       elevation: DesignTokens.elevationMd,
       color: DesignTokens.cardColor,
@@ -33,7 +33,12 @@ class DashboardCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
         child: Container(
-          padding: EdgeInsets.all(responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
+          padding: EdgeInsets.all(
+            responsiveHelper.getResponsiveSpacing(
+              context,
+              DesignTokens.spacingMd,
+            ),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -43,7 +48,9 @@ class DashboardCard extends StatelessWidget {
                 height: responsiveHelper.getResponsiveIconSize(context, 50),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+                  borderRadius: BorderRadius.circular(
+                    DesignTokens.borderRadiusMd,
+                  ),
                 ),
                 child: Icon(
                   icon,
@@ -51,29 +58,49 @@ class DashboardCard extends StatelessWidget {
                   size: responsiveHelper.getResponsiveIconSize(context, 28),
                 ),
               ),
-              SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingMd)),
-              
+              SizedBox(
+                height: responsiveHelper.getResponsiveSpacing(
+                  context,
+                  DesignTokens.spacingMd,
+                ),
+              ),
+
               // Título
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeLg),
+                  fontSize: responsiveHelper.getResponsiveFontSize(
+                    context,
+                    DesignTokens.fontSizeLg,
+                  ),
                   fontWeight: DesignTokens.fontWeightBold,
-                  color: DesignTokens.textPrimaryColor,
+                  color: const Color(
+                    0xFF1A1A1A,
+                  ), // Negro suave para mejor contraste
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              
-              SizedBox(height: responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingXs)),
-              
+
+              SizedBox(
+                height: responsiveHelper.getResponsiveSpacing(
+                  context,
+                  DesignTokens.spacingXs,
+                ),
+              ),
+
               // Subtítulo
               Text(
                 subtitle,
                 style: TextStyle(
-                  fontSize: responsiveHelper.getResponsiveFontSize(context, DesignTokens.fontSizeSm),
-                  color: DesignTokens.textSecondaryColor,
+                  fontSize: responsiveHelper.getResponsiveFontSize(
+                    context,
+                    DesignTokens.fontSizeSm,
+                  ),
+                  color: const Color(
+                    0xFF666666,
+                  ), // Gris medio para mejor contraste
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

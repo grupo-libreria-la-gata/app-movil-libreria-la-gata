@@ -87,22 +87,43 @@ class AppTheme {
         headlineLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
-          color: Color(AppConfig.primaryColor),
+          color: Color(0xFF1A1A1A), // Negro suave para mejor contraste
         ),
         headlineMedium: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: Color(AppConfig.primaryColor),
+          color: Color(0xFF1A1A1A), // Negro suave para mejor contraste
         ),
         headlineSmall: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Color(AppConfig.primaryColor),
+          color: Color(0xFF1A1A1A), // Negro suave para mejor contraste
         ),
-        titleLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-        bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+        titleLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF1A1A1A), // Negro suave para mejor contraste
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF1A1A1A), // Negro suave para mejor contraste
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: Color(0xFF1A1A1A), // Negro suave para mejor contraste
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: Color(0xFF1A1A1A), // Negro suave para mejor contraste
+        ),
+        bodySmall: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+          color: Color(0xFF666666), // Gris medio para texto secundario
+        ),
       ),
 
       // Floating Action Button Theme
@@ -175,6 +196,50 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+      ),
+
+      // Text Theme para tema oscuro
+      textTheme: const TextTheme(
+        headlineLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        headlineSmall: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: Colors.white,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: Colors.white,
+        ),
+        bodySmall: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+          color: Color(0xFFBDBDBD), // Gris claro para texto secundario
         ),
       ),
 
