@@ -50,7 +50,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       // Simular usuario autenticado con datos reales
       final user = User(
-        id: 'user_123',
+        id: '1', // ID numérico como string para compatibilidad
         name: 'Juan López', // Nombre real del usuario
         email: email,
         phone: '+505 8888 8888',

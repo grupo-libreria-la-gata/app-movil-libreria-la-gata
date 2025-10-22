@@ -175,7 +175,7 @@ class _NuevaCompraPageState extends ConsumerState<NuevaCompraPage> {
       if (response.success) {
         if (mounted) {
           _mostrarExito('Compra creada exitosamente');
-          Navigator.of(context).pop(true);
+          _limpiarFormulario();
         }
       } else {
         if (mounted) {
@@ -199,6 +199,16 @@ class _NuevaCompraPageState extends ConsumerState<NuevaCompraPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(mensaje), backgroundColor: Colors.green),
     );
+  }
+
+  void _limpiarFormulario() {
+    setState(() {
+      _proveedorId = null;
+      _detalles.clear();
+      _total = 0.0;
+      _observacionesController.clear();
+    });
+    _formKey.currentState?.reset();
   }
 
   @override

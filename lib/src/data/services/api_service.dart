@@ -321,16 +321,36 @@ class ApiService {
   /// Maneja la respuesta exitosa
   ApiResponse<T> _handleResponse<T>(Response response) {
     if (response.statusCode! >= 200 && response.statusCode! < 300) {
+      // Verificar si response.data es un Map y tiene 'message'
+      String? message;
+      Map<String, dynamic>? metadata;
+
+      if (response.data is Map<String, dynamic>) {
+        final dataMap = response.data as Map<String, dynamic>;
+        message = dataMap['message'];
+        metadata = dataMap['metadata'];
+      }
+
       return ApiResponse.success(
         data: response.data as T,
-        message: response.data['message'],
-        metadata: response.data['metadata'],
+        message: message,
+        metadata: metadata,
       );
     } else {
+      // Para errores, intentar extraer el mensaje
+      String errorMessage = 'Error en la respuesta';
+      Map<String, dynamic>? metadata;
+
+      if (response.data is Map<String, dynamic>) {
+        final dataMap = response.data as Map<String, dynamic>;
+        errorMessage = dataMap['message'] ?? errorMessage;
+        metadata = dataMap['metadata'];
+      }
+
       return ApiResponse.error(
-        message: response.data['message'] ?? 'Error en la respuesta',
+        message: errorMessage,
         statusCode: response.statusCode,
-        metadata: response.data['metadata'],
+        metadata: metadata,
       );
     }
   }

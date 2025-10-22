@@ -20,6 +20,7 @@ import '../presentation/pages/producto_management/product_management_page.dart';
 import '../presentation/pages/compras/compras_page.dart';
 import '../presentation/pages/compras/nueva_compra_page.dart';
 import '../presentation/pages/compras/compra_detail_page.dart';
+import '../presentation/pages/compras/compras_reports_page.dart';
 import '../presentation/pages/proveedores/proveedores_page.dart';
 import '../presentation/pages/proveedores/crear_proveedor_page.dart';
 import '../presentation/pages/proveedores/editar_proveedor_page.dart';
@@ -164,6 +165,11 @@ class AppRoutes {
           final compraId = state.pathParameters['id']!;
           return CompraDetailPage(compraId: int.parse(compraId));
         },
+      ),
+      GoRoute(
+        path: '/compras/reportes',
+        name: 'comprasReports',
+        builder: (context, state) => const ComprasReportsPage(),
       ),
 
       // Proveedores
