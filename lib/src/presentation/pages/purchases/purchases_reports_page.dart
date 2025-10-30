@@ -258,7 +258,7 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(fontSize: 12, color: DesignTokens.textSecondaryColor),
                 textAlign: TextAlign.center,
               ),
             ],

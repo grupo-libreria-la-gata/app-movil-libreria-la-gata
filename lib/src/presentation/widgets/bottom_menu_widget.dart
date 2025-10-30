@@ -19,6 +19,15 @@ class BottomMenuWidget extends StatefulWidget {
 class _BottomMenuWidgetState extends State<BottomMenuWidget> {
   int? _expandedIndex;
 
+  int? _computeActiveIndex(BuildContext context) {
+    final location = GoRouter.of(context).routeInformationProvider.value.location ?? '';
+    if (location.startsWith('/purchases') || location.startsWith('/sales')) return 0; // Transacciones
+    if (location.startsWith('/customers') || location.startsWith('/suppliers')) return 1; // Relaciones
+    if (location.startsWith('/inventory') || location.startsWith('/reports')) return 2; // Resumen
+    if (location.startsWith('/admin')) return 3; // Administración
+    return null; // Ninguno activo (home, perfil, etc.)
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -47,27 +56,27 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
                 children: [
                   _buildMenuButton(
                     index: 0,
-                    icon: Icons.sell,
-                    label: 'Ventas',
-                    isActive: widget.currentIndex == 0,
+                    icon: Icons.swap_horiz,
+                    label: 'Transacciones',
+                    isActive: _computeActiveIndex(context) == 0,
                   ),
                   _buildMenuButton(
                     index: 1,
                     icon: Icons.people,
-                    label: 'Gestionar',
-                    isActive: widget.currentIndex == 1,
+                    label: 'Relaciones',
+                    isActive: _computeActiveIndex(context) == 1,
                   ),
                   _buildMenuButton(
                     index: 2,
-                    icon: Icons.shopping_cart,
-                    label: 'Compras',
-                    isActive: widget.currentIndex == 2,
+                    icon: Icons.analytics,
+                    label: 'Resumen',
+                    isActive: _computeActiveIndex(context) == 2,
                   ),
                   _buildMenuButton(
                     index: 3,
-                    icon: Icons.analytics,
-                    label: 'Resumen',
-                    isActive: widget.currentIndex == 3,
+                    icon: Icons.admin_panel_settings,
+                    label: 'Administración',
+                    isActive: _computeActiveIndex(context) == 3,
                   ),
                 ],
               ),
@@ -84,44 +93,43 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
     required String label,
     required bool isActive,
   }) {
-    return GestureDetector(
+    final button = GestureDetector(
       onTap: () {
+        if (index == 3) {
+          // Administración navega directo
+          _expandedIndex = null;
+          context.push('/admin');
+          setState(() {});
+          return;
+        }
         if (_expandedIndex == index) {
-          setState(() {
-            _expandedIndex = null;
-          });
+          setState(() => _expandedIndex = null);
         } else {
-          setState(() {
-            _expandedIndex = index;
-          });
+          setState(() => _expandedIndex = index);
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: isActive ? Colors.yellow : Colors.transparent,
+          color: isActive ? DesignTokens.primaryColor.withValues(alpha: 0.12) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isActive ? Colors.orange[800] : Colors.black87,
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isActive ? Colors.orange[800] : Colors.black87,
-                fontSize: 12,
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
+        child: Icon(
+          icon,
+          color: isActive ? DesignTokens.primaryColor : Colors.black87,
+          size: 24,
         ),
       ),
+    );
+
+    return Tooltip(
+      message: label,
+      decoration: BoxDecoration(
+        color: DesignTokens.primaryColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      textStyle: TextStyle(color: DesignTokens.surfaceColor, fontSize: 12),
+      child: button,
     );
   }
 
@@ -144,12 +152,12 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
 
   List<Widget> _getSubmenuItems() {
     switch (_expandedIndex) {
-      case 0: // Sales
+      case 0: // Transacciones
         return [
           _buildSubmenuItem(
-            icon: Icons.add,
-            label: 'Nueva Venta',
-            onTap: () => context.push('/sales/new'),
+            icon: Icons.shopping_cart,
+            label: 'Compras',
+            onTap: () => context.push('/purchases'),
           ),
           _buildSubmenuItem(
             icon: Icons.receipt_long,
@@ -157,7 +165,7 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
             onTap: () => context.push('/sales'),
           ),
         ];
-      case 1: // Manage
+      case 1: // Relaciones
         return [
           _buildSubmenuItem(
             icon: Icons.people,
@@ -170,20 +178,7 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
             onTap: () => context.push('/suppliers'),
           ),
         ];
-      case 2: // Purchases
-        return [
-          _buildSubmenuItem(
-            icon: Icons.add_shopping_cart,
-            label: 'Nueva Compra',
-            onTap: () => context.push('/purchases/new'),
-          ),
-          _buildSubmenuItem(
-            icon: Icons.history,
-            label: 'Compras',
-            onTap: () => context.push('/purchases'),
-          ),
-        ];
-      case 3: // Resume
+      case 2: // Resumen
         return [
           _buildSubmenuItem(
             icon: Icons.inventory,
@@ -196,6 +191,8 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
             onTap: () => context.push('/reports'),
           ),
         ];
+      case 3: // Administración
+        return [];
       default:
         return [];
     }

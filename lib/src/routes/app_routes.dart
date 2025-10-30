@@ -14,6 +14,7 @@ import '../presentation/pages/customers/create_customer_page.dart';
 import '../presentation/pages/customers/edit_customer_page.dart';
 import '../data/models/cliente_model.dart';
 import '../presentation/pages/inventory/inventory_page.dart';
+import '../presentation/pages/inventory/inventory_detail_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/admin/admin_page.dart';
 import '../presentation/pages/brand_management/brand_management_page.dart';
@@ -58,6 +59,7 @@ class AppRoutes {
 
   // Inventory
   static const String inventory = '/inventory';
+  static const String inventoryDetail = '/inventory/:id';
   static const String productDetails = '/product-details';
 
   // Customers
@@ -274,6 +276,18 @@ class AppRoutes {
           title: 'Inventory',
           child: InventoryPage(),
         ),
+      ),
+      GoRoute(
+        path: inventoryDetail,
+        name: 'inventoryDetail',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return PageWrapper(
+            currentIndex: 3,
+            title: 'Detalle de Producto',
+            child: InventoryDetailPage(detalleProductoId: id),
+          );
+        },
       ),
 
       // Customers

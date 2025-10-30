@@ -78,7 +78,7 @@ class _CrearClientePageState extends State<CrearClientePage> {
         elevation: 0,
         title: const Text(
           'Crear Cliente',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: DesignTokens.surfaceColor, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),

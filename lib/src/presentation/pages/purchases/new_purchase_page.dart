@@ -122,7 +122,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
   Future<void> _guardarCompra() async {
     if (!_formKey.currentState!.validate()) return;
     if (_proveedorSeleccionado == null) {
-      _mostrarError('Seleccione un proveedor');
+      _mostrarError('Elija un proveedor');
       return;
     }
     if (_detalles.isEmpty) {
@@ -183,7 +183,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
             onPressed: _isLoading ? null : _guardarCompra,
             child: const Text(
               'Guardar',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: DesignTokens.surfaceColor, fontWeight: FontWeight.bold),
             ),
           ),
         ],

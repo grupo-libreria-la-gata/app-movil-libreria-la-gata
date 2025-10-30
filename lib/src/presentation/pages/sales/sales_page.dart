@@ -103,7 +103,7 @@ class _SalesPageState extends ConsumerState<SalesPage> {
                         SizedBox(height: 16),
                         Text(
                           'No sales registered',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                          style: TextStyle(fontSize: 18, color: DesignTokens.textSecondaryColor),
                         ),
                       ],
                     ),

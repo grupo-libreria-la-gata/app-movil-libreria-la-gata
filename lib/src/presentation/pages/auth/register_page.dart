@@ -324,7 +324,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
                 children: [
                   RichText(
                     text: TextSpan(
-                      style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                      style: TextStyle(color: DesignTokens.textSecondaryColor, fontSize: 14),
                       children: [
                         const TextSpan(text: 'Acepto los '),
                         TextSpan(
@@ -367,7 +367,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             Expanded(
               child: Text(
                 'Recibir notificaciones sobre eventos y ofertas especiales',
-                style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                style: TextStyle(color: DesignTokens.textSecondaryColor, fontSize: 14),
               ),
             ),
           ],
@@ -394,7 +394,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'o regístrate con',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            style: TextStyle(color: DesignTokens.textSecondaryColor, fontSize: 14),
           ),
         ),
         Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
@@ -436,7 +436,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
       children: [
         Text(
           '¿Ya tienes una cuenta? ',
-          style: TextStyle(color: Colors.grey[600]),
+          style: TextStyle(color: DesignTokens.textSecondaryColor),
         ),
         TextButton(
           onPressed: () => context.go('/login'),

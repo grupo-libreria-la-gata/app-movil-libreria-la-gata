@@ -105,7 +105,7 @@ class _PurchasesPageState extends ConsumerState<PurchasesPage> {
                         SizedBox(height: 16),
                         Text(
                           'No purchases registered',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                          style: TextStyle(fontSize: 18, color: DesignTokens.textSecondaryColor),
                         ),
                       ],
                     ),

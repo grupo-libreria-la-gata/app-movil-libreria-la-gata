@@ -100,7 +100,7 @@ class _EditarClientePageState extends State<EditarClientePage> {
         elevation: 0,
         title: const Text(
           'Editar Cliente',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: DesignTokens.surfaceColor, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),

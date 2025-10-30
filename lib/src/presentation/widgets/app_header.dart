@@ -69,19 +69,27 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
       ),
       actions: [
         // Notificaciones
-        IconButton(
-          icon: const Icon(
-            Icons.notifications,
-            color: Colors.white,
-            size: 22,
+        Tooltip(
+          message: 'Notificaciones',
+          decoration: BoxDecoration(
+            color: DesignTokens.primaryColor,
+            borderRadius: BorderRadius.circular(8),
           ),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('🔔 Notificaciones próximamente')),
-            );
-          },
-          padding: const EdgeInsets.all(8),
-          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+          textStyle: TextStyle(color: DesignTokens.surfaceColor, fontSize: 12),
+          child: IconButton(
+            icon: const Icon(
+              Icons.notifications,
+              color: Colors.white,
+              size: 22,
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('🔔 Notificaciones próximamente')),
+              );
+            },
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+          ),
         ),
         // Menú de usuario (solo si se solicita)
         if (showUserMenu) _buildUserMenu(ref, context),

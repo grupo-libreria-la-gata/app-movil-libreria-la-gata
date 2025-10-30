@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/design/design_tokens.dart';
 
 class ComprasFiltersPage extends StatefulWidget {
   final DateTime? fechaInicio;
@@ -87,7 +88,7 @@ class _ComprasFiltersPageState extends State<ComprasFiltersPage> {
         actions: [
           TextButton(
             onPressed: _limpiarFiltros,
-            child: const Text('Limpiar', style: TextStyle(color: Colors.white)),
+            child: Text('Limpiar', style: TextStyle(color: DesignTokens.surfaceColor)),
           ),
         ],
       ),

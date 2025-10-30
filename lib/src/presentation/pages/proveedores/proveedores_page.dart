@@ -89,7 +89,7 @@ class _ProveedoresPageState extends State<ProveedoresPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text('Eliminar', style: TextStyle(color: DesignTokens.errorColor)),
           ),
         ],
       ),
@@ -260,7 +260,7 @@ class _ProveedorCard extends StatelessWidget {
                 children: [
                   const Icon(Icons.delete, size: 16, color: Colors.red),
                   const SizedBox(width: 8),
-                  const Text('Eliminar', style: TextStyle(color: Colors.red)),
+                  Text('Eliminar', style: TextStyle(color: DesignTokens.errorColor)),
                 ],
               ),
             ),

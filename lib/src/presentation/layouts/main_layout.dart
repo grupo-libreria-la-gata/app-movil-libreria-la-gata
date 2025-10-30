@@ -30,37 +30,37 @@ class _MainLayoutState extends State<MainLayout> {
       ),
       body: Column(
         children: [
-          if (widget.title != null)
-            Container(
-              color: Colors.white,
-              child: SafeArea(
-                bottom: false,
-                child: SizedBox(
-                  height: kToolbarHeight,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.black),
-                        onPressed: () => Navigator.of(context).maybePop(),
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          widget.title!,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          // if (widget.title != null)
+          //   Container(
+          //     color: Colors.white,
+          //     child: SafeArea(
+          //       bottom: false,
+          //       child: SizedBox(
+          //         height: kToolbarHeight,
+          //         child: Row(
+          //           children: [
+          //             IconButton(
+          //               icon: const Icon(Icons.arrow_back, color: Colors.black),
+          //               onPressed: () => Navigator.of(context).maybePop(),
+          //             ),
+          //             const SizedBox(width: 4),
+          //             Expanded(
+          //               child: Text(
+          //                 widget.title!,
+          //                 style: const TextStyle(
+          //                   color: Colors.black,
+          //                   fontSize: 18,
+          //                   fontWeight: FontWeight.bold,
+          //                 ),
+          //                 overflow: TextOverflow.ellipsis,
+          //               ),
+          //             ),
+          //             const SizedBox(width: 12),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ),
           Expanded(child: widget.child),
         ],
       ),

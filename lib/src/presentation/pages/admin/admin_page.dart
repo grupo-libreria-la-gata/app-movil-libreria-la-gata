@@ -16,7 +16,7 @@ class AdminPage extends ConsumerWidget {
         elevation: 0,
         title: const Text(
           'Administración',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: DesignTokens.surfaceColor),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
