@@ -27,7 +27,7 @@ class _PurchasesPageState extends ConsumerState<PurchasesPage> {
   Future<void> _cargarCompras() async {
     setState(() => _isLoading = true);
     try {
-      final compras = await _compraService.obtenerTodas(1); // TODO: Obtener usuarioId del usuario logueado
+      final compras = await _compraService.obtenerTodas(1); 
       setState(() {
         _compras = compras;
       });

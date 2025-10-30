@@ -19,7 +19,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return Scaffold(
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        title: const Text('Perfil'),
+        title: const Text('Mi Perfil', style: TextStyle(color: DesignTokens.textPrimaryColor)),
         backgroundColor: DesignTokens.surfaceColor,
         foregroundColor: DesignTokens.textPrimaryColor,
         elevation: 0,

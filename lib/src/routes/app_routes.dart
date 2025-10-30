@@ -6,8 +6,6 @@ import '../presentation/pages/auth/login_page.dart';
 import '../presentation/pages/auth/register_page.dart';
 import '../presentation/pages/auth/forgot_password_page.dart';
 import '../presentation/pages/auth/email_verification_page.dart';
-import '../presentation/pages/products/products_page.dart';
-import '../presentation/pages/products/product_detail_page.dart';
 import '../presentation/pages/sales/new_sale_page.dart';
 import '../presentation/pages/sales/sales_page.dart';
 import '../presentation/pages/sales/sale_detail_page.dart';
@@ -133,31 +131,7 @@ class AppRoutes {
         },
       ),
 
-      // Productos
-      GoRoute(
-        path: products,
-        name: 'products',
-        builder: (context, state) => const PageWrapper(
-          currentIndex: 3,
-          title: 'Products',
-          child: ProductsPage(),
-        ),
-      ),
-      GoRoute(
-        path: newProduct,
-        name: 'newProduct',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Nuevo Producto - En desarrollo')),
-        ),
-      ),
-      GoRoute(
-        path: productDetail,
-        name: 'productDetail',
-        builder: (context, state) {
-          final productId = state.pathParameters['id']!;
-          return ProductDetailPage(productId: productId);
-        },
-      ),
+      
       GoRoute(
         path: editProduct,
         name: 'editProduct',
