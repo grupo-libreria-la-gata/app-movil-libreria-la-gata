@@ -5,11 +5,7 @@ import 'src/core/theme/app_theme.dart';
 import 'src/routes/app_routes.dart';
 
 void main() {
-  runApp(
-    const ProviderScope(
-      child: LaGataApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: LaGataApp()));
 }
 
 class LaGataApp extends StatelessWidget {
@@ -20,7 +16,7 @@ class LaGataApp extends StatelessWidget {
     return MaterialApp.router(
       title: AppConfig.appName,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      // darkTheme: AppTheme.darkTheme, // Removed dark theme
       themeMode: ThemeMode.system,
       routerConfig: AppRoutes.router,
       debugShowCheckedModeBanner: false,

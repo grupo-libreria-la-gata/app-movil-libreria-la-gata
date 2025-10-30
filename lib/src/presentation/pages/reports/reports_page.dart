@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../../../core/design/design_tokens.dart';
 import '../../../core/utils/responsive_helper.dart';
 
@@ -260,6 +261,8 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
             const SizedBox(height: DesignTokens.spacingMd),
             if (_startDate != null && _endDate != null) ...[
               _buildReportSummary(),
+              const SizedBox(height: DesignTokens.spacingLg),
+              _buildChartsSection(),
             ] else ...[
               const Center(
                 child: Padding(
@@ -309,6 +312,162 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
             Text('Monto total:'),
             Text('₡0.00', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
+        ),
+      ],
+    );
+  }
+
+  // Sección de gráficos (datos estáticos por ahora)
+  Widget _buildChartsSection() {
+    final responsiveHelper = ResponsiveHelper.instance;
+    final chartHeight = responsiveHelper.getResponsiveSpacing(
+      context,
+      260,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Indicadores',
+          style: TextStyle(
+            fontSize: DesignTokens.fontSizeLg,
+            fontWeight: DesignTokens.fontWeightBold,
+            color: DesignTokens.textPrimaryColor,
+          ),
+        ),
+        const SizedBox(height: DesignTokens.spacingMd),
+        // Línea: tendencia diaria
+        Container(
+          height: chartHeight,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: LineChart(
+            LineChartData(
+              gridData: const FlGridData(show: true),
+              titlesData: FlTitlesData(
+                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 36)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      const labels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+                      final i = value.toInt();
+                      return i >= 0 && i < labels.length
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(labels[i], style: const TextStyle(fontSize: 12)),
+                            )
+                          : const SizedBox.shrink();
+                    },
+                  ),
+                ),
+              ),
+              borderData: FlBorderData(show: true),
+              lineBarsData: [
+                LineChartBarData(
+                  isCurved: true,
+                  color: DesignTokens.primaryColor,
+                  barWidth: 3,
+                  dotData: const FlDotData(show: false),
+                  spots: const [
+                    FlSpot(0, 3),
+                    FlSpot(1, 2.4),
+                    FlSpot(2, 4),
+                    FlSpot(3, 3.5),
+                    FlSpot(4, 5),
+                    FlSpot(5, 3),
+                    FlSpot(6, 4.5),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: DesignTokens.spacingLg),
+        // Barras: Top categorías
+        Container(
+          height: chartHeight,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: BarChart(
+            BarChartData(
+              gridData: const FlGridData(show: true),
+              titlesData: FlTitlesData(
+                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 36)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      const labels = ['Lic.', 'Vinos', 'Cerv.', 'Ref.', 'Snacks'];
+                      final i = value.toInt();
+                      return i >= 0 && i < labels.length
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(labels[i], style: const TextStyle(fontSize: 12)),
+                            )
+                          : const SizedBox.shrink();
+                    },
+                  ),
+                ),
+              ),
+              barGroups: [
+                BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 12, color: Colors.indigo)]),
+                BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 9, color: Colors.indigo)]),
+                BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 14, color: Colors.indigo)]),
+                BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 7, color: Colors.indigo)]),
+                BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 6, color: Colors.indigo)]),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: DesignTokens.spacingLg),
+        // Pie: Métodos de pago
+        Container(
+          height: chartHeight,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: PieChart(
+            PieChartData(
+              sectionsSpace: 2,
+              centerSpaceRadius: 38,
+              sections: [
+                PieChartSectionData(
+                  color: DesignTokens.primaryColor,
+                  value: 55,
+                  title: 'Efectivo',
+                  radius: 58,
+                  titleStyle: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                PieChartSectionData(
+                  color: DesignTokens.successColor,
+                  value: 25,
+                  title: 'Tarjeta',
+                  radius: 54,
+                  titleStyle: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                PieChartSectionData(
+                  color: DesignTokens.warningColor,
+                  value: 20,
+                  title: 'Transf.',
+                  radius: 50,
+                  titleStyle: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

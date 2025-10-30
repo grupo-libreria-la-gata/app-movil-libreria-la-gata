@@ -1,392 +1,98 @@
-import '../models/base_model.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../models/compra_model.dart';
-import 'api_service.dart';
+import '../models/request_models.dart';
 
-/// Servicio para manejo de compras
 class CompraService {
-  static final CompraService _instance = CompraService._internal();
-  factory CompraService() => _instance;
-  CompraService._internal();
+  final String baseUrl = 'http://localhost:5044/api/Compras';
 
-  final ApiService _apiService = ApiService();
+  /// Obtener todas las compras
+  Future<List<CompraListResponse>> obtenerTodas(int usuarioId) async {
+    final url = Uri.parse('$baseUrl?usuarioId=$usuarioId');
+    final response = await http.get(url);
 
-  /// Crea una nueva compra
-  Future<ApiResponse<CompraModel>> crearCompra(
-    CrearCompraRequest request,
-  ) async {
-    try {
-      print('🔍 [DEBUG] CompraService: Enviando request a /api/compras');
-      print('🔍 [DEBUG] CompraService: Request data: ${request.toMap()}');
-
-      final response = await _apiService.post<Map<String, dynamic>>(
-        '/api/compras',
-        data: request.toMap(),
-      );
-
-      print('🔍 [DEBUG] CompraService: Respuesta recibida');
-      print('🔍 [DEBUG] CompraService: Success: ${response.success}');
-      print('🔍 [DEBUG] CompraService: Status Code: ${response.statusCode}');
-      print('🔍 [DEBUG] CompraService: Message: ${response.message}');
-      print('🔍 [DEBUG] CompraService: Data: ${response.data}');
-
-      if (response.success && response.data != null) {
-        final compra = CompraModel.fromMap(response.data!);
-        return ApiResponse.success(
-          data: compra,
-          message: 'Compra creada exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al crear la compra',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      print('❌ [DEBUG] CompraService: Error capturado: ${e.toString()}');
-      return ApiResponse.error(
-        message: 'Error inesperado al crear compra: ${e.toString()}',
-        statusCode: 500,
-      );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => CompraListResponse.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al obtener compras: ${response.body}');
     }
   }
 
-  /// Obtiene una compra completa por ID
-  Future<ApiResponse<CompraModel>> obtenerCompra(int compraId) async {
-    try {
-      final response = await _apiService.get<Map<String, dynamic>>(
-        '/api/compras/$compraId',
-      );
+  /// Obtener compra completa por ID
+  Future<Compra?> obtenerPorId(int compraId) async {
+    final url = Uri.parse('$baseUrl/$compraId');
+    final response = await http.get(url);
 
-      if (response.success && response.data != null) {
-        final compra = CompraModel.fromMap(response.data!);
-        return ApiResponse.success(
-          data: compra,
-          message: 'Compra obtenida exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al obtener la compra',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al obtener compra: ${e.toString()}',
-        statusCode: 500,
-      );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return Compra.fromJson(data);
+    } else if (response.statusCode == 404) {
+      return null;
+    } else {
+      throw Exception('Error al obtener compra: ${response.body}');
     }
   }
 
-  /// Lista todas las compras
-  Future<ApiResponse<List<CompraListModel>>> listarCompras(
+  /// Obtener compras por rango de fechas
+  Future<List<CompraListResponse>> obtenerPorFechas(
+    DateTime fechaInicio,
+    DateTime fechaFin,
     int usuarioId,
   ) async {
-    try {
-      final response = await _apiService.get<List<dynamic>>(
-        '/api/compras',
-        queryParameters: {'usuarioId': usuarioId},
-      );
-
-      if (response.success && response.data != null) {
-        final compras = (response.data as List)
-            .map(
-              (item) => CompraListModel.fromMap(item as Map<String, dynamic>),
-            )
-            .toList();
-
-        return ApiResponse.success(
-          data: compras,
-          message: 'Compras obtenidas exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al obtener las compras',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al obtener compras: ${e.toString()}',
-        statusCode: 500,
-      );
-    }
-  }
-
-  /// Lista compras por rango de fechas
-  Future<ApiResponse<List<CompraListModel>>> listarPorFechas({
-    required DateTime fechaInicio,
-    required DateTime fechaFin,
-    required int usuarioId,
-  }) async {
-    try {
-      final response = await _apiService.get<List<dynamic>>(
-        '/api/compras/por-fechas',
-        queryParameters: {
-          'fechaInicio': fechaInicio.toIso8601String(),
-          'fechaFin': fechaFin.toIso8601String(),
-          'usuarioId': usuarioId,
-        },
-      );
-
-      if (response.success && response.data != null) {
-        final compras = (response.data as List)
-            .map(
-              (item) => CompraListModel.fromMap(item as Map<String, dynamic>),
-            )
-            .toList();
-
-        return ApiResponse.success(
-          data: compras,
-          message: 'Compras obtenidas exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al obtener las compras',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al obtener compras: ${e.toString()}',
-        statusCode: 500,
-      );
-    }
-  }
-
-  /// Lista compras por proveedor
-  Future<ApiResponse<List<CompraListModel>>> listarPorProveedor({
-    required int proveedorId,
-    required int usuarioId,
-  }) async {
-    try {
-      final response = await _apiService.get<List<dynamic>>(
-        '/api/compras/por-proveedor/$proveedorId',
-        queryParameters: {'usuarioId': usuarioId},
-      );
-
-      if (response.success && response.data != null) {
-        final compras = (response.data as List)
-            .map(
-              (item) => CompraListModel.fromMap(item as Map<String, dynamic>),
-            )
-            .toList();
-
-        return ApiResponse.success(
-          data: compras,
-          message: 'Compras obtenidas exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al obtener las compras',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al obtener compras: ${e.toString()}',
-        statusCode: 500,
-      );
-    }
-  }
-
-  /// Lista compras con filtros
-  Future<ApiResponse<List<CompraListModel>>> listarConFiltros({
-    required CompraFiltrosRequest filtros,
-    required int usuarioId,
-  }) async {
-    try {
-      final response = await _apiService.post<List<dynamic>>(
-        '/api/compras/filtrar',
-        data: filtros.toMap(),
-        queryParameters: {'usuarioId': usuarioId},
-      );
-
-      if (response.success && response.data != null) {
-        final compras = (response.data as List)
-            .map(
-              (item) => CompraListModel.fromMap(item as Map<String, dynamic>),
-            )
-            .toList();
-
-        return ApiResponse.success(
-          data: compras,
-          message: 'Compras obtenidas exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al obtener las compras',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al obtener compras: ${e.toString()}',
-        statusCode: 500,
-      );
-    }
-  }
-
-  /// Anula una compra
-  Future<ApiResponse<bool>> anularCompra(AnularCompraRequest request) async {
-    try {
-      final response = await _apiService.post<Map<String, dynamic>>(
-        '/api/compras/anular',
-        data: request.toMap(),
-      );
-
-      if (response.success) {
-        return ApiResponse.success(
-          data: true,
-          message: 'Compra anulada exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al anular la compra',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al anular compra: ${e.toString()}',
-        statusCode: 500,
-      );
-    }
-  }
-
-  /// Obtiene resumen de compras por período
-  Future<ApiResponse<CompraResumenModel>> obtenerResumen({
-    required DateTime fechaInicio,
-    required DateTime fechaFin,
-    required int usuarioId,
-  }) async {
-    try {
-      final response = await _apiService.get<Map<String, dynamic>>(
-        '/api/compras/resumen',
-        queryParameters: {
-          'fechaInicio': fechaInicio.toIso8601String(),
-          'fechaFin': fechaFin.toIso8601String(),
-          'usuarioId': usuarioId,
-        },
-      );
-
-      if (response.success && response.data != null) {
-        final resumen = CompraResumenModel.fromMap(response.data!);
-        return ApiResponse.success(
-          data: resumen,
-          message: 'Resumen obtenido exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al obtener el resumen',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al obtener resumen: ${e.toString()}',
-        statusCode: 500,
-      );
-    }
-  }
-
-  /// Obtiene top productos comprados
-  Future<ApiResponse<List<TopProductoCompradoModel>>> obtenerTopProductos({
-    required DateTime fechaInicio,
-    required DateTime fechaFin,
-    required int usuarioId,
-  }) async {
-    try {
-      final response = await _apiService.get<List<dynamic>>(
-        '/api/compras/top-productos',
-        queryParameters: {
-          'fechaInicio': fechaInicio.toIso8601String(),
-          'fechaFin': fechaFin.toIso8601String(),
-          'usuarioId': usuarioId,
-        },
-      );
-
-      if (response.success && response.data != null) {
-        final productos = (response.data as List)
-            .map(
-              (item) => TopProductoCompradoModel.fromMap(
-                item as Map<String, dynamic>,
-              ),
-            )
-            .toList();
-
-        return ApiResponse.success(
-          data: productos,
-          message: 'Top productos obtenidos exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al obtener los top productos',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al obtener top productos: ${e.toString()}',
-        statusCode: 500,
-      );
-    }
-  }
-
-  /// Valida permisos del usuario
-  Future<ApiResponse<bool>> validarPermisos(int usuarioId) async {
-    try {
-      final response = await _apiService.get<Map<String, dynamic>>(
-        '/api/compras/validar-permisos/$usuarioId',
-      );
-
-      if (response.success && response.data != null) {
-        final tienePermisos = response.data!['tienePermisos'] ?? false;
-        return ApiResponse.success(
-          data: tienePermisos,
-          message: 'Permisos validados exitosamente',
-        );
-      } else {
-        return ApiResponse.error(
-          message: response.message ?? 'Error al validar permisos',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Error inesperado al validar permisos: ${e.toString()}',
-        statusCode: 500,
-      );
-    }
-  }
-
-  /// Calcula el total de una compra basado en los detalles
-  double calcularTotal(List<CrearDetalleCompraRequest> detalles) {
-    return detalles.fold(
-      0.0,
-      (total, detalle) => total + (detalle.cantidad * detalle.precioUnitario),
+    final url = Uri.parse(
+      '$baseUrl/por-fechas?fechaInicio=${fechaInicio.toIso8601String()}&fechaFin=${fechaFin.toIso8601String()}&usuarioId=$usuarioId',
     );
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => CompraListResponse.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al obtener compras por fechas: ${response.body}');
+    }
   }
 
-  /// Valida que una compra tenga al menos un detalle
-  bool validarDetalles(List<CrearDetalleCompraRequest> detalles) {
-    return detalles.isNotEmpty &&
-        detalles.every(
-          (detalle) => detalle.cantidad > 0 && detalle.precioUnitario > 0,
-        );
+  /// Obtener compras por proveedor
+  Future<List<CompraListResponse>> obtenerPorProveedor(
+    int proveedorId,
+    int usuarioId,
+  ) async {
+    final url = Uri.parse('$baseUrl/por-proveedor/$proveedorId?usuarioId=$usuarioId');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => CompraListResponse.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al obtener compras por proveedor: ${response.body}');
+    }
   }
 
-  /// Crea un detalle de compra
-  CrearDetalleCompraRequest crearDetalle({
-    required int detalleProductoId,
-    required int cantidad,
-    required double precioUnitario,
-    String? codigoBarra,
-  }) {
-    return CrearDetalleCompraRequest(
-      detalleProductoId: detalleProductoId,
-      cantidad: cantidad,
-      precioUnitario: precioUnitario,
-      codigoBarra: codigoBarra,
+  /// Crear una nueva compra
+  Future<Compra> crearCompra(CrearCompraRequest request) async {
+    final url = Uri.parse(baseUrl);
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(request.toJson()),
     );
+
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return Compra.fromJson(data);
+    } else {
+      throw Exception('Error al crear compra: ${response.body}');
+    }
+  }
+
+  /// Calcular total de detalles
+  double calcularTotal(List<CrearCompraDetalleRequest> detalles) {
+    return detalles.fold(0.0, (sum, detalle) => sum + detalle.subtotal);
+  }
+
+  /// Validar detalles
+  bool validarDetalles(List<CrearCompraDetalleRequest> detalles) {
+    return detalles.isNotEmpty && detalles.every((d) => d.cantidad > 0 && d.precioUnitario > 0);
   }
 }

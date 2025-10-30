@@ -7,46 +7,119 @@ import 'package:flutter/material.dart';
 ///
 class DesignTokens {
   // ===== COLORS =====
+  // 🎨 PALETA DE COLORES MINIMALISTA - La Gata App
 
-  /// Colores primarios de la marca - Tonos de verde elegantes y premium
-  static const Color primaryColor = Color(0xFF1E4D2B); // Verde oscuro elegante
-  static const Color primaryLightColor = Color(
-    0xFF2F6E3F,
-  ); // Verde medio elegante
-  static const Color primaryDarkColor = Color(0xFF13361D); // Verde muy oscuro
+  /// 🔸 COLORES PRIMARIOS
+  static const Color primaryColor = Color(
+    0xFFFFC107,
+  ); // Amarillo primario (botones)
+  static const Color primaryLightColor = Color(0xFFFFF350); // Amarillo claro
+  static const Color primaryDarkColor = Color(0xFFC49000); // Amarillo oscuro
 
-  /// Colores secundarios/accent
-  static const Color accentColor = Color(0xFFD4AF37); // Dorado premium
-  static const Color accentLightColor = Color(0xFFF4E4BC); // Dorado claro
-  static const Color accentDarkColor = Color(0xFFB8860B); // Dorado oscuro
+  /// 🔸 COLORES SECUNDARIOS
+  static const Color secondaryColor = Color(
+    0xFF2196F3,
+  ); // Azul acento (UI educativa)
+  static const Color secondaryLightColor = Color(0xFF64B5F6); // Azul claro
+  static const Color secondaryDarkColor = Color(0xFF1976D2); // Azul oscuro
 
-  /// Colores temáticos (ajustados a gama verde)
-  static const Color wineColor = Color(0xFF2E7D32); // Verde bosque
-  static const Color wineLightColor = Color(0xFF43A047); // Verde vibrante
-  static const Color wineDarkColor = Color(0xFF1B5E20); // Verde profundo
+  /// 🔸 COLORES DE ACENTO
+  static const Color accentColor = Color(
+    0xFF4CAF50,
+  ); // Verde acento (pantalla reset password)
+  static const Color accentLightColor = Color(0xFF81C784); // Verde claro
+  static const Color accentDarkColor = Color(0xFF388E3C); // Verde oscuro
 
-  /// Colores de estado
-  static const Color successColor = Color(0xFF2E7D32); // Verde más elegante
-  static const Color warningColor = Color(0xFFF57C00); // Naranja vibrante
-  static const Color errorColor = Color(0xFFD32F2F); // Rojo más suave
-  static const Color infoColor = Color(0xFF1976D2); // Azul profesional
+  /// 🔸 COLORES DE ESTADO
+  static const Color successColor = Color(0xFF4CAF50); // Verde acento
+  static const Color warningColor = Color(0xFFFFC107); // Amarillo primario
+  static const Color errorColor = Color(
+    0xFFF44336,
+  ); // Rojo alerta (errores/avisos)
+  static const Color infoColor = Color(0xFF2196F3); // Azul acento
 
-  /// Colores neutros - Fondo blanco para páginas principales
-  static const Color backgroundColor = Color(0xFFFFFFFF); // Blanco puro
-  static const Color surfaceColor = Color(0xFFFFFFFF); // Blanco puro
-  static const Color cardColor = Color(0xFFFFFFFF); // Blanco puro
-  static const Color dividerColor = Color(0xFFE8E8E8); // Gris muy claro
+  /// 🔸 COLORES DE FONDO
+  static const Color backgroundColor = Color(0xFFF5F5F5); // Gris claro fondo
+  static const Color surfaceColor = Color(0xFFFFFFFF); // Blanco base
+  static const Color cardColor = Color(0xFFFFFFFF); // Blanco base
+  static const Color tertiaryBackgroundColor = Color(
+    0xFFF5F5F5,
+  ); // Gris claro fondo
 
-  /// Colores de texto
-  static const Color textPrimaryColor = Color(0xFF1A1A1A); // Negro suave
-  static const Color textSecondaryColor = Color(0xFF666666); // Gris medio
-  static const Color textDisabledColor = Color(0xFFBDBDBD); // Gris claro
-  static const Color textOnPrimaryColor = Color(0xFFFFFFFF); // Blanco
-  static const Color textOnAccentColor = Color(0xFFFFFFFF); // Blanco
+  /// 🔸 COLORES DE TEXTO
+  static const Color textPrimaryColor = Color(0xFF000000); // Negro texto
+  static const Color textSecondaryColor = Color(
+    0xFF9E9E9E,
+  ); // Gris medio texto secundario
+  static const Color textTertiaryColor = Color(0xFF757575); // Gris medio
+  static const Color textMutedColor = Color(
+    0xFF9E9E9E,
+  ); // Gris medio texto secundario
+  static const Color textInverseColor = Color(0xFFFFFFFF); // Blanco base
 
-  /// Colores de gradientes (en gama verde)
-  static const Color gradientStartColor = Color(0xFF1E4D2B);
-  static const Color gradientEndColor = Color(0xFF2F6E3F);
+  /// 🔸 COLORES DE BORDE
+  static const Color borderLightColor = Color(0xFFE0E0E0); // Gris muy claro
+  static const Color borderMediumColor = Color(0xFFBDBDBD); // Gris medio
+  static const Color borderDarkColor = Color(0xFF757575); // Gris medio
+  static const Color dividerColor = Color(
+    0xFFE0E0E0,
+  ); // Gris muy claro para divisores
+
+  /// 🔸 COLORES DE GRADIENTES
+  static const Color gradientStartColor = Color(
+    0xFFFFC107,
+  ); // Amarillo primario
+  static const Color gradientEndColor = Color(0xFFFFF350); // Amarillo claro
+
+  /// 🔸 GRADIENTES MINIMALISTAS
+  static const LinearGradient primaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFFFC107),
+      Color(0xFFFFF350),
+    ], // Amarillo primario a amarillo claro
+  );
+
+  static const LinearGradient secondaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF2196F3), Color(0xFF64B5F6)], // Azul acento a azul claro
+  );
+
+  static const LinearGradient accentGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF4CAF50),
+      Color(0xFF81C784),
+    ], // Verde acento a verde claro
+  );
+
+  /// 🔸 SOMBRAS MINIMALISTAS
+  static const List<BoxShadow> shadowSmall = [
+    BoxShadow(
+      color: Color.fromRGBO(0, 0, 0, 0.1),
+      offset: Offset(0, 1),
+      blurRadius: 3,
+    ),
+  ];
+
+  static const List<BoxShadow> shadowMedium = [
+    BoxShadow(
+      color: Color.fromRGBO(0, 0, 0, 0.1),
+      offset: Offset(0, 4),
+      blurRadius: 6,
+    ),
+  ];
+
+  static const List<BoxShadow> shadowLarge = [
+    BoxShadow(
+      color: Color.fromRGBO(0, 0, 0, 0.1),
+      offset: Offset(0, 10),
+      blurRadius: 15,
+    ),
+  ];
 
   // ===== TYPOGRAPHY =====
 
@@ -184,21 +257,21 @@ class DesignTokens {
     ),
   ];
 
-  /// Gradientes personalizados
-  static LinearGradient get primaryGradient => const LinearGradient(
+  /// Gradientes personalizados (métodos para evitar duplicados)
+  static LinearGradient get primaryGradientMethod => const LinearGradient(
     colors: [gradientStartColor, gradientEndColor],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static LinearGradient get accentGradient => const LinearGradient(
+  static LinearGradient get accentGradientMethod => const LinearGradient(
     colors: [accentColor, accentDarkColor],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static LinearGradient get wineGradient => const LinearGradient(
-    colors: [wineColor, wineDarkColor],
+  static LinearGradient get secondaryGradientMethod => const LinearGradient(
+    colors: [secondaryColor, secondaryLightColor],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

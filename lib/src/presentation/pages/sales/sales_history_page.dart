@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/design/design_tokens.dart';
-import '../../../domain/entities/sale.dart';
+import '../../../data/models/venta_model.dart';
+import '../../../data/services/venta_service.dart';
+import '../../widgets/common/empty_state.dart';
 
-/// Página que muestra el historial de ventas
 class SalesHistoryPage extends ConsumerStatefulWidget {
   const SalesHistoryPage({super.key});
 
@@ -13,226 +14,148 @@ class SalesHistoryPage extends ConsumerStatefulWidget {
 }
 
 class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
-  String _searchQuery = '';
-  SaleStatus? _selectedStatus;
-  DateTime? _selectedDate;
+  List<VentaListResponse> _ventas = [];
+  bool _isLoading = true;
+  final VentaService _service = VentaService();
+  final int _usuarioId = 1; // TODO: Obtener del usuario logueado
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarVentas();
+  }
+
+  Future<void> _cargarVentas() async {
+    setState(() => _isLoading = true);
+    try {
+      final ventas = await _service.obtenerTodas(_usuarioId);
+      // Ordenar por fecha más reciente primero
+      ventas.sort((a, b) => b.fechaVenta.compareTo(a.fechaVenta));
+      setState(() {
+        _ventas = ventas;
+      });
+    } catch (e) {
+      _mostrarError('Error al cargar ventas: ${e.toString()}');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DesignTokens.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: DesignTokens.primaryColor,
-        elevation: 0,
-        title: const Text(
-          'Historial de Ventas',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list, color: Colors.white),
-            onPressed: _showFilterDialog,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Barra de búsqueda
-          _buildSearchBar(),
-
-          // Filtros activos
-          if (_selectedStatus != null || _selectedDate != null)
-            _buildActiveFilters(),
-
-          // Lista de ventas
-          Expanded(child: _buildSalesList()),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _ventas.isEmpty
+              ? _buildEmptyState()
+              : _buildSalesList(),
     );
   }
 
-  Widget _buildSearchBar() {
-    return Container(
-      margin: const EdgeInsets.all(DesignTokens.spacingMd),
-      decoration: BoxDecoration(
-        color: DesignTokens.cardColor,
-        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-        boxShadow: DesignTokens.cardShadow,
-      ),
-      child: TextField(
-        onChanged: (value) {
-          setState(() {
-            _searchQuery = value;
-          });
-        },
-        decoration: InputDecoration(
-          hintText: 'Buscar ventas por cliente, factura...',
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      _searchQuery = '';
-                    });
-                  },
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: DesignTokens.spacingMd,
-            vertical: DesignTokens.spacingSm,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActiveFilters() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd),
-      child: Wrap(
-        spacing: DesignTokens.spacingSm,
-        children: [
-          if (_selectedStatus != null)
-            Chip(
-              label: Text(_getStatusDisplayName(_selectedStatus!)),
-              onDeleted: () {
-                setState(() {
-                  _selectedStatus = null;
-                });
-              },
-              backgroundColor: DesignTokens.primaryColor.withValues(alpha: 0.1),
-            ),
-          if (_selectedDate != null)
-            Chip(
-              label: Text(_formatDate(_selectedDate!)),
-              onDeleted: () {
-                setState(() {
-                  _selectedDate = null;
-                });
-              },
-              backgroundColor: DesignTokens.accentColor.withValues(alpha: 0.1),
-            ),
-        ],
-      ),
+  Widget _buildEmptyState() {
+    return EmptyState(
+      icon: Icons.receipt_long,
+      title: 'No hay ventas registradas',
+      subtitle: 'Las ventas aparecerán aquí una vez que se realicen',
     );
   }
 
   Widget _buildSalesList() {
-    final sales = _getFilteredSales();
-
-    if (sales.isEmpty) {
-      return _buildEmptyState();
-    }
-
     return ListView.builder(
       padding: const EdgeInsets.all(DesignTokens.spacingMd),
-      itemCount: sales.length,
+      itemCount: _ventas.length,
       itemBuilder: (context, index) {
-        final sale = sales[index];
-        return _buildSaleCard(sale);
+        final venta = _ventas[index];
+        return _buildSaleCard(venta);
       },
     );
   }
 
-  Widget _buildSaleCard(Sale sale) {
+  Widget _buildSaleCard(VentaListResponse venta) {
     return Card(
       margin: const EdgeInsets.only(bottom: DesignTokens.spacingMd),
       elevation: DesignTokens.elevationSm,
       child: InkWell(
-        onTap: () => context.push('/sales/${sale.id}'),
+        onTap: () => context.push('/sales/${venta.ventaId}'),
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
         child: Padding(
           padding: const EdgeInsets.all(DesignTokens.spacingMd),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header con número de factura y estado
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Factura #${sale.invoiceNumber}',
-                    style: TextStyle(
-                      fontSize: DesignTokens.fontSizeLg,
-                      fontWeight: DesignTokens.fontWeightBold,
-                      color: DesignTokens.textPrimaryColor,
-                    ),
-                  ),
-                  _buildStatusChip(sale.status),
-                ],
-              ),
-
-              const SizedBox(height: DesignTokens.spacingSm),
-
-              // Información del cliente
+              // Header con número de venta y fecha
               Row(
                 children: [
-                  Icon(
-                    Icons.person,
-                    size: 16,
-                    color: DesignTokens.textSecondaryColor,
-                  ),
-                  const SizedBox(width: DesignTokens.spacingXs),
                   Expanded(
-                    child: Text(
-                      sale.customerName,
-                      style: TextStyle(
-                        color: DesignTokens.textSecondaryColor,
-                        fontSize: DesignTokens.fontSizeMd,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Venta #${venta.ventaId}',
+                          style: TextStyle(
+                            fontSize: DesignTokens.fontSizeLg,
+                            fontWeight: DesignTokens.fontWeightBold,
+                            color: DesignTokens.textPrimaryColor,
+                          ),
+                        ),
+                        Text(
+                          venta.clienteNombre,
+                          style: TextStyle(
+                            fontSize: DesignTokens.fontSizeMd,
+                            color: DesignTokens.textSecondaryColor,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  _buildStatusChip(venta.estado),
                 ],
               ),
 
-              const SizedBox(height: DesignTokens.spacingSm),
+              const SizedBox(height: DesignTokens.spacingMd),
 
               // Información de la venta
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${sale.items.length} productos',
-                        style: TextStyle(
-                          color: DesignTokens.textSecondaryColor,
-                          fontSize: DesignTokens.fontSizeSm,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Fecha: ${venta.fechaFormateada}',
+                          style: TextStyle(
+                            fontSize: DesignTokens.fontSizeSm,
+                            color: DesignTokens.textSecondaryColor,
+                          ),
                         ),
-                      ),
-                      Text(
-                        _formatDate(sale.createdAt),
-                        style: TextStyle(
-                          color: DesignTokens.textSecondaryColor,
-                          fontSize: DesignTokens.fontSizeSm,
+                        const SizedBox(height: DesignTokens.spacingXs),
+                        Text(
+                          'Hora: ${venta.horaFormateada}',
+                          style: TextStyle(
+                            fontSize: DesignTokens.fontSizeSm,
+                            color: DesignTokens.textSecondaryColor,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        'Total: ₡${_formatCurrency(sale.total)}',
+                        'Total: ₡${_formatCurrency(venta.total)}',
                         style: TextStyle(
                           fontSize: DesignTokens.fontSizeLg,
                           fontWeight: DesignTokens.fontWeightBold,
                           color: DesignTokens.primaryColor,
                         ),
                       ),
-                      Text(
-                        'Vendedor: ${sale.sellerName}',
-                        style: TextStyle(
-                          color: DesignTokens.textSecondaryColor,
-                          fontSize: DesignTokens.fontSizeSm,
-                        ),
+                      const SizedBox(height: DesignTokens.spacingXs),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: DesignTokens.textSecondaryColor,
                       ),
                     ],
                   ),
@@ -245,27 +168,28 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
     );
   }
 
-  Widget _buildStatusChip(SaleStatus status) {
+  Widget _buildStatusChip(String estado) {
     Color color;
     String text;
 
-    switch (status) {
-      case SaleStatus.completed:
+    switch (estado.toLowerCase()) {
+      case 'completada':
+      case 'completa':
         color = DesignTokens.successColor;
         text = 'Completada';
         break;
-      case SaleStatus.pending:
+      case 'pendiente':
         color = DesignTokens.warningColor;
         text = 'Pendiente';
         break;
-      case SaleStatus.cancelled:
+      case 'cancelada':
+      case 'anulada':
         color = DesignTokens.errorColor;
         text = 'Cancelada';
         break;
-      case SaleStatus.refunded:
-        color = DesignTokens.infoColor;
-        text = 'Reembolsada';
-        break;
+      default:
+        color = DesignTokens.textSecondaryColor;
+        text = estado;
     }
 
     return Container(
@@ -289,271 +213,13 @@ class _SalesHistoryPageState extends ConsumerState<SalesHistoryPage> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.receipt_long,
-            size: 64,
-            color: DesignTokens.textSecondaryColor,
-          ),
-          const SizedBox(height: DesignTokens.spacingMd),
-          Text(
-            'No se encontraron ventas',
-            style: TextStyle(
-              fontSize: DesignTokens.fontSizeLg,
-              fontWeight: DesignTokens.fontWeightMedium,
-              color: DesignTokens.textSecondaryColor,
-            ),
-          ),
-          const SizedBox(height: DesignTokens.spacingSm),
-          Text(
-            'Intenta ajustar los filtros o crear una nueva venta',
-            style: TextStyle(
-              fontSize: DesignTokens.fontSizeMd,
-              color: DesignTokens.textSecondaryColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showFilterDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Filtrar Ventas'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Filtro por estado
-            DropdownButtonFormField<SaleStatus?>(
-              initialValue: _selectedStatus,
-              decoration: const InputDecoration(
-                labelText: 'Estado',
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                const DropdownMenuItem(
-                  value: null,
-                  child: Text('Todos los estados'),
-                ),
-                ...SaleStatus.values.map(
-                  (status) => DropdownMenuItem(
-                    value: status,
-                    child: Text(_getStatusDisplayName(status)),
-                  ),
-                ),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _selectedStatus = value;
-                });
-              },
-            ),
-
-            const SizedBox(height: DesignTokens.spacingMd),
-
-            // Filtro por fecha
-            ListTile(
-              title: const Text('Fecha específica'),
-              subtitle: Text(
-                _selectedDate != null
-                    ? _formatDate(_selectedDate!)
-                    : 'Seleccionar fecha',
-              ),
-              trailing: _selectedDate != null
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        setState(() {
-                          _selectedDate = null;
-                        });
-                      },
-                    )
-                  : null,
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2020),
-                  lastDate: DateTime.now(),
-                );
-                if (date != null) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                }
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedStatus = null;
-                _selectedDate = null;
-              });
-              Navigator.of(context).pop();
-            },
-            child: const Text('Limpiar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Aplicar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Datos mock para las ventas
-  List<Sale> _getMockSales() {
-    return [
-      Sale(
-        id: '1',
-        invoiceNumber: 'F001-2024',
-        customerName: 'María González',
-        items: [
-          SaleItem(
-            productId: '1',
-            productName: 'Ron Flor de Caña 7 años',
-            productBrand: 'Flor de Caña',
-            quantity: 2,
-            unitPrice: 8500,
-            total: 17000,
-          ),
-        ],
-        subtotal: 17000,
-        tax: 1700,
-        total: 18700,
-        sellerId: '1',
-        sellerName: 'Juan López',
-        status: SaleStatus.completed,
-        paymentMethod: PaymentMethod.cash,
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      Sale(
-        id: '2',
-        invoiceNumber: 'F002-2024',
-        customerName: 'Carlos Rodríguez',
-        items: [
-          SaleItem(
-            productId: '2',
-            productName: 'Vodka Absolut',
-            productBrand: 'Absolut',
-            quantity: 1,
-            unitPrice: 12000,
-            total: 12000,
-          ),
-          SaleItem(
-            productId: '3',
-            productName: 'Whisky Jack Daniel\'s',
-            productBrand: 'Jack Daniel\'s',
-            quantity: 1,
-            unitPrice: 15000,
-            total: 15000,
-          ),
-        ],
-        subtotal: 27000,
-        tax: 2700,
-        total: 29700,
-        sellerId: '1',
-        sellerName: 'Juan López',
-        status: SaleStatus.completed,
-        paymentMethod: PaymentMethod.card,
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      Sale(
-        id: '3',
-        invoiceNumber: 'F003-2024',
-        customerName: 'Ana Martínez',
-        items: [
-          SaleItem(
-            productId: '4',
-            productName: 'Tequila José Cuervo',
-            productBrand: 'José Cuervo',
-            quantity: 1,
-            unitPrice: 9500,
-            total: 9500,
-          ),
-        ],
-        subtotal: 9500,
-        tax: 950,
-        total: 10450,
-        sellerId: '1',
-        sellerName: 'Juan López',
-        status: SaleStatus.pending,
-        paymentMethod: PaymentMethod.cash,
-        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-      ),
-    ];
-  }
-
-  List<Sale> _getFilteredSales() {
-    List<Sale> sales = _getMockSales();
-
-    // Filtro por búsqueda
-    if (_searchQuery.isNotEmpty) {
-      sales = sales
-          .where(
-            (sale) =>
-                sale.customerName.toLowerCase().contains(
-                  _searchQuery.toLowerCase(),
-                ) ||
-                sale.invoiceNumber.toLowerCase().contains(
-                  _searchQuery.toLowerCase(),
-                ) ||
-                sale.sellerName.toLowerCase().contains(
-                  _searchQuery.toLowerCase(),
-                ),
-          )
-          .toList();
-    }
-
-    // Filtro por estado
-    if (_selectedStatus != null) {
-      sales = sales.where((sale) => sale.status == _selectedStatus).toList();
-    }
-
-    // Filtro por fecha
-    if (_selectedDate != null) {
-      sales = sales
-          .where(
-            (sale) =>
-                sale.createdAt.year == _selectedDate!.year &&
-                sale.createdAt.month == _selectedDate!.month &&
-                sale.createdAt.day == _selectedDate!.day,
-          )
-          .toList();
-    }
-
-    return sales;
-  }
-
-  String _getStatusDisplayName(SaleStatus status) {
-    switch (status) {
-      case SaleStatus.completed:
-        return 'Completada';
-      case SaleStatus.pending:
-        return 'Pendiente';
-      case SaleStatus.cancelled:
-        return 'Cancelada';
-      case SaleStatus.refunded:
-        return 'Reembolsada';
-    }
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
   String _formatCurrency(double amount) {
     return amount.toStringAsFixed(0);
+  }
+
+  void _mostrarError(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+    );
   }
 }

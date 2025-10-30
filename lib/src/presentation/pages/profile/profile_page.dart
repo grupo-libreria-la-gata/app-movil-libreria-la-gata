@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../../domain/entities/user.dart';
 import '../../../core/design/design_tokens.dart';
 import '../../providers/auth_provider.dart';
 
-/// Página que muestra el perfil del usuario
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
@@ -14,377 +11,176 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  bool _isEditing = false;
-  late User _user;
-
-  @override
-  void initState() {
-    super.initState();
-    _user = _getMockUser();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+
     return Scaffold(
+      backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
-        backgroundColor: DesignTokens.primaryColor,
+        title: const Text('Perfil'),
+        backgroundColor: DesignTokens.surfaceColor,
+        foregroundColor: DesignTokens.textPrimaryColor,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text(
-          'Mi Perfil',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
         actions: [
           IconButton(
-            icon: Icon(
-              _isEditing ? Icons.save : Icons.edit,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.more_vert),
             onPressed: () {
-              setState(() {
-                _isEditing = !_isEditing;
-                if (!_isEditing) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Perfil actualizado'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              });
+              _showProfileOptions(context);
             },
-            tooltip: _isEditing ? 'Guardar' : 'Editar',
-          ),
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () => context.go('/dashboard'),
-            tooltip: 'Ir al inicio',
           ),
         ],
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Header con foto de perfil
+            // Sección de Usuario
             Container(
               width: double.infinity,
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    DesignTokens.primaryColor,
-                    DesignTokens.primaryColor.withValues(alpha: 0.8),
-                  ],
-                ),
+                color: DesignTokens.surfaceColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: DesignTokens.shadowSmall,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(DesignTokens.spacingXl),
-                child: Column(
-                  children: [
-                    // Foto de perfil
-                    GestureDetector(
-                      onTap: _isEditing ? _changeProfilePicture : null,
-                      child: Stack(
-                        children: [
-                          Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 4),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          if (_isEditing)
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: DesignTokens.primaryColor,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: DesignTokens.spacingLg),
-
-                    // Nombre del usuario
-                    Text(
-                      _user.name,
+              child: Row(
+                children: [
+                  // Avatar
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: DesignTokens.primaryColor,
+                    child: Text(
+                      user?.name.substring(0, 1).toUpperCase() ?? 'U',
                       style: const TextStyle(
-                        color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: DesignTokens.surfaceColor,
                       ),
                     ),
-                    const SizedBox(height: DesignTokens.spacingSm),
-
-                    // Email
-                    Text(
-                      _user.email,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: DesignTokens.spacingMd),
-
-                    // Badge de estado activo
-                    if (_user.isActive)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: DesignTokens.spacingMd,
-                          vertical: DesignTokens.spacingSm,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(
-                            DesignTokens.borderRadiusMd,
+                  ),
+                  const SizedBox(width: 16),
+                  // Información del usuario
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.name ?? 'Usuario',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: DesignTokens.textPrimaryColor,
                           ),
                         ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.check_circle,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'Activo',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 4),
+                        Text(
+                          user?.email ?? 'usuario@ejemplo.com',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: DesignTokens.textSecondaryColor,
+                          ),
                         ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Información del perfil
-            Padding(
-              padding: const EdgeInsets.all(DesignTokens.spacingLg),
-              child: Column(
-                children: [
-                  // Información personal
-                  _buildSection(
-                    context,
-                    title: 'Información Personal',
-                    icon: Icons.person,
-                    children: [
-                      _buildInfoField(
-                        context,
-                        label: 'Nombre Completo',
-                        value: _user.name,
-                        icon: Icons.person_outline,
-                        isEditing: _isEditing,
-                        onChanged: (value) {
-                          setState(() {
-                            _user = _user.copyWith(name: value);
-                          });
-                        },
-                      ),
-                      _buildInfoField(
-                        context,
-                        label: 'Email',
-                        value: _user.email,
-                        icon: Icons.email_outlined,
-                        isEditing: _isEditing,
-                        onChanged: (value) {
-                          setState(() {
-                            _user = _user.copyWith(email: value);
-                          });
-                        },
-                      ),
-                      _buildInfoField(
-                        context,
-                        label: 'Teléfono',
-                        value: _user.phone ?? 'No especificado',
-                        icon: Icons.phone_outlined,
-                        isEditing: _isEditing,
-                        onChanged: (value) {
-                          setState(() {
-                            _user = _user.copyWith(phone: value);
-                          });
-                        },
-                      ),
-                      _buildInfoField(
-                        context,
-                        label: 'Rol',
-                        value: _getRoleDisplayName(_user.role),
-                        icon: Icons.work_outline,
-                        isEditing:
-                            false, // El rol no se puede editar desde el perfil
-                        onChanged: (value) {
-                          // No se puede cambiar el rol desde aquí
-                        },
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: DesignTokens.spacingXl),
-
-                  // Estadísticas
-                  _buildSection(
-                    context,
-                    title: 'Estadísticas',
-                    icon: Icons.analytics,
-                    children: [
-                      _buildStatCard(
-                        context,
-                        icon: Icons.point_of_sale,
-                        title: 'Ventas Realizadas',
-                        value: '156',
-                        color: DesignTokens.successColor,
-                      ),
-                      const SizedBox(height: DesignTokens.spacingMd),
-                      _buildStatCard(
-                        context,
-                        icon: Icons.inventory,
-                        title: 'Productos Vendidos',
-                        value: '2,847',
-                        color: DesignTokens.infoColor,
-                      ),
-                      const SizedBox(height: DesignTokens.spacingMd),
-                      _buildStatCard(
-                        context,
-                        icon: Icons.trending_up,
-                        title: 'Ventas Esta Semana',
-                        value: '₡125K',
-                        color: DesignTokens.accentColor,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: DesignTokens.spacingXl),
-
-                  // Opciones de cuenta
-                  _buildSection(
-                    context,
-                    title: 'Cuenta',
-                    icon: Icons.settings,
-                    children: [
-                      _buildOptionTile(
-                        context,
-                        icon: Icons.notifications_outlined,
-                        title: 'Notificaciones',
-                        subtitle: 'Configurar alertas y recordatorios',
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Configuración de notificaciones próximamente',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildOptionTile(
-                        context,
-                        icon: Icons.security,
-                        title: 'Seguridad',
-                        subtitle:
-                            'Cambiar contraseña y configuración de seguridad',
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Configuración de seguridad próximamente',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildOptionTile(
-                        context,
-                        icon: Icons.privacy_tip_outlined,
-                        title: 'Privacidad',
-                        subtitle: 'Gestionar datos personales',
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Configuración de privacidad próximamente',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildOptionTile(
-                        context,
-                        icon: Icons.help_outline,
-                        title: 'Ayuda y Soporte',
-                        subtitle: 'Centro de ayuda y contacto',
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Centro de ayuda próximamente'),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: DesignTokens.spacingXl),
-
-                  // Botón de cerrar sesión
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        _showLogoutDialog(context, ref);
-                      },
-                      icon: const Icon(Icons.logout),
-                      label: const Text('Cerrar Sesión'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: BorderSide(color: Colors.red),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: DesignTokens.spacingLg,
-                        ),
-                      ),
+                      ],
                     ),
                   ),
-
-                  const SizedBox(height: DesignTokens.spacingXl),
                 ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Sección de Configuración
+            _buildSection(
+              title: 'Configuración',
+              children: [
+                _buildSettingItem(
+                  icon: Icons.language,
+                  title: 'Idioma',
+                  subtitle: 'Español',
+                  onTap: () => _showLanguageDialog(),
+                ),
+                _buildSettingItem(
+                  icon: Icons.straighten,
+                  title: 'Unidades de Medida',
+                  subtitle: 'Métricas',
+                  onTap: () => _showUnitsDialog(),
+                ),
+                _buildSettingItem(
+                  icon: Icons.notifications,
+                  title: 'Notificaciones',
+                  subtitle: '9:00',
+                  trailing: Switch(
+                    value: true,
+                    onChanged: (value) {
+                      // Lógica para cambiar notificaciones
+                    },
+                    activeColor: DesignTokens.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            // Sección de Ayuda
+            _buildSection(
+              title: 'Ayuda',
+              children: [
+                _buildSettingItem(
+                  icon: Icons.telegram,
+                  title: 'Comunidad en Telegram',
+                  onTap: () => _openTelegram(),
+                ),
+                _buildSettingItem(
+                  icon: Icons.feedback,
+                  title: 'Sugerencias de Mejora',
+                  onTap: () => _openFeedback(),
+                ),
+                _buildSettingItem(
+                  icon: Icons.local_florist,
+                  title: 'Sugerir Producto',
+                  onTap: () => _suggestProduct(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            // Sección de Información Legal
+            _buildSection(
+              title: 'Información Legal',
+              children: [
+                _buildSettingItem(
+                  icon: Icons.privacy_tip,
+                  title: 'Política de Privacidad',
+                  onTap: () => _openPrivacyPolicy(),
+                ),
+                _buildSettingItem(
+                  icon: Icons.description,
+                  title: 'Términos y Condiciones',
+                  onTap: () => _openTerms(),
+                ),
+                _buildSettingItem(
+                  icon: Icons.info,
+                  title: 'Acerca de',
+                  onTap: () => _showAboutDialog(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            // Botón de Cerrar Sesión
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _showLogoutDialog(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: DesignTokens.errorColor,
+                  foregroundColor: DesignTokens.surfaceColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Cerrar Sesión',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -393,214 +189,215 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  Widget _buildSection(
-    BuildContext context, {
+  Widget _buildSection({
     required String title,
-    required IconData icon,
     required List<Widget> children,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 24),
-            const SizedBox(width: DesignTokens.spacingSm),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: DesignTokens.textPrimaryColor,
+          ),
         ),
-        const SizedBox(height: DesignTokens.spacingMd),
-        ...children,
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: DesignTokens.surfaceColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: DesignTokens.shadowSmall,
+          ),
+          child: Column(children: children),
+        ),
       ],
     );
   }
 
-  Widget _buildInfoField(
-    BuildContext context, {
-    required String label,
-    required String value,
-    required IconData icon,
-    required bool isEditing,
-    required Function(String) onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: DesignTokens.spacingMd),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white, size: 20),
-          const SizedBox(width: DesignTokens.spacingSm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                if (isEditing)
-                  TextField(
-                    controller: TextEditingController(text: value),
-                    onChanged: onChanged,
-                    decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(vertical: 8),
-                    ),
-                  )
-                else
-                  Text(
-                    value,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(
-    BuildContext context, {
+  Widget _buildSettingItem({
     required IconData icon,
     required String title,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(DesignTokens.spacingMd),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: DesignTokens.spacingMd),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  value,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOptionTile(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
+    String? subtitle,
+    Widget? trailing,
+    VoidCallback? onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.white),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: DesignTokens.primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: DesignTokens.primaryColor, size: 20),
       ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
-        color: Colors.white,
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: DesignTokens.textPrimaryColor,
+        ),
       ),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 14,
+                color: DesignTokens.textSecondaryColor,
+              ),
+            )
+          : null,
+      trailing:
+          trailing ??
+          const Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: DesignTokens.textSecondaryColor,
+          ),
       onTap: onTap,
     );
   }
 
-  void _changeProfilePicture() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Cambiar foto de perfil próximamente')),
+  void _showProfileOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Editar Perfil'),
+              onTap: () {
+                Navigator.pop(context);
+                // Navegar a editar perfil
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Configuración'),
+              onTap: () {
+                Navigator.pop(context);
+                // Navegar a configuración
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Seleccionar Idioma'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Español'),
+              onTap: () => Navigator.pop(context),
+            ),
+            ListTile(
+              title: const Text('English'),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showUnitsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Unidades de Medida'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Métricas'),
+              onTap: () => Navigator.pop(context),
+            ),
+            ListTile(
+              title: const Text('Imperial'),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openTelegram() {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Abriendo Telegram...')));
+  }
+
+  void _openFeedback() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Abriendo formulario de sugerencias...')),
+    );
+  }
+
+  void _suggestProduct() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Abriendo formulario de sugerir producto...'),
+      ),
+    );
+  }
+
+  void _openPrivacyPolicy() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Abriendo política de privacidad...')),
+    );
+  }
+
+  void _openTerms() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Abriendo términos y condiciones...')),
+    );
+  }
+
+  void _showAboutDialog() {
+    showAboutDialog(
+      context: context,
+      applicationName: 'La Gata',
+      applicationVersion: '1.0.0',
+      applicationIcon: const Icon(Icons.pets),
+    );
+  }
+
+  void _showLogoutDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cerrar Sesión'),
-        content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
+        content: const Text('¿Está seguro de que desea cerrar sesión?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancelar'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.pop(context);
               ref.read(authProvider.notifier).signOut();
+              Navigator.pushReplacementNamed(context, '/login');
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Cerrar Sesión'),
           ),
         ],
       ),
     );
-  }
-
-  User _getMockUser() {
-    return User(
-      id: '1',
-      name: 'Juan Nicolás López',
-      email: 'juan.lopez@example.com',
-      phone: '+505 8888 8888',
-      role: UserRole.admin, // Rol por defecto como administrador
-      isActive: true,
-      createdAt: DateTime.now().subtract(const Duration(days: 365)),
-    );
-  }
-
-  /// Obtiene el nombre de visualización del rol
-  String _getRoleDisplayName(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return 'Administrador';
-      case UserRole.seller:
-        return 'Vendedor';
-      case UserRole.inventory:
-        return 'Inventario';
-      case UserRole.cashier:
-        return 'Cajero';
-    }
   }
 }

@@ -6,8 +6,8 @@ import '../../../core/design/design_tokens.dart';
 import '../../../core/utils/responsive_helper.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/dashboard_card.dart';
-import '../../widgets/stats_card.dart';
-import '../../widgets/app_footer.dart';
+import '../../widgets/app_header.dart';
+import '../../widgets/bottom_menu_widget.dart';
 
 /// Página principal del dashboard del sistema de facturación
 class DashboardPage extends ConsumerWidget {
@@ -26,78 +26,27 @@ class DashboardPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: DesignTokens.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: DesignTokens.primaryColor,
-        elevation: 0,
-        title: Row(
-          children: [
-            // Logo clickeable
-            GestureDetector(
-              onTap: () => context.go('/dashboard'),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(
-                    DesignTokens.borderRadiusMd,
-                  ),
-                  boxShadow: DesignTokens.cardShadow,
-                ),
-                child: const Icon(
-                  Icons.local_bar, // Icono de licorería
-                  color: Colors.green,
-                  size: 20,
-                ),
-              ),
-            ),
-            const SizedBox(width: DesignTokens.spacingSm),
-            // Nombre de la app
-            Expanded(
-              child: Text(
-                AppConfig.appName,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: DesignTokens.fontSizeLg,
-                  fontWeight: DesignTokens.fontWeightBold,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          // Notificaciones
-          IconButton(
-            icon: const Icon(
-              Icons.notifications,
-              color: Colors.white,
-              size: 22,
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('🔔 Notificaciones próximamente')),
-              );
-            },
-            padding: const EdgeInsets.all(8),
-            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-          ),
-          // Menú de usuario
-          _buildUserMenu(ref, context),
-        ],
+      appBar: AppHeader(
+        title: AppConfig.appName,
+        showBackButton: false,
+        showUserMenu: true,
       ),
-      body: SingleChildScrollView(
-        padding: ResponsiveHelper.instance.getResponsivePadding(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.instance.isSmallMobile(context) ? 12 : 16,
+            vertical: 8,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Sección de bienvenida
             _buildWelcomeSection(context, authState),
 
             SizedBox(
               height: ResponsiveHelper.instance.getResponsiveSpacing(
                 context,
-                DesignTokens.spacingXl,
+                DesignTokens.spacingLg,
               ),
             ),
 
@@ -107,7 +56,7 @@ class DashboardPage extends ConsumerWidget {
             SizedBox(
               height: ResponsiveHelper.instance.getResponsiveSpacing(
                 context,
-                DesignTokens.spacingXl,
+                DesignTokens.spacingLg,
               ),
             ),
 
@@ -117,36 +66,47 @@ class DashboardPage extends ConsumerWidget {
             SizedBox(
               height: ResponsiveHelper.instance.getResponsiveSpacing(
                 context,
-                DesignTokens.spacingXl,
+                DesignTokens.spacingLg,
               ),
             ),
 
             // Acciones secundarias
             _buildSecondaryActionsSection(context, authState),
 
-            const SizedBox(height: DesignTokens.spacingXl),
-
-            // Footer
-            const AppFooter(),
-          ],
+            // Espacio adicional para el menú inferior
+            SizedBox(height: ResponsiveHelper.instance.isSmallMobile(context) ? 100 : 80),
+            ],
+          ),
         ),
+      ),
+      bottomNavigationBar: BottomMenuWidget(
+        currentIndex: 0,
+        onTap: (index) {
+          _navigateToPage(context, index);
+        },
       ),
     );
   }
 
-  /// Construye la sección de bienvenida
+  /// Construye la sección de bienvenida (más compacta)
   Widget _buildWelcomeSection(BuildContext context, AuthState authState) {
     final responsiveHelper = ResponsiveHelper.instance;
     final isSmallMobile = responsiveHelper.isSmallMobile(context);
 
     return Container(
       padding: EdgeInsets.all(
-        responsiveHelper.getResponsiveSpacing(context, DesignTokens.spacingLg),
+        isSmallMobile ? 16 : 20,
       ),
       decoration: BoxDecoration(
         gradient: DesignTokens.primaryGradient,
-        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusLg),
-        boxShadow: DesignTokens.elevatedShadow,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -158,63 +118,44 @@ class DashboardPage extends ConsumerWidget {
                   '¡Bienvenido!',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: responsiveHelper.getResponsiveFontSize(
-                      context,
-                      DesignTokens.fontSize3xl,
-                    ),
+                    fontSize: isSmallMobile ? 20 : 24,
                     fontWeight: DesignTokens.fontWeightBold,
                   ),
                 ),
-                SizedBox(
-                  height: responsiveHelper.getResponsiveSpacing(
-                    context,
-                    DesignTokens.spacingSm,
-                  ),
-                ),
+                const SizedBox(height: 4),
                 Text(
                   authState.user?.name ?? 'Usuario',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: responsiveHelper.getResponsiveFontSize(
-                      context,
-                      DesignTokens.fontSizeXl,
-                    ),
+                    fontSize: isSmallMobile ? 16 : 18,
                     fontWeight: DesignTokens.fontWeightMedium,
                   ),
                 ),
-                SizedBox(
-                  height: responsiveHelper.getResponsiveSpacing(
-                    context,
-                    DesignTokens.spacingSm,
-                  ),
-                ),
-                Text(
-                  'Sistema de Facturación La Gata',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: responsiveHelper.getResponsiveFontSize(
-                      context,
-                      DesignTokens.fontSizeLg,
+                if (!isSmallMobile) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Sistema de Facturación La Gata',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 14,
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
-          if (!isSmallMobile) // Ocultar icono en móviles muy pequeños
+          if (!isSmallMobile)
             Container(
-              width: responsiveHelper.getResponsiveIconSize(context, 60),
-              height: responsiveHelper.getResponsiveIconSize(context, 60),
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(
-                  DesignTokens.borderRadiusFull,
-                ),
+                borderRadius: BorderRadius.circular(25),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.local_bar,
                 color: Colors.white,
-                size: responsiveHelper.getResponsiveIconSize(context, 30),
+                size: 24,
               ),
             ),
         ],
@@ -222,7 +163,7 @@ class DashboardPage extends ConsumerWidget {
     );
   }
 
-  /// Construye la sección de estadísticas
+  /// Construye la sección de estadísticas (más compacta)
   Widget _buildStatsSection(BuildContext context) {
     final responsiveHelper = ResponsiveHelper.instance;
 
@@ -230,11 +171,11 @@ class DashboardPage extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Estadísticas del Día',
+          'Resumen del Día',
           style: TextStyle(
             fontSize: responsiveHelper.getResponsiveFontSize(
               context,
-              DesignTokens.fontSizeXl,
+              DesignTokens.fontSizeLg,
             ),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
@@ -243,60 +184,103 @@ class DashboardPage extends ConsumerWidget {
         SizedBox(
           height: responsiveHelper.getResponsiveSpacing(
             context,
-            DesignTokens.spacingMd,
+            DesignTokens.spacingSm,
           ),
         ),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(
-            context,
+        // Estadísticas en una sola fila para pantallas pequeñas
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildCompactStatsCard(
+                title: 'Ventas',
+                value: '₡125K',
+                icon: Icons.sell,
+                color: DesignTokens.successColor,
+                change: '+12%',
+              ),
+              const SizedBox(width: 12),
+              _buildCompactStatsCard(
+                title: 'Compras',
+                value: '₡85K',
+                icon: Icons.shopping_cart,
+                color: DesignTokens.primaryColor,
+                change: '+8%',
+              ),
+              const SizedBox(width: 12),
+              _buildCompactStatsCard(
+                title: 'Stock Bajo',
+                value: '3',
+                icon: Icons.warning,
+                color: DesignTokens.warningColor,
+                change: '-2',
+              ),
+            ],
           ),
-          crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(
-            context,
-          ),
-          children: [
-            StatsCard(
-              title: 'Compras del dia',
-              value: '₡125,000',
-              icon: Icons.point_of_sale,
-              color: DesignTokens.primaryColor,
-              change: '+12%',
-              isPositive: true,
-            ),
-            StatsCard(
-              title: 'Productos comprados',
-              value: '45',
-              icon: Icons.inventory,
-              color: DesignTokens.successColor,
-              change: '+8%',
-              isPositive: true,
-            ),
-            StatsCard(
-              title: 'Stock Bajo',
-              value: '3',
-              icon: Icons.warning,
-              color: DesignTokens.warningColor,
-              change: '-2',
-              isPositive: false,
-            ),
-            StatsCard(
-              title: 'proveedores atendidos',
-              value: '12',
-              icon: Icons.people,
-              color: DesignTokens.accentColor,
-              change: '+3',
-              isPositive: true,
-            ),
-          ],
         ),
       ],
     );
   }
 
-  /// Construye la sección de acciones principales
+  /// Construye una tarjeta de estadísticas compacta
+  Widget _buildCompactStatsCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+    required String change,
+  }) {
+    return Container(
+      width: 100,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: DesignTokens.textPrimaryColor,
+            ),
+          ),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 10,
+              color: DesignTokens.textSecondaryColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            change,
+            style: TextStyle(
+              fontSize: 10,
+              color: change.startsWith('+') ? Colors.green : Colors.red,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Construye la sección de acciones principales (solo 4 opciones)
   Widget _buildMainActionsSection(BuildContext context, AuthState authState) {
     final responsiveHelper = ResponsiveHelper.instance;
 
@@ -308,7 +292,7 @@ class DashboardPage extends ConsumerWidget {
           style: TextStyle(
             fontSize: responsiveHelper.getResponsiveFontSize(
               context,
-              DesignTokens.fontSizeXl,
+              DesignTokens.fontSizeLg,
             ),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
@@ -317,69 +301,45 @@ class DashboardPage extends ConsumerWidget {
         SizedBox(
           height: responsiveHelper.getResponsiveSpacing(
             context,
-            DesignTokens.spacingMd,
+            DesignTokens.spacingSm,
           ),
         ),
+        // Grid de 2x2 para las 4 acciones principales
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(
-            context,
-          ),
-          crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(
-            context,
-          ),
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.2,
           children: [
+            DashboardCard(
+              title: 'Nueva Venta',
+              subtitle: 'Crear venta',
+              icon: Icons.sell,
+              color: DesignTokens.successColor,
+              onTap: () => context.push('/sales/new'),
+            ),
             DashboardCard(
               title: 'Nueva Compra',
               subtitle: 'Crear compra',
               icon: Icons.add_shopping_cart,
-              color: DesignTokens.successColor,
-              onTap: () => context.push('/compras/nueva'),
-            ),
-            DashboardCard(
-              title: 'Nueva Venta',
-              subtitle: 'Crear venta',
-              icon: Icons.shopping_cart,
-              color: DesignTokens.successColor,
-              onTap: () => context.push('/sales/new'),
+              color: DesignTokens.primaryColor,
+              onTap: () => context.push('/purchases/new'),
             ),
             DashboardCard(
               title: 'Inventario',
               subtitle: 'Gestionar inventario',
               icon: Icons.inventory,
               color: DesignTokens.infoColor,
-              onTap: () => context.push('/detalle-productos'),
+              onTap: () => context.push('/inventory'),
             ),
             DashboardCard(
-              title: 'Compras',
-              subtitle: 'Ver historial',
-              icon: Icons.receipt_long,
-              color: DesignTokens.primaryColor,
-              onTap: () => context.push('/compras'),
-            ),
-            DashboardCard(
-              title: 'Ventas',
-              subtitle: 'Ver historial',
-              icon: Icons.sell,
-              color: DesignTokens.primaryColor,
-              onTap: () => context.push('/sales'),
-            ),
-            DashboardCard(
-              title: 'Proveedores',
-              subtitle: 'Gestionar proveedores',
-              icon: Icons.business_center,
-              color: DesignTokens.accentColor,
-              onTap: () => context.push('/proveedores'),
-            ),
-            DashboardCard(
-              title: 'Clientes',
-              subtitle: 'Gestionar clientes',
-              icon: Icons.people,
-              color: DesignTokens.accentColor,
-              onTap: () => context.push('/customers'),
+              title: 'Reportes',
+              subtitle: 'Ver reportes',
+              icon: Icons.analytics,
+              color: DesignTokens.warningColor,
+              onTap: () => context.push('/reports'),
             ),
           ],
         ),
@@ -387,14 +347,11 @@ class DashboardPage extends ConsumerWidget {
     );
   }
 
-  /// Construye la sección de acciones secundarias
+  /// Construye la sección de acciones secundarias (reorganizada)
   Widget _buildSecondaryActionsSection(
     BuildContext context,
     AuthState authState,
   ) {
-    final user = authState.user;
-    final isAdmin = user?.isAdmin ?? false;
-    final canManageInventory = user?.canManageInventory ?? false;
     final responsiveHelper = ResponsiveHelper.instance;
 
     return Column(
@@ -405,7 +362,7 @@ class DashboardPage extends ConsumerWidget {
           style: TextStyle(
             fontSize: responsiveHelper.getResponsiveFontSize(
               context,
-              DesignTokens.fontSizeXl,
+              DesignTokens.fontSizeLg,
             ),
             fontWeight: DesignTokens.fontWeightBold,
             color: DesignTokens.textPrimaryColor,
@@ -414,50 +371,34 @@ class DashboardPage extends ConsumerWidget {
         SizedBox(
           height: responsiveHelper.getResponsiveSpacing(
             context,
-            DesignTokens.spacingMd,
+            DesignTokens.spacingSm,
           ),
         ),
+        // Grid de 2x1 para las opciones secundarias (mismo tamaño que Main Actions)
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: responsiveHelper.getResponsiveGridCrossAxisCount(
-            context,
-          ),
-          crossAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          mainAxisSpacing: responsiveHelper.getResponsiveGridSpacing(context),
-          childAspectRatio: responsiveHelper.getResponsiveGridChildAspectRatio(
-            context,
-          ),
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.2, // Mismo aspect ratio que Main Actions
           children: [
-            if (canManageInventory)
-              DashboardCard(
-                title: 'Stock',
-                subtitle: 'Control de inventario',
-                icon: Icons.assessment,
-                color: DesignTokens.warningColor,
-                onTap: () => context.push('/inventory'),
-              ),
             DashboardCard(
-              title: 'Reportes',
-              subtitle: 'Generar reportes',
-              icon: Icons.analytics,
-              color: DesignTokens.warningColor,
-              onTap: () => context.push('/reports'),
-            ),
-            if (isAdmin)
-              DashboardCard(
-                title: 'Empleados',
-                subtitle: 'Gestionar empleados',
-                icon: Icons.manage_accounts,
-                color: DesignTokens.accentDarkColor,
-                onTap: () => context.push('/users'),
-              ),
-            DashboardCard(
-              title: 'Administracion',
+              title: 'Administración',
               subtitle: 'Gestión del sistema',
               icon: Icons.admin_panel_settings,
               color: DesignTokens.textSecondaryColor,
               onTap: () => context.push('/admin'),
+            ),
+            DashboardCard(
+              title: 'Acceso Rápido',
+              subtitle: 'Acciones rápidas',
+              icon: Icons.flash_on,
+              color: DesignTokens.accentColor,
+              onTap: () {
+                // Mostrar un menú rápido con opciones adicionales
+                _showQuickAccessMenu(context);
+              },
             ),
           ],
         ),
@@ -465,97 +406,132 @@ class DashboardPage extends ConsumerWidget {
     );
   }
 
-  /// Construye el menú de usuario
-  Widget _buildUserMenu(WidgetRef ref, BuildContext context) {
-    final authState = ref.watch(authProvider);
-    final user = authState.user;
-
-    return PopupMenuButton<String>(
-      icon: CircleAvatar(
-        backgroundColor: Colors.white,
-        radius: 16,
-        child: Text(
-          user?.name.substring(0, 1).toUpperCase() ?? 'U',
-          style: TextStyle(
-            color: DesignTokens.primaryColor,
-            fontWeight: DesignTokens.fontWeightBold,
-            fontSize: DesignTokens.fontSizeSm,
-          ),
-        ),
-      ),
-      padding: const EdgeInsets.all(8),
-      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-      onSelected: (value) {
-        switch (value) {
-          case 'profile':
-            context.push('/profile');
-            break;
-          case 'settings':
-            context.push('/settings');
-            break;
-          case 'logout':
-            _showLogoutDialog(context, ref);
-            break;
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'profile',
-          child: Row(
-            children: [
-              const Icon(Icons.person),
-              const SizedBox(width: DesignTokens.spacingSm),
-              const Text('Perfil'),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'settings',
-          child: Row(
-            children: [
-              const Icon(Icons.settings),
-              const SizedBox(width: DesignTokens.spacingSm),
-              const Text('Configuración'),
-            ],
-          ),
-        ),
-        const PopupMenuDivider(),
-        PopupMenuItem(
-          value: 'logout',
-          child: Row(
-            children: [
-              const Icon(Icons.logout, color: Colors.red),
-              const SizedBox(width: DesignTokens.spacingSm),
-              const Text('Cerrar Sesión', style: TextStyle(color: Colors.red)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Muestra el diálogo de confirmación para cerrar sesión
-  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
+  /// Muestra un menú de acceso rápido
+  void _showQuickAccessMenu(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cerrar Sesión'),
-        content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ref.read(authProvider.notifier).signOut();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Cerrar Sesión'),
-          ),
-        ],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Acceso Rápido',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: DesignTokens.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: 20),
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 2.5,
+              children: [
+                _buildQuickAccessItem(
+                  icon: Icons.people,
+                  title: 'Clientes',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push('/customers');
+                  },
+                ),
+                _buildQuickAccessItem(
+                  icon: Icons.business_center,
+                  title: 'Proveedores',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push('/suppliers');
+                  },
+                ),
+                _buildQuickAccessItem(
+                  icon: Icons.receipt_long,
+                  title: 'Historial de Ventas',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push('/sales');
+                  },
+                ),
+                _buildQuickAccessItem(
+                  icon: Icons.history,
+                  title: 'Historial de Compras',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push('/purchases');
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
+
+  /// Construye un elemento del menú de acceso rápido
+  Widget _buildQuickAccessItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey[200]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: DesignTokens.primaryColor, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: DesignTokens.textPrimaryColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToPage(BuildContext context, int index) {
+    switch (index) {
+      case 0: // Sales
+        context.go('/dashboard');
+        break;
+      case 1: // Manage
+        context.go('/dashboard');
+        break;
+      case 2: // Purchases
+        context.go('/dashboard');
+        break;
+      case 3: // Resume
+        context.go('/dashboard');
+        break;
+    }
+  }
+
 }

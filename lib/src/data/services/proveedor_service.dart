@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/proveedor_model.dart';
+import '../models/base_model.dart';
 
 class ProveedorService {
   final String baseUrl = 'http://localhost:5044/api/Proveedores';
@@ -20,7 +21,7 @@ class ProveedorService {
     }
   }
 
-  Future<List<Proveedor>> obtenerTodos() async {
+  Future<List<Proveedor>> obtenerInactivos() async {
     final url = Uri.parse(baseUrl);
     final response = await http.get(url);
 
@@ -50,7 +51,9 @@ class ProveedorService {
     }
   }
 
-  Future<Proveedor> crearProveedor(CrearProveedorRequest request) async {
+  Future<ApiResponse<Proveedor>> crearProveedor(
+    CrearProveedorRequest request,
+  ) async {
     final url = Uri.parse(baseUrl);
     final response = await http.post(
       url,
@@ -63,13 +66,18 @@ class ProveedorService {
 
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
-      return Proveedor.fromJson(data);
+      return ApiResponse.success(
+        data: Proveedor.fromJson(data),
+        message: 'Proveedor creado exitosamente',
+      );
     } else {
-      throw Exception('Error al crear proveedor: ${response.body}');
+      return ApiResponse.error(
+        message: 'Error al crear proveedor: ${response.body}',
+      );
     }
   }
 
-  Future<Proveedor> actualizarProveedor(
+  Future<ApiResponse<Proveedor>> actualizarProveedor(
     int proveedorId,
     ActualizarProveedorRequest request,
   ) async {
@@ -85,33 +93,64 @@ class ProveedorService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return Proveedor.fromJson(data);
+      return ApiResponse.success(
+        data: Proveedor.fromJson(data),
+        message: 'Proveedor actualizado exitosamente',
+      );
     } else {
-      throw Exception('Error al actualizar proveedor: ${response.body}');
+      return ApiResponse.error(
+        message: 'Error al actualizar proveedor: ${response.body}',
+      );
     }
   }
 
-  Future<void> desactivarProveedor(int proveedorId) async {
+  Future<ApiResponse<bool>> desactivarProveedor(int proveedorId) async {
     final url = Uri.parse('$baseUrl/$proveedorId/desactivar');
     final response = await http.post(url);
 
     // Debug logging removed for production
     // Debug logging removed for production
 
-    if (response.statusCode != 204) {
-      throw Exception('Error al desactivar proveedor: ${response.body}');
+    if (response.statusCode == 204) {
+      return ApiResponse.success(
+        data: true,
+        message: 'Proveedor desactivado exitosamente',
+      );
+    } else {
+      return ApiResponse.error(
+        message: 'Error al desactivar proveedor: ${response.body}',
+      );
     }
   }
 
-  Future<void> activarProveedor(int proveedorId) async {
+  Future<ApiResponse<bool>> activarProveedor(int proveedorId) async {
     final url = Uri.parse('$baseUrl/$proveedorId/activar');
     final response = await http.post(url);
 
     // Debug logging removed for production
     // Debug logging removed for production
 
-    if (response.statusCode != 204) {
-      throw Exception('Error al activar proveedor: ${response.body}');
+    if (response.statusCode == 204) {
+      return ApiResponse.success(
+        data: true,
+        message: 'Proveedor activado exitosamente',
+      );
+    } else {
+      return ApiResponse.error(
+        message: 'Error al activar proveedor: ${response.body}',
+      );
+    }
+  }
+
+  Future<List<Proveedor>> buscarPorNombre(String nombre) async {
+    final url = Uri.parse('$baseUrl/activos/buscar?nombre=$nombre');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => Proveedor.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al buscar proveedores: ${response.body}');
     }
   }
 }

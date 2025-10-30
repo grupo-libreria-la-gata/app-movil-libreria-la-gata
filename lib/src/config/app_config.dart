@@ -1,6 +1,11 @@
 class AppConfig {
   // API Configuration
-  static const String baseUrl = 'http://localhost:5044';
+  // Para desarrollo local, usar la IP de tu máquina en lugar de localhost
+  // Encuentra tu IP con: ipconfig (Windows) o ifconfig (Mac/Linux)
+  // Opciones comunes: 192.168.1.100, 192.168.0.100, 10.0.2.2 (para emulador Android)
+  static const String baseUrl = 'http://10.0.2.2:5044'; // IP para emulador Android
+  // static const String baseUrl = 'http://192.168.1.100:5044'; // IP de tu red local
+  // static const String baseUrl = 'http://localhost:5044'; // Solo para web
   static const String apiKey = 'your_api_key_here';
 
   // Database Configuration

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/design/design_tokens.dart';
-import '../../../core/services/business_service.dart';
-import '../../../core/services/error_service.dart';
-import '../../../core/services/mock_data_service.dart';
-import '../../widgets/search_bar_widget.dart';
-import '../../widgets/product_card.dart';
+import '../../../data/services/venta_service.dart';
+import '../../../data/services/detalle_producto_service.dart';
+import '../../../data/services/cliente_service.dart';
+import '../../../data/models/cliente_model.dart';
+import '../../../data/models/detalle_producto_model.dart';
+import '../../../data/models/request_models.dart';
+import '../../providers/auth_provider.dart';
 
-/// Página para crear una nueva venta
 class NewSalePage extends ConsumerStatefulWidget {
   const NewSalePage({super.key});
 
@@ -16,78 +16,144 @@ class NewSalePage extends ConsumerStatefulWidget {
   ConsumerState<NewSalePage> createState() => _NewSalePageState();
 }
 
-class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
-  final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _customerNameController = TextEditingController();
-  final TextEditingController _customerPhoneController =
-      TextEditingController();
-  final TextEditingController _discountController = TextEditingController();
+class _NewSalePageState extends ConsumerState<NewSalePage> {
+  final VentaService _ventaService = VentaService();
+  final DetalleProductoService _detalleProductoService = DetalleProductoService();
+  final ClienteService _clienteService = ClienteService();
+  final _formKey = GlobalKey<FormState>();
+  final _observacionesController = TextEditingController();
 
-  final List<Map<String, dynamic>> _cartItems = [];
-  String _selectedPaymentMethod = 'Efectivo';
-  DiscountType _selectedDiscountType = DiscountType.none;
-  double _discountValue = 0.0;
+  Cliente? _clienteSeleccionado;
+  List<Cliente> _clientes = [];
+  List<DetalleProducto> _detalleProductos = [];
+  List<CrearVentaDetalleRequest> _detalles = [];
+  String _metodoPago = 'Efectivo';
+  bool _isLoading = false;
 
-  // Datos de ejemplo - esto vendría de un provider
-  late List<Map<String, dynamic>> _availableProducts;
-
-  List<Map<String, dynamic>> get _filteredProducts {
-    if (_searchController.text.isEmpty) {
-      return _availableProducts;
-    }
-
-    return _availableProducts.where((product) {
-      final search = _searchController.text.toLowerCase();
-      return product['name'].toLowerCase().contains(search) ||
-          product['brand'].toLowerCase().contains(search);
-    }).toList();
-  }
-
-  double get _subtotal {
-    return BusinessService().calculateSubtotal(_cartItems);
-  }
-
-  double get _tax {
-    return BusinessService().calculateTax(_subtotal);
-  }
-
-  double get _discount {
-    return BusinessService().calculateDiscount(
-      _subtotal,
-      _selectedDiscountType,
-      _discountValue,
-    );
-  }
-
-  double get _total {
-    return BusinessService().calculateTotal(_subtotal, _tax, _discount);
-  }
+  final List<String> _metodosPago = ['Efectivo', 'Tarjeta', 'Transferencia'];
 
   @override
   void initState() {
     super.initState();
-    _loadProducts();
+    _cargarDatos();
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
-    _customerNameController.dispose();
-    _customerPhoneController.dispose();
-    _discountController.dispose();
+    _observacionesController.dispose();
     super.dispose();
   }
 
-  /// Carga los productos disponibles
-  Future<void> _loadProducts() async {
-    await executeWithErrorHandling(() async {
-      // Simular carga de productos
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Cargar productos desde el servicio mock
-      _availableProducts = MockDataService().mockProducts;
-    });
+  Future<void> _cargarDatos() async {
+    setState(() => _isLoading = true);
+    try {
+      final futures = await Future.wait([
+        _clienteService.obtenerActivos(),
+        _detalleProductoService.obtenerActivos(),
+      ]);
+      
+      setState(() {
+        _clientes = futures[0] as List<Cliente>;
+        _detalleProductos = futures[1] as List<DetalleProducto>;
+      });
+    } catch (e) {
+      _mostrarError('Error al cargar datos: ${e.toString()}');
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
+
+  void _agregarDetalle(DetalleProducto producto, int cantidad, double precioUnitario) {
+    final detalleExistente = _detalles.firstWhere(
+      (d) => d.detalleProductoId == producto.detalleProductoId,
+      orElse: () => CrearVentaDetalleRequest(
+        detalleProductoId: 0,
+        cantidad: 0,
+        precioUnitario: 0,
+        codigoBarra: '',
+      ),
+    );
+
+    if (detalleExistente.detalleProductoId == 0) {
+      setState(() {
+        _detalles.add(
+          CrearVentaDetalleRequest(
+            detalleProductoId: producto.detalleProductoId,
+            cantidad: cantidad,
+            precioUnitario: precioUnitario,
+            codigoBarra: producto.codigoBarra,
+          ),
+        );
+      });
+    } else {
+      _actualizarCantidad(
+        _detalles.indexOf(detalleExistente),
+        detalleExistente.cantidad + cantidad,
+      );
+    }
+  }
+
+  void _actualizarCantidad(int index, int nuevaCantidad) {
+    if (nuevaCantidad <= 0) {
+      setState(() {
+        _detalles.removeAt(index);
+      });
+    } else {
+      setState(() {
+        final detalle = _detalles[index];
+        _detalles[index] = CrearVentaDetalleRequest(
+          detalleProductoId: detalle.detalleProductoId,
+          cantidad: nuevaCantidad,
+          precioUnitario: detalle.precioUnitario,
+          codigoBarra: detalle.codigoBarra,
+        );
+      });
+    }
+  }
+
+  Future<void> _guardarVenta() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_clienteSeleccionado == null) {
+      _mostrarError('Seleccione un cliente');
+      return;
+    }
+
+    if (_detalles.isEmpty) {
+      _mostrarError('Agregue al menos un producto');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Obtener el usuario actual
+      final authState = ref.read(authProvider);
+      final usuarioId = int.tryParse(authState.user?.id ?? '1') ?? 1; // Default to 1 if not found
+
+      final request = CrearVentaRequest(
+        clienteId: _clienteSeleccionado!.clienteId,
+        usuarioId: usuarioId,
+        metodoPago: _metodoPago,
+        total: _total,
+        observaciones: _observacionesController.text.trim(),
+        detalles: _detalles,
+      );
+
+      await _ventaService.crearVenta(request);
+      if (!mounted) return;
+      _mostrarExito('Venta creada exitosamente');
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+      _mostrarError('Error al crear venta: ${e.toString()}');
+    } finally {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+    }
+  }
+
+  double get _total => _detalles.fold(0.0, (sum, detalle) => sum + (detalle.cantidad * detalle.precioUnitario));
 
   @override
   Widget build(BuildContext context) {
@@ -95,90 +161,346 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
         backgroundColor: DesignTokens.primaryColor,
-        elevation: 0,
-        title: const Text('Nueva Venta', style: TextStyle(color: Colors.white)),
+        foregroundColor: Colors.white,
+        title: const Text('Nueva Venta'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Column(
-        children: [
-          // Información del cliente
-          _buildCustomerInfo(),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(DesignTokens.spacingMd),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Selección de Cliente
+                          _buildClienteSection(),
+                          const SizedBox(height: DesignTokens.spacingLg),
 
-          // Productos disponibles
-          Expanded(child: _buildProductsSection()),
+                          // Método de Pago
+                          _buildMetodoPagoSection(),
+                          const SizedBox(height: DesignTokens.spacingLg),
 
-          // Carrito y total
-          _buildCartSection(),
-        ],
+                          // Productos
+                          _buildProductosSection(),
+                          const SizedBox(height: DesignTokens.spacingLg),
+
+                          // Lista de Productos Agregados
+                          _buildListaProductos(),
+                          const SizedBox(height: DesignTokens.spacingLg),
+
+                          // Observaciones
+                          _buildObservacionesSection(),
+                        ],
+                      ),
+                    ),
+                  ),
+                  _buildFooter(),
+                ],
+              ),
+            ),
+    );
+  }
+
+  Widget _buildClienteSection() {
+    return Card(
+      elevation: DesignTokens.elevationSm,
+      child: Padding(
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Cliente',
+              style: TextStyle(
+                fontSize: DesignTokens.fontSizeLg,
+                fontWeight: DesignTokens.fontWeightBold,
+                color: DesignTokens.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacingSm),
+            DropdownButtonFormField<Cliente>(
+              initialValue: _clienteSeleccionado,
+              decoration: InputDecoration(
+                hintText: 'Seleccionar cliente',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                ),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: DesignTokens.spacingSm,
+                  vertical: DesignTokens.spacingSm,
+                ),
+              ),
+              items: _clientes.map((cliente) {
+                return DropdownMenuItem<Cliente>(
+                  value: cliente,
+                  child: Text(
+                    cliente.nombre,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              }).toList(),
+              onChanged: (Cliente? cliente) {
+                setState(() {
+                  _clienteSeleccionado = cliente;
+                });
+              },
+              validator: (value) {
+                if (value == null) {
+                  return 'Seleccione un cliente';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  /// Construye la sección de información del cliente
-  Widget _buildCustomerInfo() {
-    return Container(
-      padding: const EdgeInsets.all(DesignTokens.spacingMd),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+  Widget _buildMetodoPagoSection() {
+    return Card(
+      elevation: DesignTokens.elevationSm,
+      child: Padding(
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Método de Pago',
+              style: TextStyle(
+                fontSize: DesignTokens.fontSizeLg,
+                fontWeight: DesignTokens.fontWeightBold,
+                color: DesignTokens.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacingSm),
+            DropdownButtonFormField<String>(
+              initialValue: _metodoPago,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                ),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: DesignTokens.spacingSm,
+                  vertical: DesignTokens.spacingSm,
+                ),
+              ),
+              items: _metodosPago.map((metodo) {
+                return DropdownMenuItem<String>(
+                  value: metodo,
+                  child: Text(metodo),
+                );
+              }).toList(),
+              onChanged: (String? metodo) {
+                setState(() {
+                  _metodoPago = metodo!;
+                });
+              },
+            ),
+          ],
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Información del Cliente',
-            style: TextStyle(
-              fontSize: DesignTokens.fontSizeLg,
-              fontWeight: DesignTokens.fontWeightBold,
-              color: DesignTokens.textPrimaryColor,
+    );
+  }
+
+  Widget _buildProductosSection() {
+    return Card(
+      elevation: DesignTokens.elevationSm,
+      child: Padding(
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Productos',
+                    style: TextStyle(
+                      fontSize: DesignTokens.fontSizeLg,
+                      fontWeight: DesignTokens.fontWeightBold,
+                      color: DesignTokens.textPrimaryColor,
+                    ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _mostrarModalProductos(),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Agregar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: DesignTokens.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListaProductos() {
+    if (_detalles.isEmpty) {
+      return Card(
+        elevation: DesignTokens.elevationSm,
+        child: Padding(
+          padding: const EdgeInsets.all(DesignTokens.spacingLg),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.shopping_cart_outlined,
+                  size: 48,
+                  color: DesignTokens.textSecondaryColor,
+                ),
+                const SizedBox(height: DesignTokens.spacingSm),
+                Text(
+                  'No hay productos agregados',
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeMd,
+                    color: DesignTokens.textSecondaryColor,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: DesignTokens.spacingMd),
+        ),
+      );
+    }
+
+    return Card(
+      elevation: DesignTokens.elevationSm,
+      child: Padding(
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Productos Agregados',
+              style: TextStyle(
+                fontSize: DesignTokens.fontSizeLg,
+                fontWeight: DesignTokens.fontWeightBold,
+                color: DesignTokens.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacingSm),
+            ..._detalles.asMap().entries.map((entry) {
+              final index = entry.key;
+              final detalle = entry.value;
+              final producto = _detalleProductos.firstWhere(
+                (p) => p.detalleProductoId == detalle.detalleProductoId,
+                orElse: () => DetalleProducto(
+                  detalleProductoId: 0,
+                  producto: 'Producto no encontrado',
+                  marca: '',
+                  categoria: '',
+                  codigoBarra: '',
+                  precio: 0,
+                  costo: 0,
+                  stock: 0,
+                  fechaCreacion: DateTime.now(),
+                ),
+              );
+              return _buildProductItem(producto, detalle, index);
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProductItem(DetalleProducto producto, CrearVentaDetalleRequest detalle, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: DesignTokens.spacingSm),
+      padding: const EdgeInsets.all(DesignTokens.spacingSm),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  producto.producto,
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeMd,
+                    fontWeight: DesignTokens.fontWeightMedium,
+                    color: DesignTokens.textPrimaryColor,
+                  ),
+                ),
+                Text(
+                  'Marca: ${producto.marca}',
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeSm,
+                    color: DesignTokens.textSecondaryColor,
+                  ),
+                ),
+                Text(
+                  'Precio: \$${_formatCurrency(detalle.precioUnitario)}',
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeSm,
+                    color: DesignTokens.textSecondaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Row(
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _customerNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Nombre del Cliente',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        DesignTokens.borderRadiusMd,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingMd,
-                      vertical: DesignTokens.spacingSm,
+              IconButton(
+                onPressed: () => _actualizarCantidad(index, detalle.cantidad - 1),
+                icon: const Icon(Icons.remove),
+                iconSize: 20,
+              ),
+              Container(
+                width: 50,
+                height: 30,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                ),
+                child: Center(
+                  child: Text(
+                    '${detalle.cantidad}',
+                    style: TextStyle(
+                      fontSize: DesignTokens.fontSizeMd,
+                      fontWeight: DesignTokens.fontWeightMedium,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: DesignTokens.spacingMd),
-              Expanded(
-                child: TextField(
-                  controller: _customerPhoneController,
-                  decoration: InputDecoration(
-                    labelText: 'Teléfono (opcional)',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        DesignTokens.borderRadiusMd,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingMd,
-                      vertical: DesignTokens.spacingSm,
-                    ),
-                  ),
-                ),
+              IconButton(
+                onPressed: () => _actualizarCantidad(index, detalle.cantidad + 1),
+                icon: const Icon(Icons.add),
+                iconSize: 20,
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _detalles.removeAt(index);
+                  });
+                },
+                icon: const Icon(Icons.delete),
+                iconSize: 20,
+                color: DesignTokens.errorColor,
               ),
             ],
           ),
@@ -187,66 +509,108 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
     );
   }
 
-  /// Construye la sección de productos
-  Widget _buildProductsSection() {
-    return Column(
-      children: [
-        // Barra de búsqueda
-        Container(
-          padding: const EdgeInsets.all(DesignTokens.spacingMd),
-          child: SearchBarWidget(
-            controller: _searchController,
-            hintText: 'Buscar productos...',
-            onChanged: (value) => setState(() {}),
-          ),
+  Widget _buildObservacionesSection() {
+    return Card(
+      elevation: DesignTokens.elevationSm,
+      child: Padding(
+        padding: const EdgeInsets.all(DesignTokens.spacingMd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Observaciones',
+              style: TextStyle(
+                fontSize: DesignTokens.fontSizeLg,
+                fontWeight: DesignTokens.fontWeightBold,
+                color: DesignTokens.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacingSm),
+            TextFormField(
+              controller: _observacionesController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Observaciones (opcional)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                ),
+                isDense: true,
+                contentPadding: const EdgeInsets.all(DesignTokens.spacingSm),
+              ),
+            ),
+          ],
         ),
-
-        // Lista de productos
-        Expanded(
-          child: _filteredProducts.isEmpty
-              ? _buildEmptyProductsState()
-              : _buildProductsList(),
-        ),
-      ],
+      ),
     );
   }
 
-  /// Construye la lista de productos
-  Widget _buildProductsList() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spacingMd),
-      itemCount: _filteredProducts.length,
-      itemBuilder: (context, index) {
-        final product = _filteredProducts[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: DesignTokens.spacingMd),
-          child: ProductCard(
-            product: product,
-            onTap: () => _addToCart(product),
+  Widget _buildFooter() {
+    return Container(
+      padding: const EdgeInsets.all(DesignTokens.spacingMd),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, -2),
           ),
-        );
-      },
-    );
-  }
-
-  /// Construye el estado vacío de productos
-  Widget _buildEmptyProductsState() {
-    return Center(
+        ],
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 80,
-            color: DesignTokens.textSecondaryColor,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total:',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeLg,
+                  fontWeight: DesignTokens.fontWeightBold,
+                  color: DesignTokens.textPrimaryColor,
+                ),
+              ),
+              Text(
+                '\$${_formatCurrency(_total)}',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeXl,
+                  fontWeight: DesignTokens.fontWeightBold,
+                  color: DesignTokens.primaryColor,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: DesignTokens.spacingLg),
-          Text(
-            'No se encontraron productos',
-            style: TextStyle(
-              fontSize: DesignTokens.fontSizeLg,
-              fontWeight: DesignTokens.fontWeightMedium,
-              color: DesignTokens.textSecondaryColor,
+          const SizedBox(height: DesignTokens.spacingMd),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _guardarVenta,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: DesignTokens.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                ),
+              ),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      'Guardar Venta',
+                      style: TextStyle(
+                        fontSize: DesignTokens.fontSizeMd,
+                        fontWeight: DesignTokens.fontWeightBold,
+                      ),
+                    ),
             ),
           ),
         ],
@@ -254,383 +618,270 @@ class _NewSalePageState extends ConsumerState<NewSalePage> with LoadingMixin {
     );
   }
 
-  /// Construye la sección del carrito
-  Widget _buildCartSection() {
-    return Container(
-      padding: const EdgeInsets.all(DesignTokens.spacingMd),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Items del carrito
-          if (_cartItems.isNotEmpty) ...[_buildCartItems(), const Divider()],
-
-          // Totales
-          _buildTotals(),
-
-          const SizedBox(height: DesignTokens.spacingMd),
-
-          // Método de pago
-          _buildPaymentMethod(),
-
-          const SizedBox(height: DesignTokens.spacingMd),
-
-          // Configuración de descuentos
-          _buildDiscountSection(),
-
-          const SizedBox(height: DesignTokens.spacingMd),
-
-          // Botón de finalizar venta
-          _buildFinishSaleButton(),
-        ],
+  void _mostrarModalProductos() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => _ProductoModal(
+        productos: _detalleProductos,
+        onAgregar: (producto, cantidad, precio) {
+          _agregarDetalle(producto, cantidad, precio);
+        },
       ),
     );
   }
 
-  /// Construye los items del carrito
-  Widget _buildCartItems() {
-    return Column(
-      children: _cartItems.map((item) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: DesignTokens.spacingSm),
-          child: Row(
+  String _formatCurrency(double amount) {
+    return amount.toStringAsFixed(0);
+  }
+
+  void _mostrarError(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: DesignTokens.errorColor,
+      ),
+    );
+  }
+
+  void _mostrarExito(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: DesignTokens.successColor,
+      ),
+    );
+  }
+}
+
+class _ProductoModal extends StatefulWidget {
+  final List<DetalleProducto> productos;
+  final Function(DetalleProducto, int, double) onAgregar;
+
+  const _ProductoModal({
+    required this.productos,
+    required this.onAgregar,
+  });
+
+  @override
+  State<_ProductoModal> createState() => _ProductoModalState();
+}
+
+class _ProductoModalState extends State<_ProductoModal> {
+  DetalleProducto? _productoSeleccionado;
+  final _cantidadController = TextEditingController(text: '1');
+  final _precioController = TextEditingController();
+
+  @override
+  void dispose() {
+    _cantidadController.dispose();
+    _precioController.dispose();
+    super.dispose();
+  }
+
+  double get _subtotal {
+    final cantidad = int.tryParse(_cantidadController.text) ?? 0;
+    final precio = double.tryParse(_precioController.text) ?? 0;
+    return cantidad * precio;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
+      ),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(DesignTokens.spacingMd),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  '${item['name']} x${item['quantity']}',
-                  style: TextStyle(
-                    fontSize: DesignTokens.fontSizeMd,
-                    color: DesignTokens.textPrimaryColor,
-                  ),
+              Text(
+                'Agregar Producto',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeLg,
+                  fontWeight: DesignTokens.fontWeightBold,
+                  color: DesignTokens.textPrimaryColor,
                 ),
               ),
+              const SizedBox(height: DesignTokens.spacingMd),
+
+              // Selección de Producto
               Text(
-                '₡${item['total'].toStringAsFixed(0)}',
+                'Producto',
                 style: TextStyle(
                   fontSize: DesignTokens.fontSizeMd,
                   fontWeight: DesignTokens.fontWeightMedium,
                   color: DesignTokens.textPrimaryColor,
                 ),
               ),
-              IconButton(
-                icon: const Icon(
-                  Icons.remove_circle_outline,
-                  color: Colors.red,
-                ),
-                onPressed: () => _removeFromCart(item['id']),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  /// Construye los totales
-  Widget _buildTotals() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Subtotal:',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeMd,
-                color: DesignTokens.textSecondaryColor,
-              ),
-            ),
-            Text(
-              '₡${_subtotal.toStringAsFixed(0)}',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeMd,
-                color: DesignTokens.textPrimaryColor,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: DesignTokens.spacingXs),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'IVA (15%):',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeMd,
-                color: DesignTokens.textSecondaryColor,
-              ),
-            ),
-            Text(
-              '₡${_tax.toStringAsFixed(0)}',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeMd,
-                color: DesignTokens.textPrimaryColor,
-              ),
-            ),
-          ],
-        ),
-        if (_selectedDiscountType != DiscountType.none) ...[
-          const SizedBox(height: DesignTokens.spacingXs),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Descuento:',
-                style: TextStyle(
-                  fontSize: DesignTokens.fontSizeMd,
-                  color: DesignTokens.textSecondaryColor,
-                ),
-              ),
-              Text(
-                '-₡${_discount.toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: DesignTokens.fontSizeMd,
-                  color: DesignTokens.errorColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-        const Divider(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Total:',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeLg,
-                fontWeight: DesignTokens.fontWeightBold,
-                color: DesignTokens.textPrimaryColor,
-              ),
-            ),
-            Text(
-              '₡${_total.toStringAsFixed(0)}',
-              style: TextStyle(
-                fontSize: DesignTokens.fontSizeLg,
-                fontWeight: DesignTokens.fontWeightBold,
-                color: DesignTokens.primaryColor,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  /// Construye la sección de descuentos
-  Widget _buildDiscountSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Descuento:',
-          style: TextStyle(
-            fontSize: DesignTokens.fontSizeMd,
-            color: DesignTokens.textSecondaryColor,
-          ),
-        ),
-        const SizedBox(height: DesignTokens.spacingSm),
-        Row(
-          children: [
-            Expanded(
-              child: DropdownButtonFormField<DiscountType>(
-                initialValue: _selectedDiscountType,
+              const SizedBox(height: DesignTokens.spacingXs),
+              DropdownButtonFormField<DetalleProducto>(
+                initialValue: _productoSeleccionado,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      DesignTokens.borderRadiusMd,
-                    ),
+                    borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
                   ),
+                  isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: DesignTokens.spacingMd,
+                    horizontal: DesignTokens.spacingSm,
                     vertical: DesignTokens.spacingSm,
                   ),
                 ),
-                items: DiscountType.values.map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(type.displayName),
+                hint: const Text('Seleccionar producto'),
+                items: widget.productos.map((producto) {
+                  return DropdownMenuItem<DetalleProducto>(
+                    value: producto,
+                    child: Text(
+                      '${producto.producto} - ${producto.marca}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   );
                 }).toList(),
-                onChanged: (value) {
+                onChanged: (DetalleProducto? producto) {
                   setState(() {
-                    _selectedDiscountType = value!;
-                    _discountValue = 0.0;
-                    _discountController.clear();
+                    _productoSeleccionado = producto;
+                    if (producto != null) {
+                      _precioController.text = producto.precio.toString();
+                    }
                   });
                 },
               ),
-            ),
-            if (_selectedDiscountType != DiscountType.none) ...[
-              const SizedBox(width: DesignTokens.spacingMd),
-              Expanded(
-                child: TextFormField(
-                  controller: _discountController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: _selectedDiscountType == DiscountType.percentage
-                        ? '15%'
-                        : '₡1000',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        DesignTokens.borderRadiusMd,
+
+              const SizedBox(height: DesignTokens.spacingMd),
+
+              // Cantidad
+              Text(
+                'Cantidad',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeMd,
+                  fontWeight: DesignTokens.fontWeightMedium,
+                  color: DesignTokens.textPrimaryColor,
+                ),
+              ),
+              const SizedBox(height: DesignTokens.spacingXs),
+              TextFormField(
+                controller: _cantidadController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                  ),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: DesignTokens.spacingSm,
+                    vertical: DesignTokens.spacingSm,
+                  ),
+                ),
+                onChanged: (value) => setState(() {}),
+              ),
+
+              const SizedBox(height: DesignTokens.spacingMd),
+
+              // Precio Unitario
+              Text(
+                'Precio Unitario',
+                style: TextStyle(
+                  fontSize: DesignTokens.fontSizeMd,
+                  fontWeight: DesignTokens.fontWeightMedium,
+                  color: DesignTokens.textPrimaryColor,
+                ),
+              ),
+              const SizedBox(height: DesignTokens.spacingXs),
+              TextFormField(
+                controller: _precioController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                  ),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: DesignTokens.spacingSm,
+                    vertical: DesignTokens.spacingSm,
+                  ),
+                ),
+                onChanged: (value) => setState(() {}),
+              ),
+
+              const SizedBox(height: DesignTokens.spacingMd),
+
+              // Subtotal
+              Container(
+                padding: const EdgeInsets.all(DesignTokens.spacingSm),
+                decoration: BoxDecoration(
+                  color: DesignTokens.backgroundColor,
+                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Subtotal:',
+                      style: TextStyle(
+                        fontSize: DesignTokens.fontSizeMd,
+                        fontWeight: DesignTokens.fontWeightBold,
+                        color: DesignTokens.textPrimaryColor,
                       ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: DesignTokens.spacingMd,
-                      vertical: DesignTokens.spacingSm,
+                    Text(
+                      '\$${_subtotal.toStringAsFixed(0)}',
+                      style: TextStyle(
+                        fontSize: DesignTokens.fontSizeLg,
+                        fontWeight: DesignTokens.fontWeightBold,
+                        color: DesignTokens.primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: DesignTokens.spacingLg),
+
+              // Botones
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
                     ),
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      _discountValue = double.tryParse(value) ?? 0.0;
-                    });
-                  },
-                ),
+                  const SizedBox(width: DesignTokens.spacingSm),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _productoSeleccionado == null ? null : _agregarProducto,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: DesignTokens.primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Agregar'),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ],
-        ),
-      ],
-    );
-  }
-
-  /// Construye el método de pago
-  Widget _buildPaymentMethod() {
-    return Row(
-      children: [
-        Text(
-          'Método de pago:',
-          style: TextStyle(
-            fontSize: DesignTokens.fontSizeMd,
-            color: DesignTokens.textSecondaryColor,
           ),
         ),
-        const SizedBox(width: DesignTokens.spacingMd),
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            initialValue: _selectedPaymentMethod,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(
-                  DesignTokens.borderRadiusMd,
-                ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.spacingMd,
-                vertical: DesignTokens.spacingSm,
-              ),
-            ),
-            items: ['Efectivo', 'Tarjeta', 'Transferencia', 'Móvil'].map((
-              method,
-            ) {
-              return DropdownMenuItem(value: method, child: Text(method));
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                _selectedPaymentMethod = value!;
-              });
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Construye el botón de finalizar venta
-  Widget _buildFinishSaleButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _cartItems.isEmpty || loadingState.isLoading
-            ? null
-            : _finishSale,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: DesignTokens.primaryColor,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingMd),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-          ),
-        ),
-        child: loadingState.isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : Text(
-                'Finalizar Venta - ₡${_total.toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: DesignTokens.fontSizeLg,
-                  fontWeight: DesignTokens.fontWeightBold,
-                ),
-              ),
       ),
     );
   }
 
-  /// Agrega un producto al carrito
-  void _addToCart(Map<String, dynamic> product) {
-    final existingIndex = _cartItems.indexWhere(
-      (item) => item['id'] == product['id'],
-    );
+  void _agregarProducto() {
+    if (_productoSeleccionado == null) return;
 
-    setState(() {
-      if (existingIndex != -1) {
-        // Incrementar cantidad
-        _cartItems[existingIndex]['quantity']++;
-        _cartItems[existingIndex]['total'] =
-            _cartItems[existingIndex]['quantity'] *
-            _cartItems[existingIndex]['price'];
-      } else {
-        // Agregar nuevo item
-        _cartItems.add({
-          'id': product['id'],
-          'name': product['name'],
-          'price': product['price'],
-          'quantity': 1,
-          'total': product['price'],
-        });
-      }
-    });
-  }
+    final cantidad = int.tryParse(_cantidadController.text) ?? 1;
+    final precio = double.tryParse(_precioController.text) ?? 0.0;
 
-  /// Remueve un producto del carrito
-  void _removeFromCart(String productId) {
-    setState(() {
-      _cartItems.removeWhere((item) => item['id'] == productId);
-    });
-  }
+    if (cantidad <= 0 || precio <= 0) return;
 
-  /// Finaliza la venta
-  void _finishSale() async {
-    if (_customerNameController.text.trim().isEmpty) {
-      ErrorService().showErrorSnackBar(
-        context,
-        'Por favor ingresa el nombre del cliente',
-      );
-      return;
-    }
-
-    await executeWithErrorHandling(() async {
-      // Simular procesamiento
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Mostrar confirmación
-      if (mounted) {
-        ErrorService().showSuccessSnackBar(
-          context,
-          'Venta completada - Total: ₡${_total.toStringAsFixed(0)}',
-        );
-
-        // Regresar al dashboard
-        context.go('/dashboard');
-      }
-    });
+    widget.onAgregar(_productoSeleccionado!, cantidad, precio);
+    Navigator.pop(context);
   }
 }

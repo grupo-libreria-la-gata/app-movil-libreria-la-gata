@@ -50,4 +50,16 @@ class MarcaService {
       throw Exception('Error al desactivar marca: ${response.body}');
     }
   }
+
+  Future<List<Marca>> buscarPorNombre(String nombre) async {
+    final url = Uri.parse('$baseUrl/activos/buscar?nombre=$nombre');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => Marca.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al buscar marcas: ${response.body}');
+    }
+  }
 }

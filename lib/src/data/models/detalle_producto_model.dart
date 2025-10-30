@@ -31,9 +31,7 @@ class DetalleProducto {
       costo: (json['costo'] ?? 0.0).toDouble(),
       precio: (json['precio'] ?? 0.0).toDouble(),
       stock: json['stock'] ?? 0,
-      fechaCreacion: DateTime.parse(
-        json['fechaCreacion'] ?? DateTime.now().toIso8601String(),
-      ),
+      fechaCreacion: DateTime.parse(json['fechaCreacion'] ?? DateTime.now().toIso8601String()),
     );
   }
 
@@ -49,6 +47,17 @@ class DetalleProducto {
       'stock': stock,
       'fechaCreacion': fechaCreacion.toIso8601String(),
     };
+  }
+
+  // Propiedades calculadas
+  bool get isLowStock => stock <= 5; // Consideramos stock bajo si es <= 5
+  bool get isOutOfStock => stock == 0;
+  bool get isAvailable => stock > 5;
+
+  String get stockStatus {
+    if (isOutOfStock) return 'Agotado';
+    if (isLowStock) return 'Stock Bajo';
+    return 'Disponible';
   }
 
   DetalleProducto copyWith({

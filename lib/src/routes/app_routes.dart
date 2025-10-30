@@ -9,25 +9,29 @@ import '../presentation/pages/auth/email_verification_page.dart';
 import '../presentation/pages/products/products_page.dart';
 import '../presentation/pages/products/product_detail_page.dart';
 import '../presentation/pages/sales/new_sale_page.dart';
-import '../presentation/pages/sales/sales_history_page.dart';
+import '../presentation/pages/sales/sales_page.dart';
+import '../presentation/pages/sales/sale_detail_page.dart';
 import '../presentation/pages/customers/customers_page.dart';
+import '../presentation/pages/customers/create_customer_page.dart';
+import '../presentation/pages/customers/edit_customer_page.dart';
+import '../data/models/cliente_model.dart';
 import '../presentation/pages/inventory/inventory_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/admin/admin_page.dart';
 import '../presentation/pages/brand_management/brand_management_page.dart';
 import '../presentation/pages/category_management/category_management_page.dart';
 import '../presentation/pages/producto_management/product_management_page.dart';
-import '../presentation/pages/compras/compras_page.dart';
-import '../presentation/pages/compras/nueva_compra_page.dart';
-import '../presentation/pages/compras/compra_detail_page.dart';
-import '../presentation/pages/compras/compras_reports_page.dart';
-import '../presentation/pages/proveedores/proveedores_page.dart';
-import '../presentation/pages/proveedores/crear_proveedor_page.dart';
-import '../presentation/pages/proveedores/editar_proveedor_page.dart';
+import '../presentation/pages/purchases/purchases_page.dart';
+import '../presentation/pages/purchases/new_purchase_page.dart';
+import '../presentation/pages/purchases/purchase_detail_page.dart';
+import '../presentation/pages/purchases/purchases_reports_page.dart';
+import '../presentation/pages/suppliers/suppliers_page.dart';
+import '../presentation/pages/suppliers/create_supplier_page.dart';
+import '../presentation/pages/suppliers/edit_supplier_page.dart';
 import '../data/models/proveedor_model.dart';
-import '../presentation/pages/detalle_productos/detalle_productos_page.dart';
 import '../presentation/pages/reports/reports_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
+import '../presentation/layouts/page_wrapper.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -37,36 +41,49 @@ class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String emailVerification = '/email-verification';
 
-  // Productos
+  // Products
   static const String products = '/products';
   static const String productDetail = '/products/:id';
   static const String newProduct = '/products/new';
   static const String editProduct = '/products/:id/edit';
 
-  // Ventas
+  // Sales
   static const String sales = '/sales';
   static const String newSale = '/sales/new';
   static const String saleDetail = '/sales/:id';
 
-  // Inventario
+  // Purchases
+  static const String purchases = '/purchases';
+  static const String newPurchase = '/purchases/new';
+  static const String purchaseDetail = '/purchases/:id';
+  static const String purchasesReports = '/purchases/reports';
+
+  // Inventory
   static const String inventory = '/inventory';
+  static const String productDetails = '/product-details';
 
-  // Clientes
+  // Customers
   static const String customers = '/customers';
-  static const String customerDetail = '/customers/:id';
+  static const String createCustomer = '/customers/create';
+  static const String editCustomer = '/customers/:id/edit';
 
-  // Reportes
+  // Suppliers
+  static const String suppliers = '/suppliers';
+  static const String createSupplier = '/suppliers/create';
+  static const String editSupplier = '/suppliers/:id/edit';
+
+  // Reports
   static const String reports = '/reports';
 
-  // Usuarios
+  // Users
   static const String users = '/users';
   static const String userDetail = '/users/:id';
 
-  // Configuración
+  // Settings
   static const String settings = '/settings';
-  static const String profile = '/profile';
 
-  // Administración
+  // Admin
+  static const String profile = '/profile';
   static const String admin = '/admin';
 
   static GoRouter get router => GoRouter(
@@ -95,7 +112,11 @@ class AppRoutes {
       GoRoute(
         path: register,
         name: 'register',
-        builder: (context, state) => const RegisterPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'Crear Cuenta',
+          child: RegisterPage(),
+        ),
       ),
       GoRoute(
         path: forgotPassword,
@@ -116,7 +137,11 @@ class AppRoutes {
       GoRoute(
         path: products,
         name: 'products',
-        builder: (context, state) => const ProductsPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 3,
+          title: 'Products',
+          child: ProductsPage(),
+        ),
       ),
       GoRoute(
         path: newProduct,
@@ -147,106 +172,172 @@ class AppRoutes {
         },
       ),
 
-      // Compras
+      // Purchases
       GoRoute(
-        path: '/compras',
-        name: 'compras',
-        builder: (context, state) => const ComprasPage(),
+        path: purchases,
+        name: 'purchases',
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 2,
+          title: 'Purchases',
+          child: PurchasesPage(),
+        ),
       ),
       GoRoute(
-        path: '/compras/nueva',
-        name: 'nuevaCompra',
-        builder: (context, state) => const NuevaCompraPage(),
+        path: newPurchase,
+        name: 'newPurchase',
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 2,
+          title: 'New Purchase',
+          child: NewPurchasePage(),
+        ),
       ),
       GoRoute(
-        path: '/compras/:id',
-        name: 'compraDetail',
+        path: purchaseDetail,
+        name: 'purchaseDetail',
         builder: (context, state) {
-          final compraId = state.pathParameters['id']!;
-          return CompraDetailPage(compraId: int.parse(compraId));
+          final purchaseId = state.pathParameters['id']!;
+          return PageWrapper(
+            currentIndex: 2,
+            title: 'Detalle de Compra',
+            child: PurchaseDetailPage(compraId: int.parse(purchaseId)),
+          );
         },
       ),
       GoRoute(
-        path: '/compras/reportes',
-        name: 'comprasReports',
-        builder: (context, state) => const ComprasReportsPage(),
+        path: purchasesReports,
+        name: 'purchasesReports',
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 2,
+          title: 'Reportes de Compras',
+          child: PurchasesReportsPage(),
+        ),
       ),
 
-      // Proveedores
+      // Suppliers
       GoRoute(
-        path: '/proveedores',
-        name: 'proveedores',
-        builder: (context, state) => const ProveedoresPage(),
+        path: suppliers,
+        name: 'suppliers',
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 1,
+          title: 'Suppliers',
+          child: SuppliersPage(),
+        ),
       ),
       GoRoute(
-        path: '/proveedores/nuevo',
-        name: 'nuevoProveedor',
-        builder: (context, state) => const CrearProveedorPage(),
+        path: createSupplier,
+        name: 'createSupplier',
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 1,
+          title: 'Crear Proveedor',
+          child: CreateSupplierPage(),
+        ),
       ),
       GoRoute(
-        path: '/proveedores/editar',
-        name: 'editarProveedor',
+        path: editSupplier,
+        name: 'editSupplier',
         builder: (context, state) {
-          final proveedor = state.extra as Proveedor;
-          return EditarProveedorPage(proveedor: proveedor);
+          final supplier = state.extra as Proveedor;
+          return PageWrapper(
+            currentIndex: 1,
+            title: 'Editar Proveedor',
+            child: EditSupplierPage(supplier: supplier),
+          );
         },
       ),
 
-      // Detalle de Productos
-      GoRoute(
-        path: '/detalle-productos',
-        name: 'detalleProductos',
-        builder: (context, state) => const DetalleProductosPage(),
-      ),
+      // Product Details
+      // GoRoute(
+      //   path: productDetails,
+      //   name: 'productDetails',
+      //   builder: (context, state) {
+      //     final detalleProductoId = int.parse(state.pathParameters['id'] ?? '0');
+      //     return PageWrapper(
+      //       currentIndex: 3,
+      //       title: 'Detalles de Producto',
+      //       child: InventoryDetailPage(detalleProductoId: detalleProductoId),
+      //     );
+      //   },
+      // ),
 
-      // Ventas
+      // Sales
       GoRoute(
         path: newSale,
         name: 'newSale',
-        builder: (context, state) => const NewSalePage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'New Sale',
+          child: NewSalePage(),
+        ),
       ),
       GoRoute(
         path: sales,
         name: 'sales',
-        builder: (context, state) => const SalesHistoryPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'Sales',
+          child: SalesPage(),
+        ),
       ),
       GoRoute(
         path: saleDetail,
         name: 'saleDetail',
         builder: (context, state) {
-          final saleId = state.pathParameters['id']!;
-          return Scaffold(
-            appBar: AppBar(title: Text('Venta $saleId')),
-            body: Center(
-              child: Text('Detalle de venta $saleId - En desarrollo'),
-            ),
+          final saleId = int.parse(state.pathParameters['id']!);
+          return PageWrapper(
+            currentIndex: 0,
+            title: 'Detalle de Venta',
+            child: SaleDetailPage(ventaId: saleId),
           );
         },
       ),
 
-      // Inventario
+      // Inventory
       GoRoute(
         path: inventory,
         name: 'inventory',
-        builder: (context, state) => const InventoryPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 3,
+          title: 'Inventory',
+          child: InventoryPage(),
+        ),
       ),
 
-      // Clientes
+      // Customers
       GoRoute(
         path: customers,
         name: 'customers',
-        builder: (context, state) => const CustomersPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 1,
+          title: 'Customers',
+          child: CustomersPage(),
+        ),
       ),
       GoRoute(
-        path: customerDetail,
-        name: 'customerDetail',
+        path: createCustomer,
+        name: 'createCustomer',
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 1,
+          title: 'Crear Cliente',
+          child: CreateCustomerPage(),
+        ),
+      ),
+      GoRoute(
+        path: editCustomer,
+        name: 'editCustomer',
         builder: (context, state) {
-          final customerId = state.pathParameters['id']!;
-          return Scaffold(
-            appBar: AppBar(title: Text('Cliente $customerId')),
-            body: Center(
-              child: Text('Detalle del cliente $customerId - En desarrollo'),
-            ),
+          final customerId = int.parse(state.pathParameters['id']!);
+          final customer = Cliente(
+            clienteId: customerId,
+            nombre: '',
+            telefono: '',
+            email: '',
+            direccion: '',
+            activo: true,
+          );
+          return PageWrapper(
+            currentIndex: 1,
+            title: 'Editar Cliente',
+            child: EditCustomerPage(customer: customer),
           );
         },
       ),
@@ -277,49 +368,77 @@ class AppRoutes {
       GoRoute(
         path: settings,
         name: 'settings',
-        builder: (context, state) => const SettingsPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'Configuración',
+          child: SettingsPage(),
+        ),
       ),
 
       // Administración
       GoRoute(
         path: admin,
         name: 'admin',
-        builder: (context, state) => const AdminPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'Administración',
+          child: AdminPage(),
+        ),
       ),
 
       // Perfil
       GoRoute(
         path: profile,
         name: 'profile',
-        builder: (context, state) => const ProfilePage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'Perfil',
+          child: ProfilePage(),
+        ),
       ),
 
       // brand management
       GoRoute(
         path: '/admin/brands',
         name: 'brandManagement',
-        builder: (context, state) => const BrandManagementPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'Gestión de Marcas',
+          child: BrandManagementPage(),
+        ),
       ),
 
       // category management
       GoRoute(
         path: '/admin/categories',
         name: 'categoryManagement',
-        builder: (context, state) => const CategoryManagementPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'Gestión de Categorías',
+          child: CategoryManagementPage(),
+        ),
       ),
 
       // producto magement
       GoRoute(
         path: '/admin/products',
         name: 'productManagement',
-        builder: (context, state) => const ProductManagementPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 0,
+          title: 'Gestión de Productos',
+          child: ProductManagementPage(),
+        ),
       ),
 
       // Reportes
       GoRoute(
         path: reports,
         name: 'reports',
-        builder: (context, state) => const ReportsPage(),
+        builder: (context, state) => const PageWrapper(
+          currentIndex: 3,
+          title: 'Reportes',
+          child: ReportsPage(),
+        ),
       ),
     ],
   );

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 import '../../../core/design/design_tokens.dart';
 import '../../providers/auth_provider.dart';
 
@@ -18,8 +15,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
   bool _obscurePassword = true;
-  bool _rememberMe = false;
 
   @override
   void dispose() {
@@ -28,289 +25,332 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.dispose();
   }
 
-  void _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text.trim().toLowerCase();
-      final password = _passwordController.text;
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
 
-      final url = Uri.parse('http://localhost:5044/api/Auth/login');
+    setState(() => _isLoading = true);
 
-      try {
-        // Debug logging removed for production
+    try {
+      final authNotifier = ref.read(authProvider.notifier);
+      await authNotifier.signIn(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
 
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'email': email, 'passwordHash': password}),
+      if (mounted) {
+        context.go('/dashboard');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al iniciar sesión: $e'),
+            backgroundColor: DesignTokens.errorColor,
+          ),
         );
-
-        // Debug logging removed for production
-
-        if (response.statusCode == 200) {
-          // Debug logging removed for production
-
-          final authNotifier = ref.read(authProvider.notifier);
-          authNotifier.signInWithEmailAndPassword(email, password);
-        } else {
-          final error =
-              jsonDecode(response.body)['message'] ??
-              'Credenciales incorrectas';
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error), backgroundColor: Colors.red),
-            );
-          }
-        }
-      } catch (e) {
-        // Debug logging removed for production
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error de conexión con la API'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AuthState>(authProvider, (previous, next) {
-      if (next.isAuthenticated && !next.isLoading) {
-        context.go('/dashboard');
-      }
-
-      if (next.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
-        );
-        ref.read(authProvider.notifier).clearError();
-      }
-    });
-
     return Scaffold(
-      backgroundColor: DesignTokens.backgroundColor,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 40),
-                _buildHeader(),
-                const SizedBox(height: 48),
-                _buildLoginForm(),
-                const SizedBox(height: 24),
-                _buildLoginButton(),
-                const SizedBox(height: 32),
-                _buildAdditionalLinks(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            gradient: DesignTokens.primaryGradient,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: DesignTokens.elevatedShadow,
-          ),
-          child: const Icon(Icons.local_bar, size: 40, color: Colors.white),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          '¡Bienvenido a La Gata!',
-          style: TextStyle(
-            fontSize: DesignTokens.fontSize3xl,
-            fontWeight: DesignTokens.fontWeightBold,
-            color: DesignTokens.textPrimaryColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Sistema de Facturación',
-          style: TextStyle(
-            fontSize: DesignTokens.fontSizeLg,
-            color: DesignTokens.textSecondaryColor,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLoginForm() {
-    return Column(
-      children: [
-        TextFormField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          style: TextStyle(color: DesignTokens.textPrimaryColor),
-          decoration: InputDecoration(
-            labelText: 'Correo electrónico',
-            labelStyle: TextStyle(color: DesignTokens.textPrimaryColor),
-            hintText: 'ejemplo@correo.com',
-            hintStyle: TextStyle(color: DesignTokens.textSecondaryColor),
-            prefixIcon: Icon(
-              Icons.email,
-              color: DesignTokens.textSecondaryColor,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              borderSide: BorderSide(color: DesignTokens.dividerColor),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              borderSide: BorderSide(color: DesignTokens.dividerColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              borderSide: BorderSide(
-                color: DesignTokens.primaryColor,
-                width: 2,
-              ),
-            ),
-            filled: true,
-            fillColor: DesignTokens.cardColor,
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa tu correo electrónico';
-            }
-            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-              return 'Por favor ingresa un correo electrónico válido';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _passwordController,
-          obscureText: _obscurePassword,
-          style: TextStyle(color: DesignTokens.textPrimaryColor),
-          decoration: InputDecoration(
-            labelText: 'Contraseña',
-            labelStyle: TextStyle(color: DesignTokens.textPrimaryColor),
-            hintText: 'Ingresa tu contraseña',
-            hintStyle: TextStyle(color: DesignTokens.textSecondaryColor),
-            prefixIcon: Icon(
-              Icons.lock,
-              color: DesignTokens.textSecondaryColor,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                color: DesignTokens.textSecondaryColor,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              borderSide: BorderSide(color: DesignTokens.dividerColor),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              borderSide: BorderSide(color: DesignTokens.dividerColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-              borderSide: BorderSide(
-                color: DesignTokens.primaryColor,
-                width: 2,
-              ),
-            ),
-            filled: true,
-            fillColor: DesignTokens.cardColor,
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor ingresa tu contraseña';
-            }
-            if (value.length < 6) {
-              return 'La contraseña debe tener al menos 6 caracteres';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Checkbox(
-              value: _rememberMe,
-              onChanged: (value) {
-                setState(() {
-                  _rememberMe = value ?? false;
-                });
-              },
-              activeColor: DesignTokens.primaryColor,
-            ),
-            const Text('Recordarme'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLoginButton() {
-    final authState = ref.watch(authProvider);
-
-    return SizedBox(
-      height: 50,
-      child: ElevatedButton(
-        onPressed: authState.isLoading ? null : _handleLogin,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: DesignTokens.primaryColor,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
-          ),
-        ),
-        child: authState.isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          child: Column(
+            children: [
+              // Parte blanca superior
+              Container(
+                height: MediaQuery.of(context).size.height * 0.35,
+                width: double.infinity,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Logo
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: DesignTokens.primaryColor,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.local_bar, // Icono de copita para licorería
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Nombre de la app
+                      const Text(
+                        'LA GATA',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: DesignTokens.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              )
-            : const Text(
-                'Iniciar Sesión',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
-      ),
-    );
-  }
-
-  Widget _buildAdditionalLinks() {
-    return Column(
-      children: [
-        TextButton(
-          onPressed: () => context.go('/forgot-password'),
-          child: Text(
-            '¿Olvidaste tu contraseña?',
-            style: TextStyle(
-              color: DesignTokens.primaryColor,
-              fontWeight: DesignTokens.fontWeightMedium,
-            ),
+              // Parte amarilla inferior
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: DesignTokens.primaryColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Título
+                      const Text(
+                        'Bienvenido',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: DesignTokens.surfaceColor,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Inicia sesión en tu cuenta',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: DesignTokens.surfaceColor,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Formulario
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            // Email
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Correo Electrónico',
+                                  style: TextStyle(
+                                    color: DesignTokens.surfaceColor,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 15,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'admin@lagata.com',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 15,
+                                    ),
+                                    filled: true,
+                                    fillColor: DesignTokens.surfaceColor,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 14,
+                                    ),
+                                    prefixIcon: const Icon(
+                                      Icons.email_outlined,
+                                      color: Colors.grey,
+                                      size: 18,
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor ingrese su email';
+                                    }
+                                    if (!value.contains('@')) {
+                                      return 'Por favor ingrese un email válido';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            // Password
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Contraseña',
+                                  style: TextStyle(
+                                    color: DesignTokens.surfaceColor,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  controller: _passwordController,
+                                  obscureText: _obscurePassword,
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 15,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: 'Ingresa tu contraseña',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 15,
+                                    ),
+                                    filled: true,
+                                    fillColor: DesignTokens.surfaceColor,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 14,
+                                    ),
+                                    prefixIcon: const Icon(
+                                      Icons.lock_outline,
+                                      color: Colors.grey,
+                                      size: 18,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                        color: Colors.grey,
+                                        size: 18,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Por favor ingrese su contraseña';
+                                    }
+                                    if (value.length < 6) {
+                                      return 'La contraseña debe tener al menos 6 caracteres';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            // Forgot Password
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  context.push('/forgot-password');
+                                },
+                                child: const Text(
+                                  '¿Olvidaste tu contraseña?',
+                                  style: TextStyle(
+                                    color: DesignTokens.warningColor,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Login Button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 48,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _login,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: DesignTokens.primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  elevation: 6,
+                                  shadowColor: Colors.black.withValues(alpha: 0.15),
+                                ),
+                                child: _isLoading
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: DesignTokens.primaryColor,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'INICIAR SESIÓN',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1.0,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Forgot Password link
+                            Center(
+                              child: TextButton(
+                                onPressed: () {
+                                  context.push('/forgot-password');
+                                },
+                                child: const Text(
+                                  '¿Olvidaste tu contraseña?',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

@@ -10,65 +10,27 @@ class DetalleProductoService {
     final url = Uri.parse('$baseUrl/activos');
     final response = await http.get(url);
 
-    // Debug logging removed for production
-
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => DetalleProducto.fromJson(json)).toList();
     } else {
-      throw Exception(
-        'Error al obtener detalles de productos activos: ${response.body}',
-      );
-    }
-  }
-
-  /// Obtener todos los detalles de productos
-  Future<List<DetalleProducto>> obtenerTodos() async {
-    final url = Uri.parse(baseUrl);
-    final response = await http.get(url);
-
-    // Debug logging removed for production
-    // Debug logging removed for production
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map((json) => DetalleProducto.fromJson(json)).toList();
-    } else {
-      throw Exception(
-        'Error al obtener detalles de productos: ${response.body}',
-      );
+      throw Exception('Error al obtener inventario: ${response.body}');
     }
   }
 
   /// Obtener detalle de producto por ID
-  Future<DetalleProducto> obtenerPorId(int detalleProductoId) async {
+  Future<DetalleProducto?> obtenerPorId(int detalleProductoId) async {
     final url = Uri.parse('$baseUrl/$detalleProductoId');
     final response = await http.get(url);
 
-    // Debug logging removed for production
-    // Debug logging removed for production
-
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return DetalleProducto.fromJson(data);
+      final List<dynamic> data = jsonDecode(response.body);
+      if (data.isNotEmpty) {
+        return DetalleProducto.fromJson(data.first);
+      }
+      return null;
     } else {
       throw Exception('Error al obtener detalle de producto: ${response.body}');
-    }
-  }
-
-  /// Actualizar stock de un detalle de producto
-  Future<void> actualizarStock(int detalleProductoId, int nuevoStock) async {
-    final url = Uri.parse('$baseUrl/$detalleProductoId/stock');
-    final response = await http.put(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'stock': nuevoStock}),
-    );
-
-    // Debug logging removed for production
-
-    if (response.statusCode != 200) {
-      throw Exception('Error al actualizar stock: ${response.body}');
     }
   }
 
@@ -77,15 +39,21 @@ class DetalleProductoService {
     final url = Uri.parse('$baseUrl/buscar?nombre=$nombre');
     final response = await http.get(url);
 
-    // Debug logging removed for production
-
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => DetalleProducto.fromJson(json)).toList();
     } else {
-      throw Exception(
-        'Error al buscar detalles de productos: ${response.body}',
-      );
+      throw Exception('Error al buscar inventario: ${response.body}');
+    }
+  }
+
+  /// Ajustar stock de un producto
+  Future<void> ajustarStock(int detalleProductoId, int cantidad, int usuarioId) async {
+    final url = Uri.parse('$baseUrl/ajustar-stock?detalleProductoId=$detalleProductoId&cantidad=$cantidad&usuarioId=$usuarioId');
+    final response = await http.post(url);
+
+    if (response.statusCode != 204) {
+      throw Exception('Error al ajustar stock: ${response.body}');
     }
   }
 }

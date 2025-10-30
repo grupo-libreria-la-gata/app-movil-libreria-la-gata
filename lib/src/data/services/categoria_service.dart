@@ -53,4 +53,16 @@ class CategoriaService {
       throw Exception('Error al desactivar categoría: ${response.body}');
     }
   }
+
+  Future<List<Categoria>> buscarPorNombre(String nombre) async {
+    final url = Uri.parse('$baseUrl/activos/buscar?nombre=$nombre');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => Categoria.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al buscar categorías: ${response.body}');
+    }
+  }
 }
