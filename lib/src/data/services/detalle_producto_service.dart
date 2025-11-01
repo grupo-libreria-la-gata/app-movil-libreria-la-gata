@@ -57,4 +57,40 @@ class DetalleProductoService {
       throw Exception('Error al ajustar stock: ${response.body}');
     }
   }
+
+  /// Crear un nuevo DetalleProducto
+  Future<DetalleProducto> crearDetalleProducto({
+    required int productoId,
+    required int categoriaId,
+    required int marcaId,
+    String? codigoBarra,
+    required double costo,
+    required double precio,
+    required int stock,
+    required int usuarioId,
+  }) async {
+    final url = Uri.parse(baseUrl);
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'productoId': productoId,
+        'categoriaId': categoriaId,
+        'marcaId': marcaId,
+        'codigoBarra': codigoBarra ?? '',
+        'costo': costo,
+        'precio': precio,
+        'stock': stock,
+        'usuarioId': usuarioId,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return DetalleProducto.fromJson(data);
+    } else {
+      final errorBody = jsonDecode(response.body);
+      throw Exception(errorBody['message'] ?? 'Error al crear producto: ${response.body}');
+    }
+  }
 }

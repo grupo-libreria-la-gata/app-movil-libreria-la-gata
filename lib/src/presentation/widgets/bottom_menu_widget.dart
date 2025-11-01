@@ -20,10 +20,10 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
   int? _expandedIndex;
 
   int? _computeActiveIndex(BuildContext context) {
-    final location = GoRouter.of(context).routeInformationProvider.value.location;
+    final location = GoRouter.of(context).routeInformationProvider.value.uri.path;
     if (location.startsWith('/purchases') || location.startsWith('/sales')) return 0; // Transacciones
     if (location.startsWith('/customers') || location.startsWith('/suppliers')) return 1; // Relaciones
-    if (location.startsWith('/inventory') || location.startsWith('/reports')) return 2; // Resumen
+    if (location.startsWith('/inventory') || location.startsWith('/reports') || location.startsWith('/warehouse')) return 2; // Resumen
     if (location.startsWith('/admin')) return 3; // Administración
     return null; // Ninguno activo (home, perfil, etc.)
   }
@@ -93,7 +93,7 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
     required String label,
     required bool isActive,
   }) {
-    final button = GestureDetector(
+    return GestureDetector(
       onTap: () {
         if (index == 3) {
           // Administración navega directo
@@ -109,27 +109,31 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: isActive ? DesignTokens.primaryColor.withValues(alpha: 0.12) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(
-          icon,
-          color: isActive ? DesignTokens.primaryColor : DesignTokens.textPrimaryColor,
-          size: 24,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isActive ? DesignTokens.primaryColor : DesignTokens.textPrimaryColor,
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? DesignTokens.primaryColor : DesignTokens.textPrimaryColor,
+                fontSize: 10,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
         ),
       ),
-    );
-
-    return Tooltip(
-      message: label,
-      decoration: BoxDecoration(
-        color: DesignTokens.primaryColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      textStyle: TextStyle(color: DesignTokens.surfaceColor, fontSize: 12),
-      child: button,
     );
   }
 
@@ -184,6 +188,11 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
             icon: Icons.inventory,
             label: 'Inventario',
             onTap: () => context.push('/inventory'),
+          ),
+          _buildSubmenuItem(
+            icon: Icons.warehouse,
+            label: 'Almacén',
+            onTap: () => context.push('/warehouse'),
           ),
           _buildSubmenuItem(
             icon: Icons.analytics,

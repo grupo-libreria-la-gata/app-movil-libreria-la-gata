@@ -31,6 +31,7 @@ import '../presentation/pages/suppliers/edit_supplier_page.dart';
 import '../data/models/proveedor_model.dart';
 import '../presentation/pages/reports/reports_page.dart';
 import '../presentation/pages/settings/settings_page.dart';
+import '../presentation/pages/warehouse/warehouse_page.dart';
 import '../presentation/layouts/page_wrapper.dart';
 
 class AppRoutes {
@@ -62,6 +63,9 @@ class AppRoutes {
   static const String inventory = '/inventory';
   static const String inventoryDetail = '/inventory/:id';
   static const String productDetails = '/product-details';
+  
+  // Warehouse (Almacén)
+  static const String warehouse = '/warehouse';
 
   // Customers
   static const String customers = '/customers';
@@ -430,10 +434,17 @@ class AppRoutes {
         path: reports,
         name: 'reports',
         builder: (context, state) => const PageWrapper(
-          currentIndex: 3,
+          currentIndex: 2,
           title: 'Reportes',
           child: ReportsPage(),
         ),
+      ),
+      
+      // Almacén
+      GoRoute(
+        path: warehouse,
+        name: 'warehouse',
+        builder: (context, state) => const WarehousePage(),
       ),
     ],
   );

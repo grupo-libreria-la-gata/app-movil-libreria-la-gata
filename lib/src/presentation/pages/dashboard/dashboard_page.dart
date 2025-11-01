@@ -12,6 +12,7 @@ import '../../../data/services/venta_service.dart';
 import '../../../data/services/compra_service.dart';
 import '../../../data/services/detalle_producto_service.dart';
 import '../../../data/models/venta_model.dart';
+import '../../../data/models/compra_model.dart';
 import '../../../data/models/detalle_producto_model.dart';
 
 /// Página principal del dashboard del sistema de facturación
@@ -29,7 +30,21 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   Map<String, dynamic>? _ventasResumen;
   Map<String, dynamic>? _comprasResumen;
   List<VentaListResponse> _ultimasVentas = [];
+  List<CompraListResponse> _ultimasCompras = [];
   List<DetalleProducto> _productosStockBajo = [];
+  
+  // Estructura para combinar facturas
+  Map<String, dynamic> _crearFacturaItem(String tipo, int id, String nombre, double total, DateTime fecha) {
+    return {
+      'tipo': tipo,
+      'id': id,
+      'nombre': nombre,
+      'total': total,
+      'fecha': fecha,
+    };
+  }
+  
+  List<Map<String, dynamic>> _facturasCombinadas = [];
   
   // Servicios
   final _ventaService = VentaService();
@@ -58,6 +73,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         _ventaService.obtenerResumen(inicioDia, finDia, usuarioId).catchError((e) => <String, dynamic>{}),
         _compraService.obtenerResumen(inicioDia, finDia, usuarioId).catchError((e) => <String, dynamic>{}),
         _ventaService.obtenerPorFechas(inicioDia, finDia, usuarioId).catchError((e) => <VentaListResponse>[]),
+        _compraService.obtenerPorFechas(inicioDia, finDia, usuarioId).catchError((e) => <CompraListResponse>[]),
         _productoService.obtenerActivos().catchError((e) => <DetalleProducto>[]),
       ]);
       
@@ -66,12 +82,37 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           _ventasResumen = resultados[0] as Map<String, dynamic>?;
           _comprasResumen = resultados[1] as Map<String, dynamic>?;
           _ultimasVentas = resultados[2] as List<VentaListResponse>;
-          final productos = resultados[3] as List<DetalleProducto>;
+          _ultimasCompras = resultados[3] as List<CompraListResponse>;
+          final productos = resultados[4] as List<DetalleProducto>;
           
           // Filtrar productos con stock bajo (stock <= 10)
           _productosStockBajo = productos.where((p) => 
             p.stock <= 10
           ).toList();
+          
+          // Combinar facturas de compra y venta
+          _facturasCombinadas = [
+            ..._ultimasVentas.map((v) => _crearFacturaItem(
+              'venta',
+              v.ventaId,
+              v.clienteNombre,
+              v.total,
+              v.fechaVenta,
+            )),
+            ..._ultimasCompras.map((c) => _crearFacturaItem(
+              'compra',
+              c.compraId,
+              c.proveedorNombre,
+              c.total,
+              c.fechaCompra,
+            )),
+          ];
+          
+          // Ordenar por fecha descendente (más recientes primero)
+          _facturasCombinadas.sort((a, b) => (b['fecha'] as DateTime).compareTo(a['fecha'] as DateTime));
+          
+          // Limitar a las últimas 5
+          _facturasCombinadas = _facturasCombinadas.take(5).toList();
           
           _isLoading = false;
         });
@@ -654,6 +695,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     // Si no hay datos, mostrar placeholder
     if (total == 0) {
       metodosPago['efectivo'] = 1;
+    } else {
+      // No hacer nada si hay datos
     }
     
     final sections = <PieChartSectionData>[];
@@ -755,10 +798,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  /// Lista de últimas 5 facturas emitidas
+  /// Lista de últimas 5 facturas emitidas (compras y ventas)
   Widget _buildRecentInvoices(BuildContext context) {
     final responsiveHelper = ResponsiveHelper.instance;
-    final ultimas5Ventas = _ultimasVentas.take(5).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -785,7 +827,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: DesignTokens.borderLightColor),
           ),
-          child: ultimas5Ventas.isEmpty
+          child: _facturasCombinadas.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Center(
@@ -801,38 +843,76 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               : ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: ultimas5Ventas.length,
+                  itemCount: _facturasCombinadas.length,
                   separatorBuilder: (_, __) =>
                       Divider(height: 1, color: DesignTokens.borderLightColor),
                   itemBuilder: (context, index) {
-                    final venta = ultimas5Ventas[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: DesignTokens.primaryColor.withValues(
-                          alpha: 0.12,
+                    final factura = _facturasCombinadas[index];
+                    final esVenta = factura['tipo'] == 'venta';
+                    final facturaId = factura['id'] as int;
+                    final nombre = factura['nombre'] as String;
+                    final total = factura['total'] as double;
+                    return InkWell(
+                      onTap: () {
+                        if (esVenta) {
+                          context.push('/sales/$facturaId');
+                        } else {
+                          context.push('/purchases/$facturaId');
+                        }
+                      },
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: esVenta
+                              ? DesignTokens.successColor.withValues(alpha: 0.12)
+                              : DesignTokens.infoColor.withValues(alpha: 0.12),
+                          child: Icon(
+                            esVenta ? Icons.receipt_long : Icons.shopping_cart,
+                            color: esVenta ? DesignTokens.successColor : DesignTokens.infoColor,
+                            size: 18,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.receipt,
-                          color: DesignTokens.primaryColor,
-                          size: 18,
+                        title: Text(
+                          nombre,
+                          style: TextStyle(
+                            color: DesignTokens.textPrimaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      title: Text(
-                        venta.clienteNombre,
-                        style: TextStyle(
-                          color: DesignTokens.textPrimaryColor,
-                          fontWeight: FontWeight.w600,
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              esVenta 
+                                  ? 'Factura de Venta #$facturaId'
+                                  : 'Factura de Compra #$facturaId',
+                              style: TextStyle(color: DesignTokens.textSecondaryColor),
+                            ),
+                            const SizedBox(height: 2),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: esVenta
+                                    ? DesignTokens.successColor.withValues(alpha: 0.1)
+                                    : DesignTokens.infoColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                esVenta ? 'Venta' : 'Compra',
+                                style: TextStyle(
+                                  color: esVenta ? DesignTokens.successColor : DesignTokens.infoColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      subtitle: Text(
-                        'Factura #${venta.ventaId}',
-                        style: TextStyle(color: DesignTokens.textSecondaryColor),
-                      ),
-                      trailing: Text(
-                        '₡${venta.total.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          color: DesignTokens.textPrimaryColor,
-                          fontWeight: FontWeight.w600,
+                        trailing: Text(
+                          '₡${total.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            color: DesignTokens.textPrimaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     );
