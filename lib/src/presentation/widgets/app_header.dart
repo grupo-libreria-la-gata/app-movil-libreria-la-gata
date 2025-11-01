@@ -19,12 +19,27 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
     this.showUserMenu = false,
   });
 
+  /// Constructor con botón de regreso
+  const AppHeader.withBackButton({
+    super.key,
+    this.title,
+    this.showBackButton = true,
+    this.onBackPressed,
+    this.showUserMenu = false,
+  });
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AppBar(
       backgroundColor: DesignTokens.primaryColor,
       elevation: 0,
       automaticallyImplyLeading: false,
+      leading: showBackButton
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back, color: DesignTokens.textInverseColor),
+              onPressed: onBackPressed ?? () => context.pop(),
+            )
+          : null,
       title: Row(
         children: [
           GestureDetector(
@@ -33,11 +48,11 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: DesignTokens.surfaceColor,
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: DesignTokens.textPrimaryColor.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -45,7 +60,7 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
             ),
             child: const Icon(
               Icons.local_bar,
-              color: Colors.green,
+              color: DesignTokens.successColor,
               size: 20,
             ),
             ),
@@ -57,7 +72,7 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
               child: const Text(
                 'LA GATA',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: DesignTokens.surfaceColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -79,7 +94,7 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
           child: IconButton(
             icon: const Icon(
               Icons.notifications,
-              color: Colors.white,
+              color: DesignTokens.surfaceColor,
               size: 22,
             ),
             onPressed: () {
@@ -102,7 +117,7 @@ class AppHeader extends ConsumerWidget implements PreferredSizeWidget {
     
     return PopupMenuButton<String>(
       icon: CircleAvatar(
-        backgroundColor: Colors.white,
+        backgroundColor: DesignTokens.surfaceColor,
         radius: 16,
         child: Text(
           authState.user?.name.substring(0, 1).toUpperCase() ?? 'U',

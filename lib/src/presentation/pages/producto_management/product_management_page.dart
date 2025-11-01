@@ -21,6 +21,7 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
   List<Producto> _productosFiltrados = [];
   bool _loading = true;
   String _searchQuery = '';
+  bool _mostrarInactivos = false;
 
   @override
   void initState() {
@@ -29,8 +30,11 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
   }
 
   Future<void> _loadProductos() async {
+    setState(() => _loading = true);
     try {
-      final productos = await _service.obtenerActivos();
+      final productos = _mostrarInactivos
+          ? await _service.obtenerInactivos()
+          : await _service.obtenerActivos();
       setState(() {
         _productos = productos;
         _aplicarFiltros();
@@ -40,6 +44,11 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
       setState(() => _loading = false);
       _showError('Error al cargar productos');
     }
+  }
+
+  void _toggleMostrarInactivos(bool value) {
+    setState(() => _mostrarInactivos = value);
+    _loadProductos();
   }
 
   void _aplicarFiltros() async {
@@ -65,13 +74,13 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+      SnackBar(content: Text(message), backgroundColor: DesignTokens.errorColor),
     );
   }
 
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
+      SnackBar(content: Text(message), backgroundColor: DesignTokens.successColor),
     );
   }
 
@@ -143,6 +152,27 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
     }
   }
 
+  void _activarProducto(Producto producto) async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Activar Producto',
+      message: '¿Está seguro de activar el producto "${producto.nombre}"?',
+      confirmText: 'Activar',
+      icon: Icons.check_circle,
+      confirmColor: DesignTokens.successColor,
+    );
+
+    if (confirmed == true) {
+      try {
+        await _service.activarProducto(producto.productoId);
+        _showSuccess('Producto activado exitosamente');
+        await _loadProductos();
+      } catch (e) {
+        _showError('Error al activar producto');
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -150,6 +180,33 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
       backgroundColor: DesignTokens.backgroundColor,
       body: Column(
         children: [
+          // Toggle para mostrar inactivos
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DesignTokens.spacingMd,
+              vertical: DesignTokens.spacingSm,
+            ),
+            color: DesignTokens.surfaceColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  _mostrarInactivos ? 'Mostrando Inactivos' : 'Mostrando Activos',
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeSm,
+                    color: DesignTokens.textSecondaryColor,
+                  ),
+                ),
+                const SizedBox(width: DesignTokens.spacingSm),
+                Switch(
+                  value: _mostrarInactivos,
+                  onChanged: _toggleMostrarInactivos,
+                  activeTrackColor: DesignTokens.primaryColor.withValues(alpha: 0.5),
+                  activeThumbColor: DesignTokens.primaryColor,
+                ),
+              ],
+            ),
+          ),
           // Barra de búsqueda con botón agregar
           Padding(
             padding: const EdgeInsets.all(DesignTokens.spacingMd),
@@ -178,7 +235,7 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
                 FloatingActionButton.small(
                   onPressed: _crearProducto,
                   backgroundColor: DesignTokens.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: DesignTokens.textInverseColor,
                   child: const Icon(Icons.add),
                 ),
               ],
@@ -191,19 +248,25 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
                 : _productosFiltrados.isEmpty
                     ? EmptyState(
                         icon: Icons.inventory_outlined,
-                        title: _searchQuery.isNotEmpty
-                            ? 'No se encontraron productos'
-                            : 'No hay productos registrados',
-                        subtitle: _searchQuery.isNotEmpty
-                            ? 'Intenta con otro término de búsqueda'
-                            : 'Agrega tu primer producto',
+                        title: _mostrarInactivos
+                            ? (_searchQuery.isNotEmpty
+                                ? 'No se encontraron productos inactivos'
+                                : 'No hay productos inactivos')
+                            : (_searchQuery.isNotEmpty
+                                ? 'No se encontraron productos'
+                                : 'No hay productos registrados'),
+                        subtitle: _mostrarInactivos
+                            ? 'Todos los productos están activos'
+                            : (_searchQuery.isNotEmpty
+                                ? 'Intenta con otro término de búsqueda'
+                                : 'Agrega tu primer producto'),
                         action: ElevatedButton.icon(
                           onPressed: _crearProducto,
                           icon: const Icon(Icons.add),
                           label: const Text('Agregar Producto'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: DesignTokens.primaryColor,
-                            foregroundColor: Colors.white,
+                            foregroundColor: DesignTokens.textInverseColor,
                           ),
                         ),
                       )
@@ -216,20 +279,29 @@ class _ProductManagementPageState extends State<ProductManagementPage> {
                             subtitle: 'ID: ${producto.productoId}',
                             leadingIcon: Icons.inventory,
                             leadingColor: DesignTokens.successColor,
-                            actions: [
-                              CrudAction(
-                                label: 'Editar',
-                                icon: Icons.edit,
-                                onPressed: () => _editarProducto(producto),
-                                color: DesignTokens.primaryColor,
-                              ),
-                              CrudAction(
-                                label: 'Desactivar',
-                                icon: Icons.delete_outline,
-                                onPressed: () => _desactivarProducto(producto),
-                                color: DesignTokens.errorColor,
-                              ),
-                            ],
+                            actions: _mostrarInactivos
+                                ? [
+                                    CrudAction(
+                                      label: 'Activar',
+                                      icon: Icons.check_circle,
+                                      onPressed: () => _activarProducto(producto),
+                                      color: DesignTokens.successColor,
+                                    ),
+                                  ]
+                                : [
+                                    CrudAction(
+                                      label: 'Editar',
+                                      icon: Icons.edit,
+                                      onPressed: () => _editarProducto(producto),
+                                      color: DesignTokens.primaryColor,
+                                    ),
+                                    CrudAction(
+                                      label: 'Desactivar',
+                                      icon: Icons.delete_outline,
+                                      onPressed: () => _desactivarProducto(producto),
+                                      color: DesignTokens.errorColor,
+                                    ),
+                                  ],
                           );
                         },
                       ),

@@ -20,7 +20,7 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
       appBar: AppBar(
         title: const Text('Purchase Reports'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -67,7 +67,7 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
+                                    border: Border.all(color: DesignTokens.borderLightColor),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -108,7 +108,7 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
                                 child: Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
+                                    border: Border.all(color: DesignTokens.borderLightColor),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -135,13 +135,13 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Generating report...'),
-                              backgroundColor: Colors.orange,
+                              backgroundColor: DesignTokens.warningColor,
                             ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: DesignTokens.primaryColor,
-                          foregroundColor: Colors.white,
+                          foregroundColor: DesignTokens.textInverseColor,
                         ),
                         child: const Text('Generate Report'),
                       ),
@@ -172,7 +172,7 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Purchase Summary - In development'),
-                          backgroundColor: Colors.orange,
+                          backgroundColor: DesignTokens.warningColor,
                         ),
                       );
                     },
@@ -186,7 +186,7 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Top Suppliers - In development'),
-                          backgroundColor: Colors.orange,
+                          backgroundColor: DesignTokens.warningColor,
                         ),
                       );
                     },
@@ -200,7 +200,7 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Product Analysis - In development'),
-                          backgroundColor: Colors.orange,
+                          backgroundColor: DesignTokens.warningColor,
                         ),
                       );
                     },
@@ -214,7 +214,7 @@ class _PurchasesReportsPageState extends ConsumerState<PurchasesReportsPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Export Data - In development'),
-                          backgroundColor: Colors.orange,
+                          backgroundColor: DesignTokens.warningColor,
                         ),
                       );
                     },

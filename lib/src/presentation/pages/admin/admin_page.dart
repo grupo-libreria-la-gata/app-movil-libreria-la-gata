@@ -19,7 +19,7 @@ class AdminPage extends ConsumerWidget {
           style: TextStyle(color: DesignTokens.surfaceColor),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: DesignTokens.textInverseColor),
           onPressed: () => context.pop(),
         ),
       ),
@@ -74,14 +74,7 @@ class AdminPage extends ConsumerWidget {
           subtitle: 'Configurar permisos y roles de usuarios',
           icon: Icons.security,
           color: DesignTokens.accentColor,
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Gestión de roles - En desarrollo'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          },
+          onTap: () => context.push('/admin/roles'),
         ),
         const SizedBox(height: DesignTokens.spacingMd),
 
@@ -95,7 +88,7 @@ class AdminPage extends ConsumerWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Respaldo y restauración - En desarrollo'),
-                backgroundColor: Colors.orange,
+                backgroundColor: DesignTokens.warningColor,
               ),
             );
           },

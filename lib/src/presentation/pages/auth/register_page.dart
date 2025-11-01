@@ -86,7 +86,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
       if (next.error != null) {
         // Mostrar error si existe
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
+          SnackBar(content: Text(next.error!), backgroundColor: DesignTokens.errorColor),
         );
         // Limpiar el error
         ref.read(authProvider.notifier).clearError();
@@ -158,7 +158,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             borderRadius: BorderRadius.circular(20),
             boxShadow: DesignTokens.elevatedShadow,
           ),
-          child: const Icon(Icons.local_bar, size: 40, color: Colors.white),
+          child: const Icon(Icons.local_bar, size: 40, color: DesignTokens.textInverseColor),
         ),
         const SizedBox(height: 16),
         Text(
@@ -195,7 +195,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             prefixIcon: const Icon(Icons.person_outlined),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: DesignTokens.backgroundColor,
           ),
           validator: (value) {
             return ErrorService().getFieldError('name', value ?? '');
@@ -213,7 +213,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             prefixIcon: const Icon(Icons.email_outlined),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: DesignTokens.backgroundColor,
           ),
           validator: (value) {
             return ErrorService().getFieldError('email', value ?? '');
@@ -231,7 +231,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             prefixIcon: const Icon(Icons.phone_outlined),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: DesignTokens.backgroundColor,
           ),
         ),
         const SizedBox(height: 16),
@@ -256,7 +256,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: DesignTokens.backgroundColor,
           ),
           validator: (value) {
             return ErrorService().getFieldError('password', value ?? '');
@@ -286,7 +286,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: DesignTokens.backgroundColor,
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -382,14 +382,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
       isLoading: loadingState.isLoading,
       text: 'Crear Cuenta',
       backgroundColor: DesignTokens.primaryColor,
-      textColor: Colors.white,
+      textColor: DesignTokens.textInverseColor,
     );
   }
 
   Widget _buildDivider() {
     return Row(
       children: [
-        Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
+        Expanded(child: Divider(color: DesignTokens.borderLightColor, thickness: 1)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -397,7 +397,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
             style: TextStyle(color: DesignTokens.textSecondaryColor, fontSize: 14),
           ),
         ),
-        Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
+        Expanded(child: Divider(color: DesignTokens.borderLightColor, thickness: 1)),
       ],
     );
   }
@@ -420,8 +420,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with LoadingMixin {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.grey[800],
-          side: BorderSide(color: Colors.grey[300]!),
+          foregroundColor: DesignTokens.textPrimaryColor,
+          side: BorderSide(color: DesignTokens.borderLightColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

@@ -88,7 +88,7 @@ class ConfirmationDialog extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(true),
           style: ElevatedButton.styleFrom(
             backgroundColor: confirmColor ?? DesignTokens.errorColor,
-            foregroundColor: Colors.white,
+            foregroundColor: DesignTokens.textInverseColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
             ),

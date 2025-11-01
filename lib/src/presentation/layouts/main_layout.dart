@@ -32,7 +32,7 @@ class _MainLayoutState extends State<MainLayout> {
         children: [
           // if (widget.title != null)
           //   Container(
-          //     color: Colors.white,
+          //     color: DesignTokens.surfaceColor,
           //     child: SafeArea(
           //       bottom: false,
           //       child: SizedBox(
@@ -40,7 +40,7 @@ class _MainLayoutState extends State<MainLayout> {
           //         child: Row(
           //           children: [
           //             IconButton(
-          //               icon: const Icon(Icons.arrow_back, color: Colors.black),
+          //               icon: const Icon(Icons.arrow_back, color: DesignTokens.textPrimaryColor),
           //               onPressed: () => Navigator.of(context).maybePop(),
           //             ),
           //             const SizedBox(width: 4),
@@ -48,7 +48,7 @@ class _MainLayoutState extends State<MainLayout> {
           //               child: Text(
           //                 widget.title!,
           //                 style: const TextStyle(
-          //                   color: Colors.black,
+          //                   color: DesignTokens.textPrimaryColor,
           //                   fontSize: 18,
           //                   fontWeight: FontWeight.bold,
           //                 ),

@@ -71,14 +71,14 @@ class FilterChipsWidget extends StatelessWidget {
         filter['label'],
         style: TextStyle(
           fontSize: DesignTokens.fontSizeXs,
-          color: Colors.white,
+          color: DesignTokens.surfaceColor,
         ),
       ),
       backgroundColor: DesignTokens.primaryColor,
       deleteIcon: const Icon(
         Icons.close,
         size: 16,
-        color: Colors.white,
+        color: DesignTokens.surfaceColor,
       ),
       onDeleted: () => onRemoveFilter(filter['key']),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

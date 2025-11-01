@@ -118,7 +118,7 @@ class _AdvancedFiltersWidgetState extends State<AdvancedFiltersWidget> {
     return Container(
       padding: const EdgeInsets.all(DesignTokens.spacingMd),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.surfaceColor,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
         border: Border.all(color: DesignTokens.dividerColor),
       ),
@@ -427,7 +427,7 @@ class _AdvancedFiltersWidgetState extends State<AdvancedFiltersWidget> {
             onPressed: _applyFilters,
             style: ElevatedButton.styleFrom(
               backgroundColor: DesignTokens.primaryColor,
-              foregroundColor: Colors.white,
+              foregroundColor: DesignTokens.textInverseColor,
             ),
             child: const Text('Aplicar'),
           ),

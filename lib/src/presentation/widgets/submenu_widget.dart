@@ -16,17 +16,17 @@ class SubmenuWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: DesignTokens.surfaceColor,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: DesignTokens.textPrimaryColor.withValues(alpha: 0.26),
             blurRadius: 10,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -80,7 +80,7 @@ class SubmenuWidget extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: item.color.withOpacity(0.1),
+            color: item.color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(item.icon, color: item.color, size: 20),

@@ -2,9 +2,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/cliente_model.dart';
 import '../models/base_model.dart';
+import '../../config/app_config.dart';
 
 class ClienteService {
-  final String baseUrl = 'http://localhost:5044/api/Clientes';
+  String get baseUrl => '${AppConfig.baseUrl}/api/Clientes';
 
   /// Obtener todos los clientes activos
   Future<List<Cliente>> obtenerActivos() async {

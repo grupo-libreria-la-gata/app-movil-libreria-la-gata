@@ -17,6 +17,7 @@ import '../presentation/pages/inventory/inventory_page.dart';
 import '../presentation/pages/inventory/inventory_detail_page.dart';
 import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/admin/admin_page.dart';
+import '../presentation/pages/admin/role_management_page.dart';
 import '../presentation/pages/brand_management/brand_management_page.dart';
 import '../presentation/pages/category_management/category_management_page.dart';
 import '../presentation/pages/producto_management/product_management_page.dart';
@@ -372,6 +373,12 @@ class AppRoutes {
           title: 'Administración',
           child: AdminPage(),
         ),
+      ),
+      // Gestión de Roles
+      GoRoute(
+        path: '/admin/roles',
+        name: 'roleManagement',
+        builder: (context, state) => const RoleManagementPage(),
       ),
 
       // Perfil

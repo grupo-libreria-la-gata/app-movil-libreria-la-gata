@@ -59,13 +59,13 @@ class _CrearClientePageState extends State<CrearClientePage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.errorColor),
     );
   }
 
   void _mostrarExito(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.green),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.successColor),
     );
   }
 
@@ -81,7 +81,7 @@ class _CrearClientePageState extends State<CrearClientePage> {
           style: TextStyle(color: DesignTokens.surfaceColor, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: DesignTokens.textInverseColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -194,7 +194,7 @@ class _CrearClientePageState extends State<CrearClientePage> {
                       onPressed: _loading ? null : _crearCliente,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: DesignTokens.primaryColor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: DesignTokens.textInverseColor,
                       ),
                       child: _loading
                           ? const SizedBox(
@@ -203,7 +203,7 @@ class _CrearClientePageState extends State<CrearClientePage> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
+                                  DesignTokens.textInverseColor,
                                 ),
                               ),
                             )

@@ -49,6 +49,11 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
     }
   }
 
+  void _toggleMostrarInactivos(bool value) {
+    setState(() => _mostrarInactivos = value);
+    _cargarClientes();
+  }
+
   void _aplicarFiltros() async {
     if (_searchQuery.isEmpty) {
       setState(() {
@@ -72,13 +77,13 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.errorColor),
     );
   }
 
   void _mostrarExito(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.green),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.successColor),
     );
   }
 
@@ -164,6 +169,33 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
       backgroundColor: DesignTokens.backgroundColor,
       body: Column(
         children: [
+          // Toggle para mostrar inactivos
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DesignTokens.spacingMd,
+              vertical: DesignTokens.spacingSm,
+            ),
+            color: DesignTokens.surfaceColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  _mostrarInactivos ? 'Mostrando Inactivos' : 'Mostrando Activos',
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeSm,
+                    color: DesignTokens.textSecondaryColor,
+                  ),
+                ),
+                const SizedBox(width: DesignTokens.spacingSm),
+                Switch(
+                  value: _mostrarInactivos,
+                  onChanged: _toggleMostrarInactivos,
+                  activeTrackColor: DesignTokens.primaryColor.withValues(alpha: 0.5),
+                  activeThumbColor: DesignTokens.primaryColor,
+                ),
+              ],
+            ),
+          ),
           // Barra de búsqueda con botón agregar
           Padding(
             padding: const EdgeInsets.all(DesignTokens.spacingMd),
@@ -192,7 +224,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                 FloatingActionButton.small(
                   onPressed: _crearCliente,
                   backgroundColor: DesignTokens.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: DesignTokens.textInverseColor,
                   child: const Icon(Icons.add),
                 ),
               ],
@@ -217,7 +249,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                           label: const Text('Agregar Cliente'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: DesignTokens.primaryColor,
-                            foregroundColor: Colors.white,
+                            foregroundColor: DesignTokens.textInverseColor,
                           ),
                         ),
                       )
@@ -231,7 +263,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
                             leadingIcon: Icons.person,
                             leadingColor: cliente.activo
                                 ? DesignTokens.primaryColor
-                                : Colors.grey,
+                                : DesignTokens.textSecondaryColor,
                             isActive: cliente.activo,
                             actions: [
                               CrudAction(

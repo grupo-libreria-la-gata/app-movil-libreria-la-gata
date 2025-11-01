@@ -2,9 +2,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/proveedor_model.dart';
 import '../models/base_model.dart';
+import '../../config/app_config.dart';
 
 class ProveedorService {
-  final String baseUrl = 'http://localhost:5044/api/Proveedores';
+  String get baseUrl => '${AppConfig.baseUrl}/api/Proveedores';
 
   Future<List<Proveedor>> obtenerActivos() async {
     final url = Uri.parse('$baseUrl/activos');

@@ -48,7 +48,7 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Supplier created successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: DesignTokens.successColor,
             ),
           );
           Navigator.pop(context, true);
@@ -58,7 +58,7 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(response.message ?? 'Error desconocido'),
-              backgroundColor: Colors.red,
+              backgroundColor: DesignTokens.errorColor,
             ),
           );
         }
@@ -68,7 +68,7 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error creating supplier: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: DesignTokens.errorColor,
           ),
         );
       }
@@ -85,7 +85,7 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
       appBar: AppBar(
         title: const Text('Create Supplier'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
       ),
       body: Form(
         key: _formKey,
@@ -151,11 +151,11 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
                   onPressed: _isLoading ? null : _crearProveedor,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DesignTokens.primaryColor,
-                    foregroundColor: Colors.white,
+                    foregroundColor: DesignTokens.textInverseColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(color: DesignTokens.textInverseColor)
                       : const Text('Create Supplier'),
                 ),
               ),

@@ -21,6 +21,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
   List<Categoria> _categoriasFiltradas = [];
   bool _loading = true;
   String _searchQuery = '';
+  bool _mostrarInactivos = false;
 
   @override
   void initState() {
@@ -29,8 +30,11 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
   }
 
   Future<void> _loadCategorias() async {
+    setState(() => _loading = true);
     try {
-      final categorias = await _service.obtenerActivos();
+      final categorias = _mostrarInactivos
+          ? await _service.obtenerInactivos()
+          : await _service.obtenerActivos();
       setState(() {
         _categorias = categorias;
         _aplicarFiltros();
@@ -40,6 +44,11 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
       setState(() => _loading = false);
       _showError('Error al cargar categorías');
     }
+  }
+
+  void _toggleMostrarInactivos(bool value) {
+    setState(() => _mostrarInactivos = value);
+    _loadCategorias();
   }
 
   void _aplicarFiltros() async {
@@ -65,13 +74,13 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+      SnackBar(content: Text(message), backgroundColor: DesignTokens.errorColor),
     );
   }
 
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
+      SnackBar(content: Text(message), backgroundColor: DesignTokens.successColor),
     );
   }
 
@@ -143,6 +152,27 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
     }
   }
 
+  void _activarCategoria(Categoria categoria) async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Activar Categoría',
+      message: '¿Está seguro de activar la categoría "${categoria.nombre}"?',
+      confirmText: 'Activar',
+      icon: Icons.check_circle,
+      confirmColor: DesignTokens.successColor,
+    );
+
+    if (confirmed == true) {
+      try {
+        await _service.activarCategoria(categoria.categoriaId);
+        _showSuccess('Categoría activada exitosamente');
+        await _loadCategorias();
+      } catch (e) {
+        _showError('Error al activar categoría');
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -150,6 +180,33 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
       backgroundColor: DesignTokens.backgroundColor,
       body: Column(
         children: [
+          // Toggle para mostrar inactivos
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DesignTokens.spacingMd,
+              vertical: DesignTokens.spacingSm,
+            ),
+            color: DesignTokens.surfaceColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  _mostrarInactivos ? 'Mostrando Inactivos' : 'Mostrando Activos',
+                  style: TextStyle(
+                    fontSize: DesignTokens.fontSizeSm,
+                    color: DesignTokens.textSecondaryColor,
+                  ),
+                ),
+                const SizedBox(width: DesignTokens.spacingSm),
+                Switch(
+                  value: _mostrarInactivos,
+                  onChanged: _toggleMostrarInactivos,
+                  activeTrackColor: DesignTokens.primaryColor.withValues(alpha: 0.5),
+                  activeThumbColor: DesignTokens.primaryColor,
+                ),
+              ],
+            ),
+          ),
           // Barra de búsqueda con botón agregar
           Padding(
             padding: const EdgeInsets.all(DesignTokens.spacingMd),
@@ -178,7 +235,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                 FloatingActionButton.small(
                   onPressed: _crearCategoria,
                   backgroundColor: DesignTokens.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: DesignTokens.textInverseColor,
                   child: const Icon(Icons.add),
                 ),
               ],
@@ -191,19 +248,25 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                 : _categoriasFiltradas.isEmpty
                     ? EmptyState(
                         icon: Icons.category_outlined,
-                        title: _searchQuery.isNotEmpty
-                            ? 'No se encontraron categorías'
-                            : 'No hay categorías registradas',
-                        subtitle: _searchQuery.isNotEmpty
-                            ? 'Intenta con otro término de búsqueda'
-                            : 'Agrega tu primera categoría',
+                        title: _mostrarInactivos
+                            ? (_searchQuery.isNotEmpty
+                                ? 'No se encontraron categorías inactivas'
+                                : 'No hay categorías inactivas')
+                            : (_searchQuery.isNotEmpty
+                                ? 'No se encontraron categorías'
+                                : 'No hay categorías registradas'),
+                        subtitle: _mostrarInactivos
+                            ? 'Todas las categorías están activas'
+                            : (_searchQuery.isNotEmpty
+                                ? 'Intenta con otro término de búsqueda'
+                                : 'Agrega tu primera categoría'),
                         action: ElevatedButton.icon(
                           onPressed: _crearCategoria,
                           icon: const Icon(Icons.add),
                           label: const Text('Agregar Categoría'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: DesignTokens.primaryColor,
-                            foregroundColor: Colors.white,
+                            foregroundColor: DesignTokens.textInverseColor,
                           ),
                         ),
                       )
@@ -216,20 +279,29 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                             subtitle: 'ID: ${categoria.categoriaId}',
                             leadingIcon: Icons.category,
                             leadingColor: DesignTokens.accentColor,
-                            actions: [
-                              CrudAction(
-                                label: 'Editar',
-                                icon: Icons.edit,
-                                onPressed: () => _editarCategoria(categoria),
-                                color: DesignTokens.primaryColor,
-                              ),
-                              CrudAction(
-                                label: 'Desactivar',
-                                icon: Icons.delete_outline,
-                                onPressed: () => _desactivarCategoria(categoria),
-                                color: DesignTokens.errorColor,
-                              ),
-                            ],
+                            actions: _mostrarInactivos
+                                ? [
+                                    CrudAction(
+                                      label: 'Activar',
+                                      icon: Icons.check_circle,
+                                      onPressed: () => _activarCategoria(categoria),
+                                      color: DesignTokens.successColor,
+                                    ),
+                                  ]
+                                : [
+                                    CrudAction(
+                                      label: 'Editar',
+                                      icon: Icons.edit,
+                                      onPressed: () => _editarCategoria(categoria),
+                                      color: DesignTokens.primaryColor,
+                                    ),
+                                    CrudAction(
+                                      label: 'Desactivar',
+                                      icon: Icons.delete_outline,
+                                      onPressed: () => _desactivarCategoria(categoria),
+                                      color: DesignTokens.errorColor,
+                                    ),
+                                  ],
                           );
                         },
                       ),

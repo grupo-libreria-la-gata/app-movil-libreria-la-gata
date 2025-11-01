@@ -59,7 +59,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: DesignTokens.surfaceColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -68,7 +68,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               Container(
                 height: MediaQuery.of(context).size.height * 0.35,
                 width: double.infinity,
-                color: Colors.white,
+                color: DesignTokens.surfaceColor,
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
@@ -83,7 +83,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
+                              color: DesignTokens.textPrimaryColor.withValues(alpha: 0.1),
                               blurRadius: 6,
                               offset: const Offset(0, 3),
                             ),
@@ -91,7 +91,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         child: const Icon(
                           Icons.local_bar, // Icono de copita para licorería
-                          color: Colors.white,
+                          color: DesignTokens.textInverseColor,
                           size: 28,
                         ),
                       ),
@@ -165,13 +165,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   style: const TextStyle(
-                                    color: Colors.black87,
+                                    color: DesignTokens.textPrimaryColor,
                                     fontSize: 15,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'admin@lagata.com',
                                     hintStyle: TextStyle(
-                                      color: Colors.grey[500],
+                                      color: DesignTokens.textSecondaryColor,
                                       fontSize: 15,
                                     ),
                                     filled: true,
@@ -186,7 +186,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     ),
                                     prefixIcon: const Icon(
                                       Icons.email_outlined,
-                                      color: Colors.grey,
+                                      color: DesignTokens.textSecondaryColor,
                                       size: 18,
                                     ),
                                   ),
@@ -220,13 +220,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   controller: _passwordController,
                                   obscureText: _obscurePassword,
                                   style: const TextStyle(
-                                    color: Colors.black87,
+                                    color: DesignTokens.textPrimaryColor,
                                     fontSize: 15,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'Ingresa tu contraseña',
                                     hintStyle: TextStyle(
-                                      color: Colors.grey[500],
+                                      color: DesignTokens.textSecondaryColor,
                                       fontSize: 15,
                                     ),
                                     filled: true,
@@ -241,7 +241,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     ),
                                     prefixIcon: const Icon(
                                       Icons.lock_outline,
-                                      color: Colors.grey,
+                                      color: DesignTokens.textSecondaryColor,
                                       size: 18,
                                     ),
                                     suffixIcon: IconButton(
@@ -249,7 +249,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         _obscurePassword
                                             ? Icons.visibility_off
                                             : Icons.visibility,
-                                        color: Colors.grey,
+                                        color: DesignTokens.textSecondaryColor,
                                         size: 18,
                                       ),
                                       onPressed: () {
@@ -296,13 +296,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               child: ElevatedButton(
                                 onPressed: _isLoading ? null : _login,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
+                                  backgroundColor: DesignTokens.surfaceColor,
                                   foregroundColor: DesignTokens.primaryColor,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(24),
                                   ),
                                   elevation: 6,
-                                  shadowColor: Colors.black.withValues(alpha: 0.15),
+                                  shadowColor: DesignTokens.textPrimaryColor.withValues(alpha: 0.15),
                                 ),
                                 child: _isLoading
                                     ? SizedBox(
@@ -333,7 +333,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 child: const Text(
                                   '¿Olvidaste tu contraseña?',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: DesignTokens.surfaceColor,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),

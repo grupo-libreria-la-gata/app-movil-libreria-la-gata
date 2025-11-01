@@ -160,13 +160,13 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.errorColor),
     );
   }
 
   void _mostrarExito(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.green),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.successColor),
     );
   }
 
@@ -176,7 +176,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
         title: const Text('Nueva Compra'),
         actions: [
           TextButton(
@@ -243,7 +243,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
             DropdownButtonFormField<Proveedor>(
               initialValue: _proveedorSeleccionado,
               decoration: InputDecoration(
-                hintText: 'Seleccionar proveedor',
+                hintText: 'Elija un proveedor',
                 prefixIcon: const Icon(Icons.business),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
@@ -264,7 +264,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
               },
               validator: (value) {
                 if (value == null) {
-                  return 'Seleccione un proveedor';
+                  return 'Elija un proveedor';
                 }
                 return null;
               },
@@ -335,7 +335,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
                   label: const Text('Agregar'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DesignTokens.primaryColor,
-                    foregroundColor: Colors.white,
+                    foregroundColor: DesignTokens.textInverseColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
                     ),
@@ -351,7 +351,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
                 decoration: BoxDecoration(
                   color: DesignTokens.backgroundColor,
                   borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: DesignTokens.borderLightColor),
                 ),
                 child: Text(
                   'No hay productos agregados',
@@ -395,7 +395,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
       decoration: BoxDecoration(
         color: DesignTokens.backgroundColor,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: DesignTokens.borderLightColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,14 +413,14 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                icon: const Icon(Icons.edit, color: DesignTokens.infoColor, size: 20),
                 onPressed: () => _mostrarModalEditarProducto(producto, detalle, index),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(width: DesignTokens.spacingXs),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                icon: const Icon(Icons.delete, color: DesignTokens.errorColor, size: 20),
                 onPressed: () => _removerDetalle(index),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -453,10 +453,10 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
     return Container(
       padding: const EdgeInsets.all(DesignTokens.spacingMd),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.surfaceColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: DesignTokens.textPrimaryColor.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),
@@ -492,7 +492,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
               onPressed: _isLoading ? null : _guardarCompra,
               style: ElevatedButton.styleFrom(
                 backgroundColor: DesignTokens.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: DesignTokens.textInverseColor,
                 padding: const EdgeInsets.symmetric(vertical: DesignTokens.spacingMd),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
@@ -504,7 +504,7 @@ class _NewPurchasePageState extends ConsumerState<NewPurchasePage> {
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(DesignTokens.textInverseColor),
                       ),
                     )
                   : Text(
@@ -755,7 +755,7 @@ class _ProductoModalState extends State<_ProductoModal> {
                     decoration: BoxDecoration(
                       color: DesignTokens.backgroundColor,
                       borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-                      border: Border.all(color: Colors.grey.shade300),
+                      border: Border.all(color: DesignTokens.borderLightColor),
                     ),
                     child: Row(
                       children: [
@@ -819,7 +819,7 @@ class _ProductoModalState extends State<_ProductoModal> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: DesignTokens.primaryColor,
-                            foregroundColor: Colors.white,
+                            foregroundColor: DesignTokens.textInverseColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
                             ),

@@ -1,9 +1,10 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/detalle_producto_model.dart';
+import '../../config/app_config.dart';
 
 class DetalleProductoService {
-  final String baseUrl = 'http://localhost:5044/api/DetalleProductos';
+  String get baseUrl => '${AppConfig.baseUrl}/api/DetalleProductos';
 
   /// Obtener todos los detalles de productos activos
   Future<List<DetalleProducto>> obtenerActivos() async {

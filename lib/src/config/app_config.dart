@@ -1,20 +1,35 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppConfig {
   // API Configuration
   // Para desarrollo local, usar la IP de tu máquina en lugar de localhost
   // Encuentra tu IP con: ipconfig (Windows) o ifconfig (Mac/Linux)
   // Opciones comunes: 192.168.1.100, 192.168.0.100, 10.0.2.2 (para emulador Android)
-  static const String baseUrl = 'http://10.0.2.2:5044'; // IP para emulador Android
-  // static const String baseUrl = 'http://192.168.1.100:5044'; // IP de tu red local
-  // static const String baseUrl = 'http://localhost:5044'; // Solo para web
-  static const String apiKey = 'your_api_key_here';
+  // Configura la URL en el archivo .env
+  // Si dotenv no está cargado (error al cargar el .env), usar valores por defecto
+  static String get baseUrl {
+    try {
+      return dotenv.env['API_BASE_URL'] ?? 'http://localhost:5044';
+    } catch (e) {
+      return 'http://localhost:5044';
+    }
+  }
+  
+  static String get apiKey {
+    try {
+      return dotenv.env['API_KEY'] ?? 'your_api_key_here';
+    } catch (e) {
+      return 'your_api_key_here';
+    }
+  }
 
   // Database Configuration
-  static const String databaseName = 'la_gata_facturacion.db';
-  static const int databaseVersion = 1;
+  static String get databaseName => dotenv.env['DATABASE_NAME'] ?? 'la_gata_facturacion.db';
+  static int get databaseVersion => int.tryParse(dotenv.env['DATABASE_VERSION'] ?? '1') ?? 1;
 
   // App Information
-  static const String appName = 'La Gata';
-  static const String appVersion = '1.0.0';
+  static String get appName => dotenv.env['APP_NAME'] ?? 'La Gata';
+  static String get appVersion => dotenv.env['APP_VERSION'] ?? '1.0.0';
   static const String appDescription =
       'Sistema de facturación para licorería La Gata';
 
@@ -34,14 +49,14 @@ class AppConfig {
   static const int maxImageSize = 5 * 1024 * 1024; // 5MB
 
   // Pagination
-  static const int pageSize = 20;
+  static int get pageSize => int.tryParse(dotenv.env['PAGE_SIZE'] ?? '20') ?? 20;
 
   // Timeouts
-  static const int connectionTimeout = 30000; // 30 seconds
-  static const int receiveTimeout = 30000; // 30 seconds
+  static int get connectionTimeout => int.tryParse(dotenv.env['CONNECTION_TIMEOUT'] ?? '30000') ?? 30000;
+  static int get receiveTimeout => int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '30000') ?? 30000;
 
   // Cache Configuration
-  static const int cacheExpirationDays = 7;
+  static int get cacheExpirationDays => int.tryParse(dotenv.env['CACHE_EXPIRATION_DAYS'] ?? '7') ?? 7;
 
   // Notification Configuration
   static const String notificationChannelId = 'la_gata_channel';

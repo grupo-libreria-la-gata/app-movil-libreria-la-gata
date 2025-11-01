@@ -43,13 +43,13 @@ class _ClientesPageState extends State<ClientesPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.errorColor),
     );
   }
 
   void _mostrarExito(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.green),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.successColor),
     );
   }
 
@@ -176,7 +176,7 @@ class _ClientesPageState extends State<ClientesPage> {
           _mostrarInactivos ? 'Clientes Inactivos' : 'Gestión de Clientes',
         ),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
         actions: [
           IconButton(
             icon: Icon(
@@ -235,7 +235,7 @@ class _ClientesPageState extends State<ClientesPage> {
                         Icon(
                           Icons.people_outline,
                           size: 64,
-                          color: Colors.grey,
+                          color: DesignTokens.textSecondaryColor,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -244,7 +244,7 @@ class _ClientesPageState extends State<ClientesPage> {
                               : 'No hay clientes registrados',
                           style: const TextStyle(
                             fontSize: 18,
-                            color: Colors.grey,
+                            color: DesignTokens.textSecondaryColor,
                           ),
                         ),
                       ],
@@ -263,8 +263,8 @@ class _ClientesPageState extends State<ClientesPage> {
                           leading: CircleAvatar(
                             backgroundColor: cliente.activo
                                 ? DesignTokens.primaryColor
-                                : Colors.grey,
-                            child: Icon(Icons.person, color: Colors.white),
+                                : DesignTokens.textSecondaryColor,
+                            child: Icon(Icons.person, color: DesignTokens.textInverseColor),
                           ),
                           title: Text(
                             cliente.nombre,
@@ -272,7 +272,7 @@ class _ClientesPageState extends State<ClientesPage> {
                               fontWeight: FontWeight.bold,
                               color: cliente.activo
                                   ? DesignTokens.textPrimaryColor
-                                  : Colors.grey,
+                                  : DesignTokens.textSecondaryColor,
                             ),
                           ),
                           subtitle: Column(
@@ -288,8 +288,8 @@ class _ClientesPageState extends State<ClientesPage> {
                                 cliente.activo ? 'Activo' : 'Inactivo',
                                 style: TextStyle(
                                   color: cliente.activo
-                                      ? Colors.green
-                                      : Colors.red,
+                                      ? DesignTokens.successColor
+                                      : DesignTokens.errorColor,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -350,7 +350,7 @@ class _ClientesPageState extends State<ClientesPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _crearCliente,
         backgroundColor: DesignTokens.primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add, color: DesignTokens.textInverseColor),
       ),
     );
   }

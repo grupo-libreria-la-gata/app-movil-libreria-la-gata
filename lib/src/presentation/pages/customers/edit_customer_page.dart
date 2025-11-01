@@ -67,7 +67,7 @@ class _EditCustomerPageState extends ConsumerState<EditCustomerPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Customer updated successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: DesignTokens.successColor,
             ),
           );
           Navigator.pop(context, true);
@@ -77,7 +77,7 @@ class _EditCustomerPageState extends ConsumerState<EditCustomerPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(response.message ?? 'Error desconocido'),
-              backgroundColor: Colors.red,
+              backgroundColor: DesignTokens.errorColor,
             ),
           );
         }
@@ -87,7 +87,7 @@ class _EditCustomerPageState extends ConsumerState<EditCustomerPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error updating customer: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: DesignTokens.errorColor,
           ),
         );
       }
@@ -104,7 +104,7 @@ class _EditCustomerPageState extends ConsumerState<EditCustomerPage> {
       appBar: AppBar(
         title: const Text('Edit Customer'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
       ),
       body: Form(
         key: _formKey,
@@ -187,11 +187,11 @@ class _EditCustomerPageState extends ConsumerState<EditCustomerPage> {
                   onPressed: _isLoading ? null : _actualizarCliente,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DesignTokens.primaryColor,
-                    foregroundColor: Colors.white,
+                    foregroundColor: DesignTokens.textInverseColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(color: DesignTokens.textInverseColor)
                       : const Text('Update Customer'),
                 ),
               ),

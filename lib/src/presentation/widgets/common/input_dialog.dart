@@ -120,7 +120,7 @@ class _InputDialogState extends State<InputDialog> {
           onPressed: _onConfirm,
           style: ElevatedButton.styleFrom(
             backgroundColor: DesignTokens.primaryColor,
-            foregroundColor: Colors.white,
+            foregroundColor: DesignTokens.textInverseColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
             ),

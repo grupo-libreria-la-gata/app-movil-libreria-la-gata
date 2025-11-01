@@ -20,7 +20,7 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
   int? _expandedIndex;
 
   int? _computeActiveIndex(BuildContext context) {
-    final location = GoRouter.of(context).routeInformationProvider.value.location ?? '';
+    final location = GoRouter.of(context).routeInformationProvider.value.location;
     if (location.startsWith('/purchases') || location.startsWith('/sales')) return 0; // Transacciones
     if (location.startsWith('/customers') || location.startsWith('/suppliers')) return 1; // Relaciones
     if (location.startsWith('/inventory') || location.startsWith('/reports')) return 2; // Resumen
@@ -32,10 +32,10 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.surfaceColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: DesignTokens.textPrimaryColor.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -116,7 +116,7 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
         ),
         child: Icon(
           icon,
-          color: isActive ? DesignTokens.primaryColor : Colors.black87,
+          color: isActive ? DesignTokens.primaryColor : DesignTokens.textPrimaryColor,
           size: 24,
         ),
       ),
@@ -138,9 +138,9 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.surfaceColor,
         border: Border(
-          top: BorderSide(color: Colors.grey[300]!, width: 1),
+          top: BorderSide(color: DesignTokens.borderLightColor, width: 1),
         ),
       ),
       child: Row(
@@ -213,9 +213,9 @@ class _BottomMenuWidgetState extends State<BottomMenuWidget> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: DesignTokens.surfaceColor,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey[400]!),
+          border: Border.all(color: DesignTokens.borderMediumColor),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

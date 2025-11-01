@@ -72,7 +72,7 @@ class LoadingButton extends StatelessWidget {
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor ?? DesignTokens.primaryColor,
-        foregroundColor: textColor ?? Colors.white,
+        foregroundColor: textColor ?? DesignTokens.textInverseColor,
         disabledBackgroundColor: DesignTokens.textSecondaryColor.withValues(alpha: 0.3),
         disabledForegroundColor: DesignTokens.textSecondaryColor,
         minimumSize: const Size(double.infinity, 48),
@@ -83,7 +83,7 @@ class LoadingButton extends StatelessWidget {
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2.0,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor: AlwaysStoppedAnimation<Color>(DesignTokens.textInverseColor),
               ),
             )
           : Row(
@@ -547,7 +547,7 @@ class ErrorWidget extends StatelessWidget {
                 label: Text(actionText ?? 'Reintentar'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: DesignTokens.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: DesignTokens.textInverseColor,
                 ),
               ),
             ],
@@ -618,7 +618,7 @@ class EmptyStateWidget extends StatelessWidget {
                 label: Text(actionText ?? 'Agregar'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: DesignTokens.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: DesignTokens.textInverseColor,
                 ),
               ),
             ],

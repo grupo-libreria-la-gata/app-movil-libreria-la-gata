@@ -109,7 +109,7 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
         label: const Text('Generar PDF'),
         style: ElevatedButton.styleFrom(
           backgroundColor: DesignTokens.primaryColor,
-          foregroundColor: Colors.white,
+          foregroundColor: DesignTokens.textInverseColor,
           padding: const EdgeInsets.symmetric(
             horizontal: DesignTokens.spacingLg,
             vertical: DesignTokens.spacingMd,
@@ -187,7 +187,7 @@ class _PdfExportWidgetState extends State<PdfExportWidget> {
                 label: const Text('Compartir'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: DesignTokens.accentColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: DesignTokens.textInverseColor,
                   padding: const EdgeInsets.symmetric(
                     horizontal: DesignTokens.spacingMd,
                     vertical: DesignTokens.spacingSm,

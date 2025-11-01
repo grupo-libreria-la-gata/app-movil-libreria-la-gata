@@ -1,9 +1,10 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/marca_model.dart';
+import '../../config/app_config.dart';
 
 class MarcaService {
-  final String baseUrl = 'http://localhost:5044/api/Marcas';
+  String get baseUrl => '${AppConfig.baseUrl}/api/Marcas';
   final int usuarioId = 1; // ⚠️ Reemplaza con el ID real del usuario logueado
 
   Future<List<Marca>> obtenerActivos() async {
@@ -60,6 +61,27 @@ class MarcaService {
       return data.map((json) => Marca.fromJson(json)).toList();
     } else {
       throw Exception('Error al buscar marcas: ${response.body}');
+    }
+  }
+
+  Future<List<Marca>> obtenerInactivos() async {
+    final url = Uri.parse('$baseUrl/inactivos?usuarioId=$usuarioId');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => Marca.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al obtener marcas inactivas: ${response.body}');
+    }
+  }
+
+  Future<void> activarMarca(int marcaId) async {
+    final url = Uri.parse('$baseUrl/activar?marcaId=$marcaId&usuarioId=$usuarioId');
+    final response = await http.post(url);
+
+    if (response.statusCode != 204) {
+      throw Exception('Error al activar marca: ${response.body}');
     }
   }
 }

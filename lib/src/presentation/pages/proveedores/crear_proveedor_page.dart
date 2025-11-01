@@ -56,7 +56,7 @@ class _CrearProveedorPageState extends State<CrearProveedorPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Proveedor creado exitosamente'),
-            backgroundColor: Colors.green,
+            backgroundColor: DesignTokens.successColor,
           ),
         );
         Navigator.pop(context, true);
@@ -66,7 +66,7 @@ class _CrearProveedorPageState extends State<CrearProveedorPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al crear proveedor: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: DesignTokens.errorColor,
           ),
         );
       }
@@ -81,7 +81,7 @@ class _CrearProveedorPageState extends State<CrearProveedorPage> {
       appBar: AppBar(
         title: const Text('Nuevo Proveedor'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
         actions: [
           if (_isLoading)
             const Padding(
@@ -97,7 +97,7 @@ class _CrearProveedorPageState extends State<CrearProveedorPage> {
               onPressed: _guardarProveedor,
               child: const Text(
                 'Guardar',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: DesignTokens.textInverseColor),
               ),
             ),
         ],
@@ -230,7 +230,7 @@ class _CrearProveedorPageState extends State<CrearProveedorPage> {
                       onPressed: _isLoading ? null : _guardarProveedor,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: DesignTokens.primaryColor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: DesignTokens.textInverseColor,
                       ),
                       child: _isLoading
                           ? const SizedBox(
@@ -239,7 +239,7 @@ class _CrearProveedorPageState extends State<CrearProveedorPage> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
+                                  DesignTokens.textInverseColor,
                                 ),
                               ),
                             )

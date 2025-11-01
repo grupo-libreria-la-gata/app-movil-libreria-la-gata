@@ -131,7 +131,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
                 const SizedBox(width: DesignTokens.spacingXs),
                 // Botón de filtros
                 IconButton(
-                  icon: const Icon(Icons.filter_list, color: Colors.black87),
+                  icon: const Icon(Icons.filter_list, color: DesignTokens.textPrimaryColor),
                   onPressed: _showFilterDialog,
                 ),
               ],
@@ -198,7 +198,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.errorColor),
     );
   }
 

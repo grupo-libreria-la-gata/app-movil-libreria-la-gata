@@ -101,7 +101,7 @@ class _ConnectionTestWidgetState extends State<ConnectionTestWidget> {
                 label: Text(_isTesting ? 'Probando...' : 'Probar Conexión'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: DesignTokens.primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: DesignTokens.textInverseColor,
                 ),
               ),
             ),

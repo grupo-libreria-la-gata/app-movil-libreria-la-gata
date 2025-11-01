@@ -89,13 +89,13 @@ class _SplashPageState extends ConsumerState<SplashPage>
                       width: 120,
                       height: 120,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: DesignTokens.textInverseColor,
                         borderRadius: BorderRadius.circular(
                           DesignTokens.borderRadiusLg,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
+                            color: DesignTokens.textPrimaryColor.withValues(alpha: 0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -116,7 +116,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                       style: TextStyle(
                         fontSize: DesignTokens.fontSize4xl,
                         fontWeight: DesignTokens.fontWeightBold,
-                        color: Colors.white,
+                        color: DesignTokens.textInverseColor,
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -129,7 +129,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                       style: TextStyle(
                         fontSize: DesignTokens.fontSizeMd,
                         fontWeight: DesignTokens.fontWeightNormal,
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: DesignTokens.textInverseColor.withValues(alpha: 0.9),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -143,7 +143,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
                       child: CircularProgressIndicator(
                         strokeWidth: 3,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white.withValues(alpha: 0.8),
+                          DesignTokens.textInverseColor.withValues(alpha: 0.8),
                         ),
                       ),
                     ),

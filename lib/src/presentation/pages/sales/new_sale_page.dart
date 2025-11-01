@@ -161,7 +161,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
         title: const Text('Nueva Venta'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -339,7 +339,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
                   label: const Text('Agregar'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DesignTokens.primaryColor,
-                    foregroundColor: Colors.white,
+                    foregroundColor: DesignTokens.textInverseColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
                     ),
@@ -428,9 +428,9 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
       margin: const EdgeInsets.only(bottom: DesignTokens.spacingSm),
       padding: const EdgeInsets.all(DesignTokens.spacingSm),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.surfaceColor,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: DesignTokens.borderLightColor),
       ),
       child: Row(
         children: [
@@ -474,7 +474,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
                 width: 50,
                 height: 30,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: DesignTokens.borderLightColor),
                   borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
                 ),
                 child: Center(
@@ -548,10 +548,10 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
     return Container(
       padding: const EdgeInsets.all(DesignTokens.spacingMd),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.surfaceColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: DesignTokens.borderLightColor.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, -2),
@@ -590,7 +590,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
               onPressed: _isLoading ? null : _guardarVenta,
               style: ElevatedButton.styleFrom(
                 backgroundColor: DesignTokens.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: DesignTokens.textInverseColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
                 ),
@@ -600,7 +600,7 @@ class _NewSalePageState extends ConsumerState<NewSalePage> {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: DesignTokens.surfaceColor,
                         strokeWidth: 2,
                       ),
                     )
@@ -859,7 +859,7 @@ class _ProductoModalState extends State<_ProductoModal> {
                       onPressed: _productoSeleccionado == null ? null : _agregarProducto,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: DesignTokens.primaryColor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: DesignTokens.textInverseColor,
                       ),
                       child: const Text('Agregar'),
                     ),

@@ -136,19 +136,19 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
               vertical: DesignTokens.spacingSm,
             ),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
+              border: Border.all(color: DesignTokens.borderLightColor),
               borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                Icon(Icons.calendar_today, size: 16, color: DesignTokens.textSecondaryColor),
                 const SizedBox(width: DesignTokens.spacingSm),
                 Text(
                   date != null
                       ? '${date.day}/${date.month}/${date.year}'
                       : 'Seleccionar fecha',
                   style: TextStyle(
-                    color: date != null ? Colors.black : Colors.grey[600],
+                    color: date != null ? DesignTokens.textPrimaryColor : DesignTokens.textSecondaryColor,
                   ),
                 ),
               ],
@@ -220,7 +220,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                     label: const Text('Exportar PDF'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: DesignTokens.primaryColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: DesignTokens.textInverseColor,
                     ),
                   ),
                 ),
@@ -233,8 +233,8 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                     icon: const Icon(Icons.table_chart),
                     label: const Text('Exportar Excel'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: DesignTokens.successColor,
+                      foregroundColor: DesignTokens.textInverseColor,
                     ),
                   ),
                 ),
@@ -269,7 +269,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                   padding: EdgeInsets.all(DesignTokens.spacingXl),
                   child: Text(
                     'Selecciona las fechas para generar el reporte',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(fontSize: 16, color: DesignTokens.textSecondaryColor),
                   ),
                 ),
               ),
@@ -342,9 +342,9 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
           height: chartHeight,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: DesignTokens.surfaceColor,
             borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: DesignTokens.borderLightColor),
           ),
           child: LineChart(
             LineChartData(
@@ -394,9 +394,9 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
           height: chartHeight,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: DesignTokens.surfaceColor,
             borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: DesignTokens.borderLightColor),
           ),
           child: BarChart(
             BarChartData(
@@ -420,11 +420,11 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                 ),
               ),
               barGroups: [
-                BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 12, color: Colors.indigo)]),
-                BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 9, color: Colors.indigo)]),
-                BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 14, color: Colors.indigo)]),
-                BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 7, color: Colors.indigo)]),
-                BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 6, color: Colors.indigo)]),
+                BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 12, color: DesignTokens.secondaryColor)]),
+                BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 9, color: DesignTokens.secondaryColor)]),
+                BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 14, color: DesignTokens.secondaryColor)]),
+                BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 7, color: DesignTokens.secondaryColor)]),
+                BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 6, color: DesignTokens.secondaryColor)]),
               ],
             ),
           ),
@@ -435,9 +435,9 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
           height: chartHeight,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: DesignTokens.surfaceColor,
             borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: DesignTokens.borderLightColor),
           ),
           child: PieChart(
             PieChartData(

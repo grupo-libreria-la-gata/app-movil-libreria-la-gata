@@ -293,7 +293,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             label: const Text('Guardar'),
             style: ElevatedButton.styleFrom(
               backgroundColor: DesignTokens.primaryColor,
-              foregroundColor: Colors.white,
+              foregroundColor: DesignTokens.textInverseColor,
             ),
           ),
         ),
@@ -313,7 +313,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Configuración guardada exitosamente'),
-        backgroundColor: Colors.green,
+        backgroundColor: DesignTokens.successColor,
       ),
     );
   }

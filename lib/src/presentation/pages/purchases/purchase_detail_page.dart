@@ -48,7 +48,7 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
       backgroundColor: DesignTokens.backgroundColor,
       appBar: AppBar(
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -167,7 +167,7 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd)),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: DesignTokens.surfaceColor,
           borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
         ),
         child: Padding(
@@ -232,7 +232,7 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd)),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: DesignTokens.surfaceColor,
           borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
         ),
         child: Padding(
@@ -271,12 +271,12 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
       margin: const EdgeInsets.only(bottom: DesignTokens.spacingSm),
       padding: const EdgeInsets.all(DesignTokens.spacingMd),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: DesignTokens.surfaceColor,
         borderRadius: BorderRadius.circular(DesignTokens.borderRadiusSm),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: DesignTokens.borderLightColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: DesignTokens.borderLightColor.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 2,
             offset: const Offset(0, 1),
@@ -415,7 +415,7 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd)),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: DesignTokens.surfaceColor,
           borderRadius: BorderRadius.circular(DesignTokens.borderRadiusMd),
         ),
         child: Padding(
@@ -502,7 +502,7 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
       child: Text(
         text,
         style: const TextStyle(
-          color: Colors.white,
+          color: DesignTokens.surfaceColor,
           fontSize: DesignTokens.fontSizeSm,
           fontWeight: DesignTokens.fontWeightBold,
         ),
@@ -516,7 +516,7 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.errorColor),
     );
   }
 }

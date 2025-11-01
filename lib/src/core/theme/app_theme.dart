@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../design/design_tokens.dart';
 
 class AppTheme {
@@ -14,8 +15,9 @@ class AppTheme {
         // background: DesignTokens.backgroundColor, // Deprecated
         error: DesignTokens.errorColor,
       ),
-      fontFamily:
-          'Roboto', // Fuente Roboto para mejor compatibilidad con iconos
+      // En web, usar Google Fonts (ya incluidas en index.html)
+      // En móvil/desktop, usar fuente local
+      fontFamily: kIsWeb ? 'Roboto' : null, // En web usa Google Fonts, en móvil usa fuente del sistema
       // Icon Theme - Asegurar que los iconos se muestren correctamente
       iconTheme: const IconThemeData(
         color: DesignTokens.primaryColor,

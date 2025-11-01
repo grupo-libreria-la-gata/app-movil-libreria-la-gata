@@ -65,7 +65,7 @@ class _EditSupplierPageState extends ConsumerState<EditSupplierPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Supplier updated successfully'),
-              backgroundColor: Colors.green,
+              backgroundColor: DesignTokens.successColor,
             ),
           );
           Navigator.pop(context, true);
@@ -75,7 +75,7 @@ class _EditSupplierPageState extends ConsumerState<EditSupplierPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(response.message ?? 'Error desconocido'),
-              backgroundColor: Colors.red,
+              backgroundColor: DesignTokens.errorColor,
             ),
           );
         }
@@ -85,7 +85,7 @@ class _EditSupplierPageState extends ConsumerState<EditSupplierPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error updating supplier: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: DesignTokens.errorColor,
           ),
         );
       }
@@ -102,7 +102,7 @@ class _EditSupplierPageState extends ConsumerState<EditSupplierPage> {
       appBar: AppBar(
         title: const Text('Edit Supplier'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
       ),
       body: Form(
         key: _formKey,
@@ -185,11 +185,11 @@ class _EditSupplierPageState extends ConsumerState<EditSupplierPage> {
                   onPressed: _isLoading ? null : _actualizarProveedor,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: DesignTokens.primaryColor,
-                    foregroundColor: Colors.white,
+                    foregroundColor: DesignTokens.textInverseColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(color: DesignTokens.textInverseColor)
                       : const Text('Update Supplier'),
                 ),
               ),

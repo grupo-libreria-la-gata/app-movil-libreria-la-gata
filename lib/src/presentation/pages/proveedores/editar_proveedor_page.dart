@@ -71,7 +71,7 @@ class _EditarProveedorPageState extends State<EditarProveedorPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Proveedor actualizado exitosamente'),
-            backgroundColor: Colors.green,
+            backgroundColor: DesignTokens.successColor,
           ),
         );
         Navigator.pop(context, true);
@@ -81,7 +81,7 @@ class _EditarProveedorPageState extends State<EditarProveedorPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al actualizar proveedor: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: DesignTokens.errorColor,
           ),
         );
       }
@@ -96,7 +96,7 @@ class _EditarProveedorPageState extends State<EditarProveedorPage> {
       appBar: AppBar(
         title: const Text('Editar Proveedor'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
         actions: [
           if (_isLoading)
             const Padding(
@@ -112,7 +112,7 @@ class _EditarProveedorPageState extends State<EditarProveedorPage> {
               onPressed: _actualizarProveedor,
               child: const Text(
                 'Guardar',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: DesignTokens.textInverseColor),
               ),
             ),
         ],
@@ -245,7 +245,7 @@ class _EditarProveedorPageState extends State<EditarProveedorPage> {
                       onPressed: _isLoading ? null : _actualizarProveedor,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: DesignTokens.primaryColor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: DesignTokens.textInverseColor,
                       ),
                       child: _isLoading
                           ? const SizedBox(
@@ -254,7 +254,7 @@ class _EditarProveedorPageState extends State<EditarProveedorPage> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
+                                  DesignTokens.textInverseColor,
                                 ),
                               ),
                             )

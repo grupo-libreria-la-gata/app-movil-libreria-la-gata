@@ -40,13 +40,13 @@ class _ProveedoresPageState extends State<ProveedoresPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.errorColor),
     );
   }
 
   void _mostrarExito(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.green),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.successColor),
     );
   }
 
@@ -129,7 +129,7 @@ class _ProveedoresPageState extends State<ProveedoresPage> {
       appBar: AppBar(
         title: const Text('Proveedores'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -196,7 +196,7 @@ class _ProveedoresPageState extends State<ProveedoresPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _crearProveedor,
         backgroundColor: DesignTokens.primaryColor,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add, color: DesignTokens.textInverseColor),
       ),
     );
   }
@@ -223,7 +223,7 @@ class _ProveedorCard extends StatelessWidget {
           child: Text(
             proveedor.nombre[0].toUpperCase(),
             style: const TextStyle(
-              color: Colors.white,
+              color: DesignTokens.surfaceColor,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -258,7 +258,7 @@ class _ProveedorCard extends StatelessWidget {
               value: 'delete',
               child: Row(
                 children: [
-                  const Icon(Icons.delete, size: 16, color: Colors.red),
+                  const Icon(Icons.delete, size: 16, color: DesignTokens.errorColor),
                   const SizedBox(width: 8),
                   Text('Eliminar', style: TextStyle(color: DesignTokens.errorColor)),
                 ],
@@ -337,7 +337,7 @@ class ProveedorSearchDelegate extends SearchDelegate {
             child: Text(
               proveedor.nombre[0].toUpperCase(),
               style: const TextStyle(
-                color: Colors.white,
+                color: DesignTokens.surfaceColor,
                 fontWeight: FontWeight.bold,
               ),
             ),

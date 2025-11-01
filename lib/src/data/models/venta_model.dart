@@ -113,38 +113,68 @@ class DetalleVenta {
 
 class VentaListResponse {
   final int ventaId;
+  final int clienteId;
   final String clienteNombre;
+  final int usuarioId;
+  final String usuarioNombre;
+  final String metodoPago;
   final DateTime fechaVenta;
   final double total;
-  final String estado;
+  final String? observaciones;
+  final bool activo;
+  final int totalItems;
 
   const VentaListResponse({
     required this.ventaId,
+    required this.clienteId,
     required this.clienteNombre,
+    required this.usuarioId,
+    required this.usuarioNombre,
+    required this.metodoPago,
     required this.fechaVenta,
     required this.total,
-    required this.estado,
+    this.observaciones,
+    required this.activo,
+    required this.totalItems,
   });
 
   factory VentaListResponse.fromJson(Map<String, dynamic> json) {
     return VentaListResponse(
-      ventaId: json['ventaId'] ?? 0,
-      clienteNombre: json['clienteNombre'] ?? '',
-      fechaVenta: DateTime.parse(json['fechaVenta'] ?? DateTime.now().toIso8601String()),
-      total: (json['total'] ?? 0.0).toDouble(),
-      estado: json['estado'] ?? '',
+      ventaId: json['ventaId'] ?? json['VentaId'] ?? 0,
+      clienteId: json['clienteId'] ?? json['ClienteId'] ?? 0,
+      clienteNombre: json['clienteNombre'] ?? json['ClienteNombre'] ?? '',
+      usuarioId: json['usuarioId'] ?? json['UsuarioId'] ?? 0,
+      usuarioNombre: json['usuarioNombre'] ?? json['UsuarioNombre'] ?? '',
+      metodoPago: json['metodoPago'] ?? json['MetodoPago'] ?? '',
+      fechaVenta: json['fechaVenta'] != null
+          ? DateTime.parse(json['fechaVenta'])
+          : json['Fecha'] != null
+              ? DateTime.parse(json['Fecha'])
+              : DateTime.now(),
+      total: ((json['total'] ?? json['Total']) ?? 0.0).toDouble(),
+      observaciones: json['observaciones'] ?? json['Observaciones'],
+      activo: json['activo'] ?? json['Activo'] ?? true,
+      totalItems: json['totalItems'] ?? json['TotalItems'] ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'ventaId': ventaId,
+      'clienteId': clienteId,
       'clienteNombre': clienteNombre,
+      'usuarioId': usuarioId,
+      'usuarioNombre': usuarioNombre,
+      'metodoPago': metodoPago,
       'fechaVenta': fechaVenta.toIso8601String(),
       'total': total,
-      'estado': estado,
+      'observaciones': observaciones,
+      'activo': activo,
+      'totalItems': totalItems,
     };
   }
+
+  String get estado => activo ? 'Activa' : 'Anulada';
 
   String get fechaFormateada {
     return '${fechaVenta.day.toString().padLeft(2, '0')}/'

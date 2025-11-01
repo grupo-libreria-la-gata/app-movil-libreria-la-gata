@@ -40,7 +40,7 @@ class _PurchasesPageState extends ConsumerState<PurchasesPage> {
 
   void _mostrarError(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: Colors.red),
+      SnackBar(content: Text(mensaje), backgroundColor: DesignTokens.errorColor),
     );
   }
 
@@ -50,7 +50,7 @@ class _PurchasesPageState extends ConsumerState<PurchasesPage> {
       appBar: AppBar(
         title: const Text('Purchase History'),
         backgroundColor: DesignTokens.primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: DesignTokens.textInverseColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -100,7 +100,7 @@ class _PurchasesPageState extends ConsumerState<PurchasesPage> {
                         Icon(
                           Icons.shopping_cart_outlined,
                           size: 64,
-                          color: Colors.grey,
+                          color: DesignTokens.textSecondaryColor,
                         ),
                         SizedBox(height: 16),
                         Text(
@@ -121,10 +121,10 @@ class _PurchasesPageState extends ConsumerState<PurchasesPage> {
                         ),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: DesignTokens.infoColor,
                             child: const Icon(
                               Icons.shopping_cart,
-                              color: Colors.white,
+                              color: DesignTokens.textInverseColor,
                             ),
                           ),
                           title: Text(
@@ -149,15 +149,15 @@ class _PurchasesPageState extends ConsumerState<PurchasesPage> {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: Colors.blue,
+                                  color: DesignTokens.infoColor,
                                 ),
                               ),
                               Text(
                                 compra.estado,
                                 style: TextStyle(
                                   color: compra.estado.toLowerCase() == 'completada' 
-                                      ? Colors.green
-                                      : Colors.orange,
+                                      ? DesignTokens.successColor
+                                      : DesignTokens.warningColor,
                                   fontSize: 12,
                                 ),
                               ),

@@ -2,9 +2,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/compra_model.dart';
 import '../models/request_models.dart';
+import '../../config/app_config.dart';
 
 class CompraService {
-  final String baseUrl = 'http://localhost:5044/api/Compras';
+  String get baseUrl => '${AppConfig.baseUrl}/api/Compras';
 
   /// Obtener todas las compras
   Future<List<CompraListResponse>> obtenerTodas(int usuarioId) async {
@@ -94,5 +95,42 @@ class CompraService {
   /// Validar detalles
   bool validarDetalles(List<CrearCompraDetalleRequest> detalles) {
     return detalles.isNotEmpty && detalles.every((d) => d.cantidad > 0 && d.precioUnitario > 0);
+  }
+
+  /// Obtener resumen de compras por período
+  Future<Map<String, dynamic>> obtenerResumen(
+    DateTime fechaInicio,
+    DateTime fechaFin,
+    int usuarioId,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/resumen?fechaInicio=${fechaInicio.toIso8601String()}&fechaFin=${fechaFin.toIso8601String()}&usuarioId=$usuarioId',
+    );
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('Error al obtener resumen de compras: ${response.body}');
+    }
+  }
+
+  /// Obtener top productos comprados
+  Future<List<Map<String, dynamic>>> obtenerTopProductos(
+    DateTime fechaInicio,
+    DateTime fechaFin,
+    int usuarioId,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/top-productos?fechaInicio=${fechaInicio.toIso8601String()}&fechaFin=${fechaFin.toIso8601String()}&usuarioId=$usuarioId',
+    );
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => json as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Error al obtener top productos: ${response.body}');
+    }
   }
 }
